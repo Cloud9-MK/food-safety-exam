@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>コストコ フードセーフティー 模擬試験 Level 2 — Vol.4</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Barlow+Condensed:wght@500;600;700;800&display=swap');
+  :root {
+    --bg:#0B0B0F;--card:#131318;--border:#222228;
+    --red:#C0392B;--accent:#FF6B6B;--gold:#F39C12;
+    --text:#EBEBEB;--muted:#6C6C7A;
+    --correct:#27AE60;--wrong:#C0392B;--selected:#1A5276;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;}
+  #header{background:linear-gradient(135deg,#7B241C 0%,#C0392B 100%);padding:13px 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 3px 20px rgba(0,0,0,.6);border-bottom:2px solid var(--accent);}
+  #header h1{font-family:'Barlow Condensed',sans-serif;font-size:1.55rem;letter-spacing:3px;color:#fff;font-weight:800;}
+  .hd-sub{font-size:.62rem;color:rgba(255,255,255,.65);letter-spacing:2px;margin-bottom:2px;}
+  .vol-badge{background:var(--gold);color:#111;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:800;padding:3px 10px;border-radius:4px;letter-spacing:2px;margin-left:10px;}
+  #progress-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+  #progress-text{font-size:.78rem;color:rgba(255,255,255,.85);}
+  #progress-bar-outer{width:180px;height:5px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;}
+  #progress-bar-inner{height:100%;width:0%;background:var(--accent);border-radius:3px;transition:width .4s;}
+  #start-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90vh;padding:40px 20px;text-align:center;}
+  .vol-label{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:5px;color:var(--accent);margin-bottom:14px;}
+  .big-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2.8rem,7vw,4.8rem);color:#fff;letter-spacing:3px;line-height:1.1;margin-bottom:8px;font-weight:800;}
+  .big-title span{color:var(--accent);}
+  .big-sub{font-size:.82rem;color:var(--muted);letter-spacing:2px;margin-bottom:40px;}
+  .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:480px;margin-bottom:40px;}
+  .info-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+  .info-card .num{font-family:'Barlow Condensed',sans-serif;font-size:2.4rem;color:var(--accent);line-height:1;font-weight:700;}
+  .info-card .label{font-size:.68rem;color:var(--muted);margin-top:4px;}
+  .start-btn{background:var(--red);color:#fff;border:1px solid var(--accent);padding:16px 56px;font-size:1rem;font-family:'Noto Sans JP',sans-serif;font-weight:700;border-radius:8px;cursor:pointer;letter-spacing:2px;transition:all .15s;box-shadow:0 4px 20px rgba(192,57,43,.45);}
+  .start-btn:hover{background:#922B21;transform:translateY(-2px);}
+  #quiz-screen{display:none;padding:28px 20px;max-width:820px;margin:0 auto;}
+  .q-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  .q-num{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;color:var(--gold);letter-spacing:2px;font-weight:700;}
+  .q-category{font-size:.67rem;background:var(--border);color:var(--muted);padding:4px 12px;border-radius:20px;letter-spacing:1px;}
+  .q-text{font-size:1rem;line-height:1.85;font-weight:500;margin-bottom:24px;padding:22px;background:var(--card);border:1px solid var(--border);border-radius:12px;border-left:4px solid var(--accent);}
+  .options{display:flex;flex-direction:column;gap:11px;}
+  .option{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:15px 18px;cursor:pointer;display:flex;align-items:flex-start;gap:12px;transition:border-color .15s,background .15s,transform .1s;font-size:.93rem;line-height:1.65;}
+  .option:hover:not(.disabled){border-color:#444;background:#181818;transform:translateX(4px);}
+  .opt-letter{min-width:27px;height:27px;background:var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--muted);flex-shrink:0;transition:background .15s,color .15s;margin-top:1px;}
+  .option.selected{border-color:var(--selected);background:rgba(26,82,118,.18);}
+  .option.selected .opt-letter{background:var(--selected);color:#fff;}
+  .option.correct{border-color:var(--correct);background:rgba(39,174,96,.1);}
+  .option.correct .opt-letter{background:var(--correct);color:#fff;}
+  .option.wrong{border-color:var(--wrong);background:rgba(192,57,43,.1);}
+  .option.wrong .opt-letter{background:var(--wrong);color:#fff;}
+  .option.disabled{cursor:default;}
+  .explanation{display:none;margin-top:18px;padding:18px 20px;background:#0a1a0e;border:1px solid var(--correct);border-radius:10px;font-size:.88rem;line-height:1.85;color:#c0e8cc;}
+  .explanation.wrong-exp{background:#1a0a0a;border-color:var(--wrong);color:#f0c0c0;}
+  .explanation .exp-title{font-weight:700;margin-bottom:8px;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;}
+  .nav-row{display:flex;justify-content:flex-end;gap:10px;margin-top:26px;}
+  .nav-btn{padding:11px 28px;border:none;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all .15s;}
+  .nav-btn.primary{background:var(--red);color:#fff;border:1px solid var(--accent);}
+  .nav-btn.primary:hover{background:#922B21;}
+  .nav-btn.secondary{background:var(--border);color:var(--text);border:none;}
+  .nav-btn.secondary:hover{background:#2c2c30;}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  #result-screen{display:none;padding:50px 20px;max-width:680px;margin:0 auto;text-align:center;}
+  .score-ring{width:190px;height:190px;margin:0 auto 28px;position:relative;}
+  .score-ring svg{transform:rotate(-90deg);}
+  .score-ring .score-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+  .score-pct{font-family:'Barlow Condensed',sans-serif;font-size:3rem;line-height:1;color:var(--text);font-weight:700;}
+  .score-label{font-size:.65rem;color:var(--muted);letter-spacing:1px;}
+  .result-title{font-family:'Barlow Condensed',sans-serif;font-size:2.3rem;letter-spacing:3px;margin-bottom:8px;font-weight:800;}
+  .result-msg{color:var(--muted);margin-bottom:28px;line-height:1.8;white-space:pre-line;}
+  .result-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+  .stat-card .snum{font-family:'Barlow Condensed',sans-serif;font-size:2rem;line-height:1;font-weight:700;}
+  .stat-card .slabel{font-size:.68rem;color:var(--muted);margin-top:4px;}
+  .retry-btn{background:var(--red);color:#fff;border:1px solid var(--accent);padding:14px 44px;font-size:.95rem;font-weight:700;border-radius:8px;cursor:pointer;letter-spacing:2px;transition:all .15s;margin:8px;}
+  .retry-btn:hover{background:#922B21;}
+  .review-section{text-align:left;margin-top:44px;}
+  .review-title{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--gold);margin-bottom:18px;font-weight:700;}
+  .review-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:10px;}
+  .review-item.r-wrong{border-color:rgba(192,57,43,.38);}
+  .review-item.r-correct{border-color:rgba(39,174,96,.22);}
+  .review-q{font-size:.88rem;margin-bottom:10px;line-height:1.6;}
+  .ra-label{color:var(--muted);font-size:.72rem;margin-bottom:3px;}
+  .ra-correct{color:var(--correct);font-weight:500;}
+  .ra-wrong{color:var(--wrong);}
+</style>
+</head>
+<body>
+<div id="header">
+  <div>
+    <div class="hd-sub">COSTCO WHOLESALE JAPAN</div>
+    <h1>FOOD SAFETY EXAM <span class="vol-badge">VOL.4</span></h1>
+  </div>
+  <div id="progress-wrap">
+    <span id="progress-text">0 / 100</span>
+    <div id="progress-bar-outer"><div id="progress-bar-inner"></div></div>
+  </div>
+</div>
+
+<div id="start-screen">
+  <div class="vol-label">VOLUME 4 — ADVANCED VARIETY</div>
+  <div class="big-title">模擬試験<br><span>第4弾</span></div>
+  <div class="big-sub">Food Safety Training Level 2 / 一般衛生管理プログラム</div>
+  <div class="info-grid">
+    <div class="info-card"><div class="num">100</div><div class="label">問題数</div></div>
+    <div class="info-card"><div class="num">4-5</div><div class="label">択問題</div></div>
+    <div class="info-card"><div class="num">85</div><div class="label">合格点</div></div>
+  </div>
+  <button class="start-btn" onclick="startExam()">試験開始</button>
+</div>
+
+<div id="quiz-screen">
+  <div class="q-meta">
+    <span class="q-num" id="q-num-label">問題 1 / 100</span>
+    <span class="q-category" id="q-category"></span>
+  </div>
+  <div class="q-text" id="q-text"></div>
+  <div class="options" id="options-container"></div>
+  <div class="explanation" id="explanation"></div>
+  <div class="nav-row">
+    <button class="nav-btn secondary" id="prev-btn" onclick="prevQ()">◀ 前へ</button>
+    <button class="nav-btn primary" id="next-btn" onclick="nextQ()">次へ ▶</button>
+    <button class="nav-btn primary" id="submit-btn" onclick="submitExam()" style="display:none">結果を見る</button>
+  </div>
+</div>
+
+<div id="result-screen">
+  <div class="score-ring">
+    <svg width="190" height="190" viewBox="0 0 190 190">
+      <circle cx="95" cy="95" r="80" fill="none" stroke="#222228" stroke-width="13"/>
+      <circle id="score-arc" cx="95" cy="95" r="80" fill="none" stroke="#C0392B" stroke-width="13"
+        stroke-linecap="round" stroke-dasharray="503" stroke-dashoffset="503"/>
+    </svg>
+    <div class="score-text">
+      <div class="score-pct" id="score-pct">0</div>
+      <div class="score-label">点</div>
+    </div>
+  </div>
+  <div class="result-title" id="result-title">—</div>
+  <div class="result-msg" id="result-msg"></div>
+  <div class="result-stats">
+    <div class="stat-card"><div class="snum" id="r-correct" style="color:var(--correct)">0</div><div class="slabel">正解</div></div>
+    <div class="stat-card"><div class="snum" id="r-wrong" style="color:var(--wrong)">0</div><div class="slabel">不正解</div></div>
+    <div class="stat-card"><div class="snum" id="r-unanswered" style="color:var(--gold)">0</div><div class="slabel">未回答</div></div>
+  </div>
+  <button class="retry-btn" onclick="retryExam()">もう一度挑戦</button>
+  <button class="retry-btn" style="background:var(--border);color:var(--text);border-color:var(--border)" onclick="showReview()">間違いを確認</button>
+  <div class="review-section" id="review-section" style="display:none"></div>
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+
+// ── 1. 穴埋め形式 ──────────────────────────────
+{cat:"穴埋め", q:"「危険温度区域とは（　A　）°C〜（　B　）°Cの範囲を指す」A・Bの正しい組み合わせはどれか？",
+ opts:["A=4、B=60","A=0、B=40","A=5、B=65","A=10、B=70"],
+ ans:0, exp:"危険温度区域は4°C（40°F）〜60°C（140°F）です。この範囲でバクテリアが急速に増殖します。"},
+
+{cat:"穴埋め", q:"「冷凍食品は（　　）°C以下で保管しなければならない」空欄に入る数値として正しいものはどれか？",
+ opts:["−10","−25","−18","-5"],
+ ans:2, exp:"冷凍食品は−18°C（0°F）以下で保管しなければなりません。"},
+
+{cat:"穴埋め", q:"「コストコでは塩素系サニタイザーは（　　）ppmで（　　）分間浸漬する」正しい組み合わせはどれか？",
+ opts:["100 ppm・3分","50 ppm・10分","200 ppm・5分","500 ppm・1分"],
+ ans:2, exp:"コストコが定める塩素系サニタイザーの消毒条件は200 ppmで5分間浸漬です（PRP 10条）。"},
+
+{cat:"穴埋め", q:"「加熱調理後の食品の冷却は（　A　）分以内に20°C以下、かつ（　B　）分以内に10°C以下にする」A・Bの正しい組み合わせはどれか？",
+ opts:["A=60、B=120","A=20、B=40","A=45、B=90","A=30、B=60"],
+ ans:3, exp:"冷却は30分以内に20°C以下、かつ60分以内に10°C以下にする必要があります（大量調理施設衛生管理マニュアル・PRP 08条 Q）。"},
+
+{cat:"穴埋め", q:"「手洗いはハンドソープをつけてから（　　）秒間洗わなければならない」正しい秒数はどれか？",
+ opts:["10秒","60秒","30秒","20秒"],
+ ans:2, exp:"コストコではハンドソープをつけてから非接触式タイマーで最低30秒間手を洗います（PRP 02条 C）。"},
+
+{cat:"穴埋め", q:"「受領した温度管理が必要な食品は（　　）分以内に適切な保管庫へ移動させる」正しいものはどれか？",
+ opts:["10分","30分","20分","60分"],
+ ans:2, exp:"温度管理が必要な食品は受領後20分以内に既定の温度帯の保管庫へ移動させなければなりません（PRP 06条）。"},
+
+{cat:"穴埋め", q:"「再加熱は中心温度（　　）°C以上を（　　）秒以上保持し、再加熱開始から（　　）時間以内に完了する」正しい組み合わせはどれか？",
+ opts:["63°C・30秒・1時間","80°C・14秒・1時間","85°C・90秒・3時間","74°C・15秒・2時間"],
+ ans:3, exp:"再加熱の基準は中心温度74°C以上・15秒以上保持・再加熱開始から2時間以内の完了です（PRP 08条 Q）。"},
+
+{cat:"穴埋め", q:"「冷蔵庫・冷凍庫の温度は（　　）時間ごとにTemp Check Walk Logに記録する」正しいものはどれか？",
+ opts:["4時間","8時間","1時間","2時間"],
+ ans:3, exp:"全ての冷蔵庫・冷凍庫は2時間ごとに温度を点検し記録します（PRP 10条）。"},
+
+{cat:"穴埋め", q:"「食品安全トレーニングLevel 2に合格するには（　　）点以上のスコアが必要」正しいものはどれか？",
+ opts:["85点","70点","80点","75点"],
+ ans:0, exp:"Food Safety Training Level 2の合格ラインは85点以上です（PRP 05条）。"},
+
+{cat:"穴埋め", q:"「包丁殺菌庫の紫外線灯は最低でも（　　）か月に1度交換する」正しいものはどれか？",
+ opts:["6か月","3か月","24か月","12か月"],
+ ans:0, exp:"包丁殺菌庫の殺菌紫外線灯は最低6か月に1度交換しなければなりません（PRP 10条 N）。"},
+
+// ── 2. 「誤っているものを選べ」形式 ──────────
+{cat:"誤り選択", q:"FATTOMの6因子について正しく説明しているものを選べ。次のうち誤っているものはどれか？",
+ opts:["F（Food）：バクテリアは増殖に栄養を必要とする","O（Oxygen）：全てのバクテリアは酸素を必要とする","T（Temperature）：バクテリアは4〜60°Cで増殖が活発","A（Acidity）：バクテリアはpH4.6〜7.5の食品を好む"],
+ ans:1, exp:"Oのポイントは「酸素の有無」への適応性です。偏性嫌気性細菌は酸素がない環境でのみ増殖できるため、「全てのバクテリアが酸素を必要とする」は誤りです。"},
+
+{cat:"誤り選択", q:"手洗いの正しい手順として誤っているものはどれか？",
+ opts:["使い捨てペーパータオルで水分を拭き取る","流温水で手を濡らす","洗い終わったらエプロンで水分を拭き取る","ハンドソープをつけて30秒間洗う"],
+ ans:2, exp:"エプロンや作業着で手を拭くことは再汚染の原因となるため禁止です。必ず使い捨てペーパータオルを使用します（PRP 02条）。"},
+
+{cat:"誤り選択", q:"リステリア菌の特徴として誤っているものはどれか？",
+ opts:["4°C以下でも増殖できる","芽胞を形成する","生ハムやスモークサーモンが主なPHF","潜伏期間が1日〜10週間と非常に長い"],
+ ans:1, exp:"リステリア菌は芽胞を形成しません。芽胞形成菌はボツリヌス菌・ウェルシュ菌・セレウス菌などです。"},
+
+{cat:"誤り選択", q:"食品の正しい保管温度の組み合わせとして誤っているものはどれか？",
+ opts:["常温食品：10〜21°C","冷凍食品：−18°C以下","温かい食品のホールド：50°C以上","冷蔵食品：4°C以下"],
+ ans:2, exp:"温かい食品のホールドは60°C（140°F）以上が必要です。50°Cは危険温度区域（4〜60°C）内となり、バクテリアの増殖リスクがあります。"},
+
+{cat:"誤り選択", q:"コストコのエプロン色分けルールについて誤っているものはどれか？",
+ opts:["D88：黄エプロン＝商品製造（調理中）の取扱い","D63：白エプロン＝加熱調理済み食品の取扱い","D61：青エプロン＝生の鶏肉の取扱い","D61：赤エプロン＝加熱調理済み食品の取扱い"],
+ ans:0, exp:"D88（フードコート）の黄エプロンはサニテーション・清掃作業時に使用します。商品製造（調理中）は白エプロンです（PRP 04条 H）。"},
+
+{cat:"誤り選択", q:"ノロウイルスに関して誤っているものはどれか？",
+ opts:["食品中では増殖できず、ヒトの腸管のみで増殖する","二次感染が起きやすい","加熱調理（85°C/90秒）では死滅しない","エタノール（アルコール）消毒に耐性がある"],
+ ans:2, exp:"ノロウイルスは85°C以上・90秒以上の加熱で死滅します。「加熱で死滅しない」は誤りです。ただしアルコール消毒には耐性があります。"},
+
+{cat:"誤り選択", q:"清掃の5段階について誤っているものはどれか？",
+ opts:["第5段階：自然乾燥（空気乾燥）させる","第3段階：消毒してから流水ですすぐ","第1段階：大まかな汚れ・食品残渣を除去する","第2段階：適切な洗剤で洗う"],
+ ans:1, exp:"正しい順番は①汚れ除去→②洗剤で洗う→③流水ですすぐ→④消毒する→⑤自然乾燥です。「消毒してからすすぐ」は誤りで、消毒は残留させます（PRP 10条）。"},
+
+{cat:"誤り選択", q:"PHF（潜在的に危険な食品）に関して誤っているものはどれか？",
+ opts:["加熱済みの豆類はPHFに該当する","加熱不十分な鶏肉はPHFに該当する","カットメロンはPHFに該当する","水分活性0.60以下の食品はPHFに該当する"],
+ ans:3, exp:"水分活性0.60以下の食品（乾燥食品・高塩分食品など）はバクテリアが増殖できないためPHFには該当しません。PHFの水分活性基準は0.85以上です。"},
+
+{cat:"誤り選択", q:"記録管理について誤っているものはどれか？",
+ opts:["記録には永久インクのボールペンを使用する","フリクションボールペンは使用できる","記録の保管期間の記載がない場合は最低1年間保管する","訂正は二重線で消し正しい内容を記載する"],
+ ans:1, exp:"フリクションボールペン（摩擦で消えるペン）は容易に内容を改ざんできるため使用禁止です。鉛筆・シャープペンも同様に禁止（PRP 15条 B）。"},
+
+{cat:"誤り選択", q:"HACCPの7原則について誤っているものはどれか？",
+ opts:["原則2：重要管理点（CCP）の決定","原則4：製品説明書の作成","原則1：危害分析","原則3：管理基準（CL）の設定"],
+ ans:1, exp:"原則4はモニタリング方法の設定です。製品説明書の作成はHACCPの7原則ではなく「12手順」の準備段階（手順2）に含まれます。"},
+
+// ── 3. シナリオ／事例問題 ─────────────────────
+{cat:"事例問題", q:"鮮魚部門の担当者が、朝の作業開始時に冷蔵庫の温度が8°Cであることに気づいた。正しい対応の順序はどれか？",
+ opts:["温度を記録し、管理職に報告・食品の状態を確認しながら原因を調査・必要に応じて食品を廃棄または別の冷蔵庫へ移動する","冷蔵庫の電源を切り再起動すれば問題ない","温度計を交換してもう一度測定するだけでよい","そのまま作業を継続し、夜に上司へ報告する"],
+ ans:0, exp:"冷蔵庫温度の逸脱（4°Cを超えた場合）は温度記録・管理職への報告・食品の安全確認・原因調査・必要に応じた廃棄または別庫への移動が正しい対応です。"},
+
+{cat:"事例問題", q:"デリ部門の従業員が手の傷口に絆創膏を貼って製造作業をしていた。管理監督者がとるべき対応として正しいものはどれか？",
+ opts:["絆創膏の上から使い捨て手袋を着用するよう指示し、絆創膏の脱落がないか定期的に確認する","化膿していなければ絆創膏なしでも問題ない","絆創膏で傷口が覆われているので問題ない","その従業員を即日解雇する"],
+ ans:0, exp:"絆創膏を貼った上から使い捨て手袋を着用し、脱落がないか定期的に確認することが正しい対応です。化膿創には黄色ブドウ球菌が存在することがあります（PRP 03条 H）。"},
+
+{cat:"事例問題", q:"フードコートの従業員が調理中に体調不良（腹痛・下痢）を訴えた。管理監督者の正しい対応はどれか？",
+ opts:["軽症なら休憩をとらせて作業を継続させる","マスクを着用させて継続させる","直ちに食品取扱業務から外し、管理職に報告・必要に応じて医療機関を受診させる","2時間様子を見て判断する"],
+ ans:2, exp:"下痢・嘔吐等の症状がある従業員は直ちに食品取扱業務から外し、管理職に報告・必要に応じて医療機関受診の手配をしなければなりません（PRP 03条 I）。"},
+
+{cat:"事例問題", q:"倉庫で殺虫剤の容器が転倒し、近くにあった食品の包装に殺虫剤がかかってしまった。正しい対応はどれか？",
+ opts:["少量なので無視してよい","殺虫剤が付着した食品・包装材は廃棄し、本社フードセーフティー部門に報告する","外包装を交換すれば使用できる","外側を拭けば食品は使用できる"],
+ ans:1, exp:"化学薬品による汚染が疑われる食品・包装材はすべて廃棄しなければなりません（PRP 07条 H・09条）。"},
+
+{cat:"事例問題", q:"受領担当者が冷凍食品を受け取ったところ、製品の外箱に液体が染み出ており一部が解凍されているように見えた。正しい対応はどれか？",
+ opts:["早急に冷凍庫に入れれば問題ない","バイヤーに連絡し、受領拒否の判断を仰ぐ","自己判断で廃棄する","とりあえず受領し後で報告する"],
+ ans:1, exp:"温度逸脱・品質不良が疑われる受領品は、自己判断で廃棄または受領するのではなく、バイヤーに連絡して受領拒否または廃棄の指示を求めます（PRP 06条 E-a）。"},
+
+{cat:"事例問題", q:"デイリーインスペクション中に、3槽シンクの消毒槽のサニタイザー濃度が100 ppmしかないことが分かった。正しい対応はどれか？",
+ opts:["翌日交換すればよい","100 ppmでも問題ない","濃度が低い状態でも5分以上浸漬すれば問題ない","消毒槽のサニタイザーをただちに交換または追加し、200 ppm以上にしてから使用を再開する"],
+ ans:3, exp:"消毒槽のサニタイザー濃度は200 ppm以上を維持しなければなりません。規定濃度を下回った場合は直ちに交換・補充が必要です（PRP 10条 H）。"},
+
+{cat:"事例問題", q:"ミート部門でT&H対象のカットレタスを検査完了前に誤ってサラダの製造に使用してしまった。正しい対応はどれか？",
+ opts:["販売を続けて消費者に注意喚起するだけでよい","販売済みの商品はリコール回収・未販売品は販売停止とし、本社フードセーフティー部門に報告する","廃棄するだけでよい","販売前であれば問題ない"],
+ ans:1, exp:"T&H未完了品・不合格品を使用したRTE製品は販売済みはリコール回収・未販売品は販売停止とし、本社フードセーフティー部門に報告しなければなりません（PRP 08条 K）。"},
+
+{cat:"事例問題", q:"夜間、製造場の床でネズミの糞と思われるものを発見した。正しい初動対応はどれか？",
+ opts:["市販の殺鼠剤を配置する","翌日の開店前に清掃すれば問題ない","自分で片付けて次の日に上司に報告する","発見状況を記録し、管理職に即報告・委託業者（イカリ消毒）へ連絡・汚染可能性がある食品を確認する"],
+ ans:3, exp:"ペスト発見時は発見状況を記録し管理職に即報告、委託業者（イカリ消毒）への連絡、汚染可能性がある食品の確認・必要に応じた廃棄が必要です（PRP 12条）。"},
+
+{cat:"事例問題", q:"鮮魚の刺身を製造中、使用したまな板が生ガキの取扱いに使用されていたことが分かった。正しい対応はどれか？",
+ opts:["気にしなくてよい","まな板を直ちに洗浄・消毒し、すでに製造した刺身の安全性を管理職と確認する","洗えばそのまま使用できる","消毒液を噴霧するだけでよい"],
+ ans:1, exp:"異なる食材間でのまな板の混用は交差汚染のリスクがあります。直ちに洗浄・消毒し、製造済み食品の安全性を確認しなければなりません（PRP 08条 O）。"},
+
+{cat:"事例問題", q:"フードコートの従業員が使い捨て手袋をはめたままトイレに行き、戻ってきてそのまま調理を再開しようとしていた。管理監督者の対応として正しいものはどれか？",
+ opts:["手袋をしていたので問題ない","本人の判断に任せる","アルコール消毒を手袋の上からすれば問題ない","直ちに手袋を外して手洗いをするよう指示し、新しい手袋に交換させる"],
+ ans:3, exp:"トイレに行った後は手袋を外して手洗い・新しい手袋への交換が必須です。使い捨て手袋はトイレ後の汚染を防ぐことができません（PRP 02条・04条）。"},
+
+// ── 4. 数値の正誤・比較問題 ──────────────────
+{cat:"数値・比較", q:"次の加熱温度・時間の組み合わせのうち、厚生労働省が定める63°C/30分相当の殺菌効率として正しいものはどれか？",
+ opts:["80°C / 14秒","75°C / 1分（コストコ基準）","84°C / 4秒","70°C / 3分"],
+ ans:1, exp:"75°C/1分、80°C/14秒、84°C/4秒はいずれも63°C/30分と同等以上の殺菌効果があります。コストコでは75°C/1分を基準の一つとしています。"},
+
+{cat:"数値・比較", q:"次の温度のうち病原性バクテリアの増殖に最も適した温度はどれか？",
+ opts:["37°C","60°C","4°C","20°C"],
+ ans:0, exp:"病原性バクテリアの最適増殖温度は37°C（体温付近）です。ヒトの体温に近いほど増殖が活発になります。"},
+
+{cat:"数値・比較", q:"次の潜伏時間のうち最も短いものはどれか？",
+ opts:["A型肝炎ウイルス（15〜50日）","黄色ブドウ球菌（1〜6時間）","リステリア菌（1日〜10週間）","ボツリヌス菌（12〜36時間）"],
+ ans:1, exp:"黄色ブドウ球菌の潜伏時間は1〜6時間で、記載の中で最も短いです。食品中の毒素を摂取して発症するため発症が速いのが特徴です。"},
+
+{cat:"数値・比較", q:"二枚貝の加熱殺菌基準と他の食肉・鮮魚の加熱殺菌基準の違いとして正しいものはどれか？",
+ opts:["すべて85°C/90秒が必要","二枚貝も他の食肉・鮮魚も同じ63°C/30分","二枚貝のみ85〜90°C/90秒が必要。他の食肉・鮮魚は63°C/30分相当","二枚貝は75°C/1分、他は63°C/30分"],
+ ans:2, exp:"二枚貝（カキ・ハマグリ等）は85〜90°C/90秒以上の加熱が必要です。他の食肉・鮮魚・巻貝は63°C/30分相当で異なります（PRP 08条 R）。"},
+
+{cat:"数値・比較", q:"次の消毒方法のうち浸漬時間が最も短いものはどれか？",
+ opts:["4級アンモニウム（50 ppm）：30秒","塩素系（200 ppm）：5分","熱湯（77°C以上）：30秒","ヨウ素（125〜250 ppm）：30秒"],
+ ans:0, exp:"4級アンモニウム（50 ppm）とヨウ素（125〜250 ppm）は最低30秒です。熱湯（77°C/30秒）も同じですが、塩素系の5分間が最長です。"},
+
+{cat:"数値・比較", q:"「病原性バクテリアが増殖を開始する水分活性（Aw）の下限値」として正しいものはどれか？",
+ opts:["0.95","0.75","0.60","0.85"],
+ ans:3, exp:"病原性バクテリアが増殖を開始するために必要な水分活性は0.85以上です（酵母は0.75以上、カビは0.60以上から増殖可能）。"},
+
+{cat:"数値・比較", q:"次のうち「食品の常温保管温度帯」として正しいものはどれか？",
+ opts:["10〜21°C（50〜70°F）","15〜25°C","5〜15°C","20〜30°C"],
+ ans:0, exp:"常温保管が可能な食品は換気の良い場所で10〜21°C（50〜70°F）で保管します（PRP 07条 C）。"},
+
+{cat:"数値・比較", q:"コストコでフードコートのダイスタマネギが使用できる最長時間として正しいものはどれか？",
+ opts:["4時間","6時間","8時間","2時間"],
+ ans:1, exp:"フードコートのトッピング用ダイスタマネギは微生物検査の結果により最長でも6時間までしか使用できません（PRP 08条 K-d）。"},
+
+{cat:"数値・比較", q:"腸内細菌PCR検査の対象となる菌の組み合わせとして正しいものはどれか？",
+ opts:["赤痢・サルモネラ属菌・腸管出血性大腸菌O-157","黄色ブドウ球菌・ボツリヌス菌・リステリア菌","ノロウイルス・A型肝炎・カンピロバクター","ウェルシュ菌・セレウス菌・腸炎ビブリオ菌"],
+ ans:0, exp:"コストコフレッシュ部門の全従業員が月1回受ける腸内細菌PCR検査の対象は赤痢・サルモネラ属菌・腸管出血性大腸菌O-157の3種類です（PRP 03条 J）。"},
+
+{cat:"数値・比較", q:"Food Safety Training Level 1とLevel 2の受講頻度の正しい組み合わせはどれか？",
+ opts:["Level 1：2年に1回、Level 2：5年に1回","Level 1：6か月に1回、Level 2：毎年","Level 1：1年に1回（全従業員）、Level 2：3年に1回（管理職）","Level 1・2ともに毎年"],
+ ans:2, exp:"Level 1は全従業員が1年に1回、Level 2は管理職（管理監督者）が3年に1回受講・合格が必要です（PRP 05条 A）。"},
+
+// ── 5. 原因と結果の関係問題 ──────────────────
+{cat:"原因と結果", q:"「真空パック食品の中でボツリヌス菌が増殖しやすい理由」として正しいものはどれか？",
+ opts:["ボツリヌス菌は偏性嫌気性細菌であり、酸素のない真空状態がまさに増殖に最適な環境だから","真空パックは殺菌処理されていないから","真空パックは高温になるため","真空パックは水分活性が高いから"],
+ ans:0, exp:"ボツリヌス菌は偏性嫌気性細菌（酸素がない環境でのみ増殖）です。真空パックは酸素がないためボツリヌス菌の増殖環境として特に危険です。"},
+
+{cat:"原因と結果", q:"「大量調理のカレーや煮込み料理でウェルシュ菌中毒が起きやすい理由」として正しいものはどれか？",
+ opts:["鍋の深部は酸素が少なく高温保持で芽胞が活性化し、冷却が不十分だと急増するから","調理時間が長いとバクテリアが増えるから","カレースパイスがバクテリアを活性化させるから","煮込み料理は水分が多いから"],
+ ans:0, exp:"鍋の深部は嫌気状態になりやすくウェルシュ菌（偏性嫌気性）に最適。加熱で芽胞が活性化し、冷却不足（危険温度区域の長時間滞在）で急増します。"},
+
+{cat:"原因と結果", q:"「まな板・包丁の色分け管理をする目的」として正しいものはどれか？",
+ opts:["生食品と加熱済み食品の二次汚染（交差汚染）を防ぐため","部門の識別を容易にするため","在庫管理を容易にするため","衛生検査官へのアピールのため"],
+ ans:0, exp:"まな板・包丁の色分けは生鶏肉・生牛肉・魚・加熱済み食品などを使い分けることで交差汚染（二次汚染）を防ぐためです。"},
+
+{cat:"原因と結果", q:"「FIFOを徹底する理由」として正しいものはどれか？",
+ opts:["コスト削減のみを目的とするため","在庫数の把握を容易にするため","新しい食品を先に使うことで鮮度を保つため","古い在庫を優先して使用することで期限切れによる廃棄ロスを防ぎ、品質・安全性を確保するため"],
+ ans:3, exp:"FIFOは古い（賞味期限・消費期限が近い）食品を優先して使用することで、期限切れによる廃棄ロスを防ぎ品質と安全性を確保するための管理手法です。"},
+
+{cat:"原因と結果", q:"「手洗いシンクを食器洗浄に使用してはいけない理由」として正しいものはどれか？",
+ opts:["汚染された器具・食品残渣によって手洗いシンクが汚染され手洗い効果が失われるから","水の節約のため","見た目が悪くなるから","器具が傷つくから"],
+ ans:0, exp:"手洗いシンクを器具洗浄や食品準備に使用すると、シンク自体が汚染され手洗い効果が著しく低下します。手洗い専用シンクとして維持することが必須です（PRP 02条 F）。"},
+
+{cat:"原因と結果", q:"「防虫防鼠でゴミ庫を施錠する理由」として正しいものはどれか？",
+ opts:["法律で義務付けられているため","ゴミはペスト（害虫・げっ歯類）の食料・繁殖場所になるため、侵入・繁殖を防ぐため","施設の美観を保つため","ゴミを盗まれないようにするため"],
+ ans:1, exp:"ゴミはペスト（げっ歯類・害虫）にとっての食料・繁殖場所になります。ゴミ庫を施錠することでペストの侵入・繁殖を防ぎます（PRP 12条 D）。"},
+
+{cat:"原因と結果", q:"「サニタイザーを洗い流さずに残留させてよい理由」として正しいものはどれか？",
+ opts:["洗い流す水が使えないから","手間がかかるから","コストコが認可した適切濃度のサニタイザーは食品接触面に残留させることが許可・推奨されており、継続的な消毒効果があるため","残留しても見えないから"],
+ ans:2, exp:"適切な濃度（200 ppm）で使用したサニタイザーは食品接触面での残留が許可されており、継続的な消毒効果があります。むしろ洗い流すと効果が消えてしまいます（PRP 10条 J）。"},
+
+{cat:"原因と結果", q:"「冷却工程を急速に行うことが求められる理由」として正しいものはどれか？",
+ opts:["食品の香りを保つため","電気代を節約するため","食品の見た目を良くするため","食品が危険温度区域（4〜60°C）に滞在する時間を最短にし、バクテリアの増殖を防ぐため"],
+ ans:3, exp:"急速冷却の目的は食品が危険温度区域（4〜60°C）に滞在する時間を最短にし、バクテリアの増殖を防ぐことです。"},
+
+{cat:"原因と結果", q:"「製造場内での私物（スマートフォン・時計等）の持ち込みを禁止する理由」として正しいものはどれか？",
+ opts:["私物が物理的異物（ガラス・金属・プラスチック等）となる危険性と、バクテリアの媒介物となる可能性があるため","業務に集中させるため","盗難を防ぐため","情報漏洩を防ぐため"],
+ ans:0, exp:"スマートフォン・時計・アクセサリー等は破損した際に物理的異物（ガラス・金属）の混入源となる危険性と、バクテリアの媒介物となる可能性があるため禁止です（PRP 04条 C）。"},
+
+{cat:"原因と結果", q:"「記録にフリクションボールペンや鉛筆を使用してはいけない理由」として正しいものはどれか？",
+ opts:["容易に内容を消去・改ざんできるため、記録の真正性が保証されないから","水に弱いから","インクが薄くなりやすいから","高価だから"],
+ ans:0, exp:"フリクションボールペン・鉛筆・シャープペンは消去が容易で記録の内容を改ざんできるため禁止です。永久インクのボールペンのみ使用可能です（PRP 15条 B）。"},
+
+// ── 6. 法令・規格 ───────────────────────────
+{cat:"法令・規格", q:"日本でHACCPが食品衛生法に明記・完全義務化されたのはいつか？",
+ opts:["2020年6月（施行）","2018年6月（改正食品衛生法公布）","2021年6月（完全義務化）","2023年4月"],
+ ans:2, exp:"2018年6月に改正食品衛生法が公布され、2020年6月に施行、2021年6月に完全義務化（経過措置終了）となりました。"},
+
+{cat:"法令・規格", q:"GFSIとはどのような機関か？",
+ opts:["日本の食品安全検査機関","WHO傘下の食品安全機関","世界食品安全イニシアチブ（Global Food Safety Initiative）：食品安全認証スキームを評価・承認する国際組織","米国の農務省（USDA）"],
+ ans:2, exp:"GFSIは世界食品安全イニシアチブ（Global Food Safety Initiative）で、食品安全管理システムの認証スキームを評価・承認する国際組織です。コストコはGFSI認証サプライヤーからの仕入れを原則とします（PRP 06条）。"},
+
+{cat:"法令・規格", q:"日本の食品衛生法における「食品事業者の責務」として最も適切なものはどれか？",
+ opts:["販売後の食品の安全は消費者の責任","食品等事業者は食品安全に関する知識と技術の習得に努め、安全な食品を提供する責務を持つ","食品安全は政府が全て管理するため事業者の責務はない","輸入食品のみ食品衛生法の対象となる"],
+ ans:1, exp:"食品等事業者は食品安全に関する知識・技術の習得に努め、安全な食品・添加物・器具・容器包装・おもちゃを販売する責務を持ちます（食品衛生法第3条）。"},
+
+{cat:"法令・規格", q:"コストコにおけるサプライヤー管理基準として正しいものはどれか？",
+ opts:["日本国内のサプライヤーのみ使用可能","JAS認定があれば問題ない","GFSIに認証された、またはコストコ自社監査に合格した工場・農場からの仕入れを原則とする","どのサプライヤーからでも仕入れ可能"],
+ ans:2, exp:"コストコではGFSIの認証を受けた、またはコストコ自社監査に合格した工場・農場からの仕入れを原則とし、サプライヤーの品質を管理します（PRP 06条 B）。"},
+
+{cat:"法令・規格", q:"日本の「大量調理施設衛生管理マニュアル」の対象施設として正しいものはどれか？",
+ opts:["同一メニューを1回300食以上または1日750食以上提供する施設","全ての飲食店","学校給食施設のみ","コンビニエンスストアのみ"],
+ ans:0, exp:"大量調理施設衛生管理マニュアルは同一メニューを1回300食以上または1日750食以上提供する施設（学校・病院・事業所・大型レストランなど）を対象としています。"},
+
+// ── 7. 用語定義問題 ──────────────────────────
+{cat:"用語定義", q:"「バイオフィルム（Biofilm）」の説明として正しいものはどれか？",
+ opts:["原材料を包む包装材の総称","食品に使用する保護フィルム","バクテリアが食品接触面等に形成する粘着性の薄膜で、通常の洗浄・消毒では除去が難しく食中毒の原因となる","食品添加物の一種"],
+ ans:2, exp:"バイオフィルムはバクテリアが形成する粘着性の薄膜で、食品接触面・排水管・配管の内側などに形成されます。通常の洗浄・消毒では除去が難しく定期的な分解洗浄が必要です。"},
+
+{cat:"用語定義", q:"「トレーサビリティ（Traceability）」の食品安全における意味として正しいものはどれか？",
+ opts:["食品の売上データを追跡すること","食品がどこで生産・加工・流通されたかを追跡できる仕組みで、問題発生時の原因特定とリコール対応に不可欠","従業員の作業履歴を管理すること","食品の栄養成分を追跡すること"],
+ ans:1, exp:"トレーサビリティとは食品の生産・加工・流通の各段階を記録・追跡できる仕組みです。問題発生時の迅速な原因特定・リコール対応に不可欠です。"},
+
+{cat:"用語定義", q:"「交差汚染（Cross-contamination）」の正しい説明はどれか？",
+ opts:["食品が腐敗すること","食品同士の味が混ざること","病原性微生物・アレルゲン等が手・器具・調理台などを介して別の食品に移ること","化学物質が食品に混入すること"],
+ ans:2, exp:"交差汚染は病原性微生物・アレルゲン等が手・器具・調理台・包装材などを介して別の食品に移ることです。二次汚染とも呼ばれます。"},
+
+{cat:"用語定義", q:"「SSOP（Sanitation Standard Operating Procedures）」の説明として正しいものはどれか？",
+ opts:["施設・設備・機器の衛生的な清掃・消毒手順を定めた標準作業手順書","食品の品質規格書","従業員の採用基準","HACCPの危害分析表"],
+ ans:0, exp:"SSOPは施設・設備・機器の衛生的な清掃・消毒手順を定めた標準作業手順書（Sanitation Standard Operating Procedures）です。HACCPのPRPの一部として位置づけられます。"},
+
+{cat:"用語定義", q:"「ロット（Lot）」の食品安全における意味として正しいものはどれか？",
+ opts:["同一の製造条件・日時・原材料で製造された食品の単位。CCPの記録・リコールの単位としても使用される","食品の価格単位","保管場所の単位","食品の重量単位"],
+ ans:0, exp:"ロットは同一製造条件・日時・原材料で製造された食品の単位です。CCPの加熱殺菌温度はロットごとに記録し、リコール時もロット単位で対応します（PRP 08条 S）。"},
+
+{cat:"用語定義", q:"「エンドオブデイ（EOD）」の意味として正しいものはどれか？",
+ opts:["週末の在庫確認","年度末の設備点検","毎日の製造作業終了後に実施する全面的な清掃・消毒プログラム","月末の締め作業"],
+ ans:2, exp:"エンドオブデイ（EOD）は毎日の製造作業終了後に実施する全面的な清掃・消毒プログラムです（PRP 10条 B）。"},
+
+{cat:"用語定義", q:"「危害要因（Hazard）」の食品安全における定義として正しいものはどれか？",
+ opts:["食品の価格を変動させる要因","食品の品質を低下させるあらゆる要因","消費者の健康に悪影響を与える可能性がある生物的・化学的・物理的な要因","食品の賞味期限を短縮させる要因"],
+ ans:2, exp:"危害要因とは消費者の健康に悪影響を与える可能性がある生物的（バクテリア・ウイルス・寄生虫）・化学的（農薬・毒素）・物理的（ガラス・金属）な要因です。"},
+
+// ── 8. 複合知識・応用問題 ────────────────────
+{cat:"複合・応用", q:"冷蔵庫の中で生鶏肉・生牛肉・魚・RTE食品を保管する場合、上段から正しい配置順はどれか？",
+ opts:["魚→RTE食品→生牛肉→生鶏肉","生鶏肉→生牛肉→魚→RTE食品","生牛肉→RTE食品→魚→生鶏肉","RTE食品→魚→生牛肉→生鶏肉（最下段）"],
+ ans:3, exp:"加熱温度が高い食品ほど下段に配置します（万が一汁が滴った際の汚染を最小化）。上からRTE食品→魚→生牛肉→生鶏肉（最低74°C以上の加熱が必要なため最下段）が基本です。"},
+
+{cat:"複合・応用", q:"HACCPの12手順を正しい順番で並べたとき「手順1」に当たるものはどれか？",
+ opts:["製品説明書の作成","製造工程図の作成","危害分析","HACCPチームの編成"],
+ ans:3, exp:"HACCPの手順1はHACCPチームの編成です。専門知識・経験を持つメンバーで構成されるHACCPチームが全体の推進役を担います。"},
+
+{cat:"複合・応用", q:"「食中毒のリスクを最も効果的に低減する方法の組み合わせ」として正しいものはどれか？",
+ opts:["殺菌剤の大量使用","加熱調理のみ","適切な温度管理のみ","適切な温度管理・手洗い・交差汚染の防止・清掃消毒の4つを組み合わせた多層防御"],
+ ans:3, exp:"食中毒予防の多層防御（スイスチーズモデル）：適切な温度管理・徹底した手洗い・交差汚染防止・清掃消毒を組み合わせることが最も効果的です。"},
+
+{cat:"複合・応用", q:"食品アレルギー対応として誤っているものはどれか？",
+ opts:["アレルゲンを含む食品の製造後は器具を洗浄・消毒してから別の食品の製造を行う","アレルゲンを含む食品のラベルを正確に表示する","アレルゲン情報を従業員全員が把握する","「アレルゲンを除いてください」との要望があれば、製造場内で個別対応してアレルゲンを完全除去できる"],
+ ans:3, exp:"製造場内でのアレルゲン完全除去は設備・環境上困難であり、製造施設での個別対応は「アレルゲンがない」とは保証できません。誤解を招く対応は避けるべきです。"},
+
+{cat:"複合・応用", q:"「PRPが遵守されていないとHACCPが機能しない」具体例として最も適切なものはどれか？",
+ opts:["CCPさえ守ればPRPは不要","記録さえ取れればPRPは不要","HACCPは完璧なシステムなのでPRPは関係ない","手洗いが不十分（PRP違反）だと、どれだけ加熱殺菌（CCP）を徹底しても加熱後の食品に二次汚染が起きる"],
+ ans:3, exp:"手洗い不徹底（PRP違反）→加熱後のRTE食品への二次汚染。これはCCPでは対応できません。PRPがHACCPの前提条件である具体的な理由です。"},
+
+{cat:"複合・応用", q:"「食品安全文化（Food Safety Culture）」の説明として正しいものはどれか？",
+ opts:["組織全体が食品安全を最優先とする価値観・行動・信念を共有し、日常業務に組み込まれている状態","罰則によって強制的に維持されるもの","マニュアルを作れば自然に醸成される","特定の従業員だけが食品安全を意識すればよい"],
+ ans:0, exp:"食品安全文化とは組織全体が食品安全を最優先とする価値観・行動・信念を共有し、マニュアルがなくても安全行動が日常業務に自然に組み込まれている状態です。"},
+
+{cat:"複合・応用", q:"「コストコの食品安全プログラム全体の構造」として正しいものはどれか？",
+ opts:["HACCPのみ","PRPを土台とし、その上にHACCPが機能する二層構造","PRPのみ","GFSIのみ"],
+ ans:1, exp:"コストコの食品安全プログラムはPRP（一般衛生管理プログラム：土台）の上にHACCP（重要管理点管理）が機能する二層構造です（Level 2テキスト 11.2）。"},
+
+// ── 9. 判断問題（○×の理由を問う） ─────────────
+{cat:"判断・理由", q:"「有症期間が終われば、食中毒菌はすべて体内から消える」この考えは正しいか？",
+ opts:["正しい。症状が治まれば安全","正しい。免疫が完全に排除する","誤り。食中毒菌は永続的に体内に残る","誤り。症状が消えてもキャリア状態として体内に菌が残存し、他者へ感染させる可能性がある"],
+ ans:3, exp:"症状が治まっても体内にバクテリアが残存する「キャリア状態」になる場合があります。キャリア状態の食品取扱者が食品を調理することで二次感染が広がります。"},
+
+{cat:"判断・理由", q:"「冷蔵保管すれば食品は無限に安全に保存できる」この考えは正しいか？",
+ opts:["誤り。1週間を超えると危険","正しい。冷蔵は完全な保存方法","正しい。4°C以下では全菌が死滅する","誤り。冷蔵は増殖を抑制するが停止はしない。リステリア菌のように低温でも増殖する菌もあり、時間とともに安全性は低下する"],
+ ans:3, exp:"冷蔵（4°C以下）はバクテリアの増殖を抑制しますが停止はしません。リステリア菌のように低温でも増殖する菌もあり、冷蔵保管でも賞味期限・品質管理は必要です。"},
+
+{cat:"判断・理由", q:"「食品の乾燥（低水分活性）はバクテリア増殖を抑制するが、ウイルスには効果がない」この記述は正しいか？",
+ opts:["誤り。乾燥はウイルスにも有効","正しい。ウイルスは食品中では増殖しないが乾燥環境でも生存でき、水分のある環境（ヒトの細胞）に入れば増殖する","誤り。乾燥はバクテリアには無効","正しい。ウイルスは全て乾燥で死滅する"],
+ ans:1, exp:"ウイルスは食品中では増殖しませんが乾燥環境でも生存でき、ヒトの粘膜・細胞に入ると増殖します。水分活性の低下はバクテリア抑制に有効ですがウイルス制御の手段とはなりません。"},
+
+{cat:"判断・理由", q:"「食品の腐敗臭がすれば必ず食中毒の原因菌が存在する」この記述は正しいか？",
+ opts:["正しい。腐敗臭と食中毒菌は常に一致する","誤り。腐敗臭がある食品は食中毒を起こさない","正しい。臭いが指標となる","誤り。腐敗臭を出すのは腐敗性バクテリアで、病原性バクテリアとは異なる。無臭でも食中毒を起こす場合がある"],
+ ans:3, exp:"腐敗臭は腐敗性バクテリア（シュウドモナスなど）の働きによるものです。サルモネラ・カンピロバクターなどの病原性バクテリアは臭いを変化させずに増殖するため、無臭でも食中毒を引き起こします。"},
+
+{cat:"判断・理由", q:"「消毒は洗浄の代わりになる」この考えは正しいか？",
+ opts:["誤り。洗浄のみで消毒は不要","誤り。汚れ・食品残渣が残った状態では消毒効果が大幅に低下する。洗浄なしの消毒は効果が得られない","正しい。強力な消毒剤なら洗浄は不要","正しい。時間短縮のため洗浄を省略できる"],
+ ans:1, exp:"汚れ・油脂・食品残渣が残っている状態ではサニタイザーが汚れに阻害され消毒効果が大幅に低下します。「まず洗浄、次に消毒」の順序は変えられません。"},
+
+{cat:"判断・理由", q:"「アレルギー反応は体質であり食品安全の問題ではない」この考えは正しいか？",
+ opts:["正しい。加熱すれば解決する","誤り。アレルゲンの適切な表示・交差汚染防止は食品事業者の法的責務であり、アナフィラキシーショックによる死亡事例もある重大な食品安全の問題","正しい。アレルギーは個人の問題","誤り。アレルギーは食中毒と無関係"],
+ ans:1, exp:"アレルゲンの適切な表示・コンタミネーション防止は食品衛生法上の義務です。アナフィラキシーショックは死亡事例もある重大なリスクで、食品安全の中核的問題です。"},
+
+// ── 10. 細かい実務知識 ───────────────────────
+{cat:"実務知識", q:"コストコで「スペックシート（製品仕様書・レシピ）」を作成する権限がある部門はどれか？",
+ opts:["各倉庫店のフレッシュフーズマネージャー","本社の購買部またはフードセーフティー部門","各部門のシフトリーダー","外部のコンサルタント"],
+ ans:1, exp:"スペックシート（製品仕様書・レシピ）は本社の購買部またはフードセーフティー部門が作成します。倉庫店独自のレシピで製造することは禁止です（PRP 08条 E）。"},
+
+{cat:"実務知識", q:"コストコの「Temp Check Walk Log」に記録する対象として正しいものはどれか？",
+ opts:["製造場室温のみ","従業員の体温のみ","全ての冷蔵庫・冷凍庫の庫内温度（2時間ごと）","外気温のみ"],
+ ans:2, exp:"Temp Check Walk Logには全ての冷蔵庫・冷凍庫の庫内温度を2時間ごとに記録します（PRP 10条 R）。"},
+
+{cat:"実務知識", q:"コストコの受領記録に記入が必要な項目として含まれないものはどれか？",
+ opts:["受領担当者名","サプライヤーの株価","受領温度","製品名・ロット番号"],
+ ans:1, exp:"受領記録にはサプライヤー名・製品名・ロット番号・受領温度・受領担当者名・受領日時などが必要です。サプライヤーの株価は記録事項ではありません（PRP 06条 D）。"},
+
+{cat:"実務知識", q:"製造場内で落とした未使用の器具（例：清潔なトング）の正しい対処法はどれか？",
+ opts:["アルコール噴霧のみで使用できる","洗浄・消毒・乾燥後に使用する","拾ってすぐに使用できる","5秒ルールを適用して使用できる"],
+ ans:1, exp:"製造場内で落とした器具は清潔に見えても汚染されていると見なし、洗浄・消毒・乾燥後に使用しなければなりません（PRP 10条 A）。「5秒ルール」は科学的根拠がありません。"},
+
+{cat:"実務知識", q:"コストコの製造場内で使用するまな板の材質として適切なものはどれか？",
+ opts:["大理石製","木製まな板","ポリエチレン（PE）または同等の樹脂製で分解・洗浄が容易なもの","竹製まな板"],
+ ans:2, exp:"製造場では木製・竹製まな板は傷がつきやすくバクテリアの温床になるため禁止です。ポリエチレン等の樹脂製で洗浄・消毒が容易なものを使用します（PRP 08条 O）。"},
+
+{cat:"実務知識", q:"「ヒヤリハット」の食品安全での活用方法として正しいものはどれか？",
+ opts:["記録せず次回から注意するだけ","上司に口頭報告するだけ","重大事故に至らなかった軽微なインシデントを記録・分析し再発防止策を講じることで食品安全事故を未然に防ぐ","事故が起きてから初めて対策を立てる"],
+ ans:2, exp:"ヒヤリハット（インシデント）を記録・分析し再発防止策を実施することで重大な食品安全事故を未然に防ぐことができます。フードセーフティー文化の根幹です。"},
+
+{cat:"実務知識", q:"洗浄剤・消毒剤の容器に必ず貼付しなければならないものはどれか？",
+ opts:["価格タグ","製造担当者名","内容物の名称・注意事項等を記載したラベル","製造日"],
+ ans:2, exp:"洗浄剤・消毒剤の容器には内容物の名称・使用方法・注意事項等を記載したラベルを必ず貼付し、内容物が明確に識別できるようにしなければなりません（PRP 09条 C）。"},
+
+{cat:"実務知識", q:"コストコにおいてアレルゲン情報の確認が最優先で必要とされる場面はどれか？",
+ opts:["製品の価格設定時","年度末の在庫確認時","GFSIの監査時のみ","新製品の導入時・レシピ変更時・原材料変更時"],
+ ans:3, exp:"アレルゲン情報の確認は新製品の導入時・レシピ（スペックシート）の変更時・使用原材料の変更時に特に重要です。ラベル表示の更新も必要です（PRP 08条 X）。"},
+
+{cat:"実務知識", q:"コストコの製造場の「ドライゾーン」と「ウェットゾーン」の違いとして正しいものはどれか？",
+ opts:["ドライゾーンとウェットゾーンの区別はない","ドライゾーンは冷凍庫内、ウェットゾーンは冷蔵庫内","ドライゾーンは倉庫、ウェットゾーンは製造場全体","ドライゾーンは水気を使わない乾いた作業区域、ウェットゾーンは水を使う洗浄や解凍などを行う区域"],
+ ans:3, exp:"ドライゾーンは水気を使わない乾いた作業区域、ウェットゾーンは水を使う洗浄・解凍等を行う区域です。区域を分けることで交差汚染と滑り転倒を防ぎます（PRP 10条）。"},
+
+{cat:"実務知識", q:"コストコの製造場への入室時に健康・服装チェックシートへの記入が免除されるのはどれか？",
+ opts:["10年以上のベテラン従業員","誰も免除されない（外部業者・訪問者を含む全入室者が記入必須）","管理職以上","当日の製造に関与しない場合"],
+ ans:1, exp:"健康・服装チェックシートへの記入は製造への関与・役職・在籍年数に関わらず、外部業者・訪問者を含む全ての入室者に義務付けられています（PRP 04条 A）。"},
+
+];
+
+// ────────────────────────────────────────────
+
+let currentQ=0;
+let answers=new Array(ALL_QUESTIONS.length).fill(null);
+let answered=new Array(ALL_QUESTIONS.length).fill(false);
+
+function startExam(){
+  document.getElementById('start-screen').style.display='none';
+  document.getElementById('quiz-screen').style.display='block';
+  loadQuestion(0);
+}
+
+function loadQuestion(idx){
+  currentQ=idx;
+  const q=ALL_QUESTIONS[idx];
+  const total=ALL_QUESTIONS.length;
+  document.getElementById('q-num-label').textContent=`問題 ${idx+1} / ${total}`;
+  document.getElementById('q-category').textContent=q.cat;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('progress-text').textContent=`${idx+1} / ${total}`;
+  document.getElementById('progress-bar-inner').style.width=((idx+1)/total*100)+'%';
+  const letters=['A','B','C','D','E'];
+  const container=document.getElementById('options-container');
+  container.innerHTML='';
+  q.opts.forEach((opt,i)=>{
+    const btn=document.createElement('div');
+    btn.className='option';
+    btn.innerHTML=`<span class="opt-letter">${letters[i]}</span><span>${opt}</span>`;
+    btn.onclick=()=>selectAnswer(i);
+    container.appendChild(btn);
+  });
+  const exp=document.getElementById('explanation');
+  exp.style.display='none';
+  exp.className='explanation';
+  if(answered[idx]) showResult(answers[idx],q.ans,q.exp,false);
+  document.getElementById('prev-btn').disabled=idx===0;
+  const isLast=idx===total-1;
+  document.getElementById('next-btn').style.display=isLast?'none':'inline-block';
+  document.getElementById('submit-btn').style.display=isLast?'inline-block':'none';
+}
+
+function selectAnswer(optIdx){
+  if(answered[currentQ]) return;
+  answers[currentQ]=optIdx;
+  answered[currentQ]=true;
+  const q=ALL_QUESTIONS[currentQ];
+  showResult(optIdx,q.ans,q.exp,true);
+}
+
+function showResult(selected,correct,expText,animate){
+  const opts=document.querySelectorAll('.option');
+  opts.forEach(o=>o.classList.add('disabled'));
+  opts[correct].classList.add('correct');
+  if(selected!==correct) opts[selected].classList.add('wrong');
+  else opts[selected].classList.add('correct');
+  const exp=document.getElementById('explanation');
+  exp.style.display='block';
+  const isCorrect=selected===correct;
+  exp.className='explanation'+(isCorrect?'':' wrong-exp');
+  exp.innerHTML=`<div class="exp-title">${isCorrect?'✓ 正解！':'✗ 不正解'}</div>${expText}`;
+}
+
+function nextQ(){if(currentQ<ALL_QUESTIONS.length-1) loadQuestion(currentQ+1);}
+function prevQ(){if(currentQ>0) loadQuestion(currentQ-1);}
+
+function submitExam(){
+  const total=ALL_QUESTIONS.length;
+  let correct=0,unanswered=0;
+  ALL_QUESTIONS.forEach((q,i)=>{
+    if(answers[i]===null) unanswered++;
+    else if(answers[i]===q.ans) correct++;
+  });
+  const wrong=total-correct-unanswered;
+  const score=Math.round((correct/total)*100);
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('result-screen').style.display='block';
+  document.getElementById('progress-bar-inner').style.width='100%';
+  document.getElementById('progress-text').textContent=`${total} / ${total}`;
+  document.getElementById('score-pct').textContent=score;
+  document.getElementById('r-correct').textContent=correct;
+  document.getElementById('r-wrong').textContent=wrong;
+  document.getElementById('r-unanswered').textContent=unanswered;
+  const passed=score>=85;
+  document.getElementById('result-title').textContent=passed?'合格 PASS':'不合格 FAIL';
+  document.getElementById('result-title').style.color=passed?'var(--correct)':'var(--wrong)';
+  document.getElementById('result-msg').textContent=passed
+    ?`おめでとうございます！合格ライン（85点）突破！\n正解率 ${score}% — 完璧です！`
+    :`合格ライン（85点）まであと${85-score}点です。\n解説を確認して苦手分野を復習しましょう。`;
+  setTimeout(()=>{
+    const arc=document.getElementById('score-arc');
+    arc.style.transition='stroke-dashoffset 1.5s ease';
+    arc.style.strokeDashoffset=503-(score/100)*503;
+    arc.style.stroke=passed?'var(--correct)':'var(--wrong)';
+  },100);
+}
+
+function showReview(){
+  const section=document.getElementById('review-section');
+  section.style.display=section.style.display==='none'?'block':'none';
+  if(section.innerHTML.trim()!==''&&section.style.display==='none') return;
+  const letters=['A','B','C','D','E'];
+  let html='<div class="review-title">解答レビュー — 全問</div>';
+  ALL_QUESTIONS.forEach((q,i)=>{
+    const isCorrect=answers[i]===q.ans;
+    const cls=isCorrect?'r-correct':'r-wrong';
+    let ansText=answers[i]===null?'未回答':`${letters[answers[i]]}. ${q.opts[answers[i]]}`;
+    html+=`<div class="review-item ${cls}">
+      <div style="font-size:.72rem;margin-bottom:7px;color:var(--gold);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px">${i+1}問目 — ${q.cat}</div>
+      <div class="review-q">${q.q}</div>
+      <div>
+        <div class="ra-label">あなたの回答</div>
+        <div class="${isCorrect?'ra-correct':'ra-wrong'}" style="font-size:.85rem">${ansText}</div>
+        ${!isCorrect?`<div class="ra-label" style="margin-top:7px">正解</div><div class="ra-correct" style="font-size:.85rem">${letters[q.ans]}. ${q.opts[q.ans]}</div>`:''}
+        <div class="ra-label" style="margin-top:7px">解説</div>
+        <div style="color:var(--text);opacity:.8;font-size:.82rem;line-height:1.7">${q.exp}</div>
+      </div>
+    </div>`;
+  });
+  section.innerHTML=html;
+}
+
+function retryExam(){
+  answers=new Array(ALL_QUESTIONS.length).fill(null);
+  answered=new Array(ALL_QUESTIONS.length).fill(false);
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('score-arc').style.strokeDashoffset=503;
+  document.getElementById('review-section').style.display='none';
+  document.getElementById('review-section').innerHTML='';
+  document.getElementById('quiz-screen').style.display='block';
+  document.getElementById('progress-bar-inner').style.width='1%';
+  loadQuestion(0);
+}
+</script>
+</body>
+</html>

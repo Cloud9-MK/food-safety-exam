@@ -1,0 +1,66 @@
+{
+  "name": "コストコ フードセーフティー模擬試験",
+  "short_name": "FoodSafety模試",
+  "description": "コストコ フードセーフティー Level 2 模擬試験（Vol.1〜5・全500問）",
+  "lang": "ja",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#E31837",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Vol.1 — FOUNDATION",
+      "short_name": "Vol.1",
+      "url": "./food_safety_exam_vol1.html"
+    },
+    {
+      "name": "Vol.2",
+      "short_name": "Vol.2",
+      "url": "./food_safety_exam_vol2.html"
+    },
+    {
+      "name": "Vol.3",
+      "short_name": "Vol.3",
+      "url": "./food_safety_exam_vol3.html"
+    },
+    {
+      "name": "Vol.4",
+      "short_name": "Vol.4",
+      "url": "./food_safety_exam_vol4.html"
+    },
+    {
+      "name": "Vol.5",
+      "short_name": "Vol.5",
+      "url": "./food_safety_exam_vol5.html"
+    }
+  ]
+}

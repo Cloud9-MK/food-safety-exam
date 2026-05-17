@@ -1,0 +1,10 @@
+# Python cache & build artifacts
+__pycache__/
+*.pyc
+
+# inject_pwa.py が作るバックアップ（コミット不要）
+*.html.bak
+
+# Mac / Windows のシステムファイル
+.DS_Store
+Thumbs.db

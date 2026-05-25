@@ -659,8 +659,14 @@ function submit(){
 }
 function review(){
   const s=document.getElementById('rvs');
-  s.style.display=s.style.display==='none'?'block':'none';
-  if(s.innerHTML.trim()!==''&&s.style.display==='none')return;
+  // Toggle visibility
+  const isHidden = (s.style.display==='none' || s.style.display==='');
+  if(!isHidden){
+    s.style.display='none';
+    return;
+  }
+  s.style.display='block';
+  // Always rebuild content (avoid stale state)
   let h='<div class="rvt">解答レビュー — 全問</div>';
   Q.forEach((q,i)=>{
     const ok=ans[i]===q.a,cl=ok?'rc':'rw';

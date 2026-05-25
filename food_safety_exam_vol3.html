@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>コストコ フードセーフティー 模擬試験 Level 2 — Vol.3</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Syne:wght@700;800&display=swap');
+:root{
+  --bg:#08090D;--card:#10121A;--border:#1E2130;
+  --purple:#5B4FE9;--accent:#A78BFA;--gold:#FBBF24;
+  --text:#F1F0FF;--muted:#6B7280;
+  --correct:#10B981;--wrong:#EF4444;--selected:#1E40AF;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;}
+#header{
+  background:linear-gradient(135deg,#1E1B4B 0%,#3730A3 60%,#5B4FE9 100%);
+  padding:13px 26px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 4px 24px rgba(91,79,233,.4);
+  border-bottom:2px solid var(--accent);
+}
+#header h1{font-family:'Syne',sans-serif;font-size:1.5rem;letter-spacing:2px;color:#fff;font-weight:800;}
+.hd-sub{font-size:.62rem;color:rgba(255,255,255,.6);letter-spacing:2px;margin-bottom:2px;}
+.vol-badge{background:var(--gold);color:#111;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:800;padding:3px 10px;border-radius:4px;letter-spacing:2px;margin-left:10px;}
+#pw{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+#pt{font-size:.78rem;color:rgba(255,255,255,.85);}
+#pbo{width:180px;height:5px;background:rgba(255,255,255,.18);border-radius:3px;overflow:hidden;}
+#pbi{height:100%;width:0%;background:var(--accent);border-radius:3px;transition:width .4s;}
+#start{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90vh;padding:40px 20px;text-align:center;}
+.vl{font-family:'Syne',sans-serif;font-size:.78rem;letter-spacing:5px;color:var(--accent);margin-bottom:14px;}
+.bt{font-family:'Syne',sans-serif;font-size:clamp(2.6rem,6.5vw,4.5rem);color:#fff;letter-spacing:2px;line-height:1.1;margin-bottom:8px;font-weight:800;}
+.bt span{color:var(--accent);}
+.tl{font-size:.9rem;color:var(--gold);letter-spacing:1px;margin-bottom:6px;}
+.bs{font-size:.8rem;color:var(--muted);margin-bottom:40px;}
+.ig{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:480px;margin-bottom:40px;}
+.ic{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.ic .n{font-family:'Syne',sans-serif;font-size:2.4rem;color:var(--accent);line-height:1;font-weight:700;}
+.ic .l{font-size:.68rem;color:var(--muted);margin-top:4px;}
+.sb{background:var(--purple);color:#fff;border:1px solid var(--accent);padding:16px 56px;font-size:1rem;font-weight:700;border-radius:8px;cursor:pointer;letter-spacing:2px;transition:all .15s;box-shadow:0 4px 24px rgba(91,79,233,.5);}
+.sb:hover{background:#4338CA;transform:translateY(-2px);}
+#quiz{display:none;padding:28px 20px;max-width:820px;margin:0 auto;}
+.qm{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.qn{font-family:'Syne',sans-serif;font-size:1rem;color:var(--gold);letter-spacing:2px;font-weight:700;}
+.qcat{font-size:.67rem;background:var(--border);color:var(--muted);padding:4px 12px;border-radius:20px;}
+.trap{display:none;font-size:.65rem;background:rgba(239,68,68,.15);color:#F87171;border:1px solid rgba(239,68,68,.3);padding:3px 10px;border-radius:20px;margin-right:6px;}
+.trap.on{display:inline-block;}
+.qt{font-size:1rem;line-height:1.9;font-weight:500;margin-bottom:22px;padding:22px;background:var(--card);border:1px solid var(--border);border-radius:12px;border-left:4px solid var(--accent);}
+.opts{display:flex;flex-direction:column;gap:10px;}
+.opt{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:15px 18px;cursor:pointer;display:flex;align-items:flex-start;gap:12px;transition:border-color .15s,background .15s,transform .1s;font-size:.93rem;line-height:1.65;}
+.opt:hover:not(.dis){border-color:#334;background:#13151F;transform:translateX(4px);}
+.ol{min-width:27px;height:27px;background:var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--muted);flex-shrink:0;margin-top:1px;transition:background .15s,color .15s;}
+.opt.sel{border-color:var(--selected);background:rgba(30,64,175,.18);}
+.opt.sel .ol{background:var(--selected);color:#fff;}
+.opt.cor{border-color:var(--correct);background:rgba(16,185,129,.1);}
+.opt.cor .ol{background:var(--correct);color:#fff;}
+.opt.wrg{border-color:var(--wrong);background:rgba(239,68,68,.1);}
+.opt.wrg .ol{background:var(--wrong);color:#fff;}
+.opt.dis{cursor:default;}
+.exp{display:none;margin-top:16px;padding:18px 20px;background:#061410;border:1px solid var(--correct);border-radius:10px;font-size:.88rem;line-height:1.9;color:#A7F3D0;}
+.exp.we{background:#140606;border-color:var(--wrong);color:#FECACA;}
+.exp .et{font-weight:700;margin-bottom:6px;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;}
+.exp .ep{margin-top:10px;padding:8px 12px;background:rgba(251,191,36,.08);border-left:3px solid var(--gold);border-radius:4px;font-size:.82rem;color:var(--gold);}
+.nr{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
+.nb{padding:11px 28px;border:none;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all .15s;}
+.nb.p{background:var(--purple);color:#fff;border:1px solid var(--accent);}
+.nb.p:hover{background:#4338CA;}
+.nb.s{background:var(--border);color:var(--text);}
+.nb.s:hover{background:#252840;}
+.nb:disabled{opacity:.35;cursor:not-allowed;}
+#result{display:none;padding:50px 20px;max-width:680px;margin:0 auto;text-align:center;}
+.sr{width:200px;height:200px;margin:0 auto 28px;position:relative;}
+.sr svg{transform:rotate(-90deg);}
+.sr .st{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.sp{font-family:'Syne',sans-serif;font-size:3.2rem;line-height:1;color:var(--text);font-weight:800;}
+.sl{font-size:.65rem;color:var(--muted);}
+.rt{font-family:'Syne',sans-serif;font-size:2.2rem;letter-spacing:2px;margin-bottom:8px;font-weight:800;}
+.rm{color:var(--muted);margin-bottom:28px;line-height:1.8;white-space:pre-line;}
+.rsg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+.rsc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.rsn{font-family:'Syne',sans-serif;font-size:2rem;line-height:1;font-weight:700;}
+.rsl{font-size:.68rem;color:var(--muted);margin-top:4px;}
+.rb{background:var(--purple);color:#fff;border:1px solid var(--accent);padding:14px 44px;font-size:.95rem;font-weight:700;border-radius:8px;cursor:pointer;letter-spacing:2px;transition:all .15s;margin:8px;}
+.rb:hover{background:#4338CA;}
+.rvs{text-align:left;margin-top:44px;}
+.rvt{font-family:'Syne',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--gold);margin-bottom:18px;font-weight:700;}
+.rvi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:10px;}
+.rvi.rw{border-color:rgba(239,68,68,.35);}
+.rvi.rc{border-color:rgba(16,185,129,.22);}
+.rvq{font-size:.88rem;margin-bottom:10px;line-height:1.6;}
+.ral{color:var(--muted);font-size:.72rem;margin-bottom:3px;}
+.rac{color:var(--correct);font-weight:500;}
+.raw{color:var(--wrong);}
+</style>
+<!-- PWA-INJECT-START -->
+<link rel="manifest" href="./manifest.json" />
+<meta name="theme-color" content="#E31837" />
+<meta name="application-name" content="FoodSafety模試" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="FoodSafety模試" />
+<link rel="apple-touch-icon" href="./icons/icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png" />
+<link rel="shortcut icon" href="./icons/icon-64.png" />
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function (e) {
+        console.warn('SW register failed:', e);
+      });
+    });
+  }
+</script>
+<!-- PWA-INJECT-END -->
+</head>
+<body>
+<div id="header">
+  <div><div class="hd-sub">COSTCO WHOLESALE JAPAN</div><h1>FOOD SAFETY EXAM <span class="vol-badge">VOL.5</span></h1></div>
+  <div id="pw"><span id="pt">0 / 60</span><div id="pbo"><div id="pbi"></div></div></div>
+</div>
+<div id="start">
+  <div class="vl">VOLUME 5 — PASS GUARANTEE EDITION</div>
+  <div class="bt">模擬試験<br><span>第5弾</span></div>
+  <div class="tl">⚡ 絶対合格のために設計された100問</div>
+  <div class="bs">本番で出やすい・間違えやすい・数値が似ているポイントを厳選</div>
+  <div class="ig">
+    <div class="ic"><div class="n">60</div><div class="l">問題数</div></div>
+    <div class="ic"><div class="n">4-5</div><div class="l">択問題</div></div>
+    <div class="ic"><div class="n">85</div><div class="l">合格点</div></div>
+  </div>
+  <button class="sb" onclick="start()">試験開始</button>
+</div>
+<div id="quiz">
+  <div class="qm">
+    <span class="qn" id="qn">問題 1 / 60</span>
+    <div style="display:flex;align-items:center;">
+      <span class="trap" id="trap">⚠ ひっかけ注意</span>
+      <span class="qcat" id="qcat"></span>
+    </div>
+  </div>
+  <div class="qt" id="qt"></div>
+  <div class="opts" id="opts"></div>
+  <div class="exp" id="exp"></div>
+  <div class="nr">
+    <button class="nb s" id="pb" onclick="prev()">◀ 前へ</button>
+    <button class="nb p" id="nb" onclick="next()">次へ ▶</button>
+    <button class="nb p" id="sub" onclick="submit()" style="display:none">結果を見る</button>
+  </div>
+</div>
+<div id="result">
+  <div class="sr">
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="85" fill="none" stroke="#1E2130" stroke-width="13"/>
+      <circle id="arc" cx="100" cy="100" r="85" fill="none" stroke="#5B4FE9" stroke-width="13"
+        stroke-linecap="round" stroke-dasharray="534" stroke-dashoffset="534"/>
+    </svg>
+    <div class="st"><div class="sp" id="sp">0</div><div class="sl">点</div></div>
+  </div>
+  <div class="rt" id="rtt">—</div>
+  <div class="rm" id="rm"></div>
+  <div class="rsg">
+    <div class="rsc"><div class="rsn" id="rc" style="color:var(--correct)">0</div><div class="rsl">正解</div></div>
+    <div class="rsc"><div class="rsn" id="rw" style="color:var(--wrong)">0</div><div class="rsl">不正解</div></div>
+    <div class="rsc"><div class="rsn" id="ru" style="color:var(--gold)">0</div><div class="rsl">未回答</div></div>
+  </div>
+  <button class="rb" onclick="retry()">もう一度挑戦</button>
+  <button class="rb" style="background:var(--border);border-color:var(--border)" onclick="review()">間違いを確認</button>
+  <div class="rvs" id="rvs" style="display:none"></div>
+</div>
+<script>
+const Q=[
+{c:"受領管理",t:false,
+ q:"納入車両の点検項目として該当しないものはどれか？",
+ o:["コンテナ内の温度が適切に維持","コンテナや包装に穴が開いてない","コンテナ内に虫やげっ歯類なし","配送ドライバーの健康状態確認"],
+ a:3,
+ e:"納入車両の点検項目は①コンテナ内が適切な温度②悪臭なし③汚れ・ゴミなし④虫・げっ歯類なし⑤コンテナ・包装に穴なし、の5項目。ドライバーの健康状態は点検対象ではありません（一般衛生管理プログラム 06条 A）。",
+ p:"🚛 車両点検5項目：温度・悪臭・汚れ・虫・穴"},
+
+{c:"受領管理",t:false,
+ q:"温度管理が必要な食品の受領後の保管庫移動の期限はどれか？",
+ o:["受領後60分以内に移動","受領後30分以内に移動","受領後10分以内に移動","受領後20分以内に移動"],
+ a:3,
+ e:"温度管理が必要な食品（冷蔵または冷凍食品）は受領後20分以内に保管庫（冷蔵庫 or 冷凍庫）に移動させなければなりません（一般衛生管理プログラム 06条 F）。",
+ p:"⏱️ 温度管理品は受領後20分以内に保管庫へ"},
+
+{c:"受領管理",t:true,
+ q:"冷凍食品の受領時の温度基準として正しいものはどれか？",
+ o:["−18°C以下かつ冷凍状態","−10°C以下なら受領可能","−15°C以下かつ冷凍状態","−5°C以下かつ凍結状態"],
+ a:2,
+ e:"冷凍食品の受領温度は−15°C以下かつ冷凍状態です。一般衛生管理プログラム改訂により従来の−18°Cから−15°Cに変更されました。冷凍状態であることも必須条件です（一般衛生管理プログラム 06条 C）。",
+ p:"🧊 冷凍食品の受領＝−15°C以下＋冷凍状態（−18°Cは旧基準）"},
+
+{c:"受領管理",t:false,
+ q:"生鮮魚介類の受領時の温度として正しいものはどれか？",
+ o:["10°C以下で受領","7°C以下で受領","4°C以下で受領","0°C以下で受領"],
+ a:2,
+ e:"生鮮魚介類は4°C以下で受領します。野菜・果物・農産加工品・大豆加工品・水産加工品・生鮮畜産物・畜産加工品・乳製品・卵類・その他加工食品は10°C以下です（一般衛生管理プログラム 06条 C）。",
+ p:"🐟 生鮮魚介類のみ4°C以下。他の冷蔵品は10°C以下"},
+
+{c:"受領管理",t:false,
+ q:"受領拒否や廃棄が発生した場合の最初の対応として正しいものはどれか？",
+ o:["本社フードセーフティーへ直接連絡","管轄の保健所に通報し指示仰ぐ","配送ドライバーへ次回改善要請","該当部門バイヤーに連絡し指示"],
+ a:3,
+ e:"受領温度の逸脱、食品の腐敗・破損、容器包装の破れ等で受領拒否・返品・廃棄が生じた場合、最初に該当部門のバイヤーに連絡し、受領拒否または廃棄の指示を求めます（一般衛生管理プログラム 06条 E）。",
+ p:"📞 受領トラブル→まず該当部門バイヤーへ連絡"},
+
+{c:"受領管理",t:false,
+ q:"受領確認手順として誤っているものはどれか？",
+ o:["PO番号・アイテム名・数量の相違確認","賞味期限や消費期限切れの点検","荷物周囲・上下・パレットの点検","内容物の味と匂いの確認による点検"],
+ a:3,
+ e:"受領確認は①PO番号・アイテム名・数量②期限切れの点検③荷物周囲（前後上下）・パレットの異常点検が必須。味や匂いの確認は対象外です（一般衛生管理プログラム 06条 D）。",
+ p:"✅ 受領確認3項目：PO・期限・荷物外観"},
+
+{c:"受領管理",t:false,
+ q:"受領拒否時の伝票管理として正しいものはどれか？",
+ o:["口頭伝達のみで記録は不要となる","配送ドライバーが単独でサインする","受領責任者とドライバー双方サイン","本社の事後承認のみで処理可能"],
+ a:2,
+ e:"一部返品時は伝票記載数量を変更し、配送ドライバーのサインに加え、受領責任者（レシービング部門の管理職またはGM・AGM上位管理職）のサインをもらいます（一般衛生管理プログラム 06条 E）。",
+ p:"✍️ 受領拒否伝票：ドライバー＋受領責任者の双方サイン"},
+
+{c:"受領管理",t:true,
+ q:"受領後に返品が発生した場合の冷蔵原材料の保管温度として正しいものはどれか？",
+ o:["返品処理が完了するまで常温保管","食品表示ラベル準拠の温度で保管","−18°C以下の冷凍庫で一時保管","室温で別室に隔離して保管"],
+ a:1,
+ e:"受領後に返品する際は、現物を返品指定場所に移動し、冷蔵・冷凍製品の場合は食品表示ラベルに準じた温度（10°C・4°C以下もしくは−15°C以下）で保管した状態で指示を受けます（一般衛生管理プログラム 06条 E）。",
+ p:"🌡️ 返品中も食品表示ラベルの保管温度を維持"},
+
+{c:"受領管理",t:false,
+ q:"受領拒否した原材料の情報は誰に共有すべきか？",
+ o:["本社の経理部門のみに共有する","配送業者の本社窓口に直接連絡","保健所と労働基準監督署に通報","該当部門バイヤー（仕入先連絡）"],
+ a:3,
+ e:"原材料・製品を拒否した場合、それらの情報は仕入れ先へのフォローアップのためにバイヤーに共有します（一般衛生管理プログラム 06条 E）。",
+ p:"📨 拒否情報はバイヤー経由で仕入先へフィードバック"},
+
+{c:"受領管理",t:false,
+ q:"納入車両に不備の可能性が1つ以上ある場合の最初の対応はどれか？",
+ o:["原材料・製品の損傷・包装破れ点検","ただちに受領拒否を確定する処理","保健所に通報し指示を仰ぐ対応","受領担当者の判断で受領実施する"],
+ a:0,
+ e:"納入車両における不備の可能性が1つ以上ある場合の対応：①原材料や製品に損傷や包装破れの可能性がないかを点検②兆候があれば現物を点検し受領可否を決定③受領拒否したものは伝票に記録し保管（一般衛生管理プログラム 06条 B）。",
+ p:"🔍 車両不備→まず損傷・破れの点検から始める"},
+
+{c:"受領管理",t:false,
+ q:"受領温度の確認方法として最も適切なものはどれか？",
+ o:["手で触れて感覚的に判断する","温度計で食品の表面温度を測定","外気温と比較して判断する","配送員の口頭報告で判断する"],
+ a:1,
+ e:"受領時における温度管理が必要な食品の表面温度を温度計で測定します。食品表示ラベルに記載の保管温度を遵守できているか客観的に判断します（一般衛生管理プログラム 06条 C）。",
+ p:"🌡️ 受領温度は温度計で表面温度を測定"},
+
+{c:"受領管理",t:false,
+ q:"受領が拒否された原材料の処理として正しいものはどれか？",
+ o:["そのまま製造に使用してリスク低減","受領伝票・納品案内書に記録し保管","配送員に渡してすぐに持ち帰り","社内ゴミ庫で即廃棄処分する"],
+ a:1,
+ e:"受領を拒否した車両・原材料・製品・包装資材などは、受入伝票や納品案内書などの帳票類に記録し保管します。後から原因究明や仕入先指導に活用するためです（一般衛生管理プログラム 06条 B）。",
+ p:"📋 受領拒否品も帳票に記録して保管（追跡用）"},
+
+{c:"受領管理",t:false,
+ q:"野菜・果物の受領温度として正しいものはどれか？",
+ o:["4°C以下","10°C以下","15°C以下","20°C以下"],
+ a:1,
+ e:"野菜・果物の受領温度は10°C以下です。農産加工品・大豆加工品・水産加工品・畜産加工品・乳製品・卵類・その他加工食品も同じく10°C以下です（一般衛生管理プログラム 06条 C）。",
+ p:"🥬 野菜・果物・加工品＝10°C以下（魚介のみ4°C）"},
+
+{c:"受領管理",t:false,
+ q:"受領温度の管理について「食品表示ラベル」がある場合の対応はどれか？",
+ o:["ラベルの記載温度を遵守する","一律に4°C以下で受領する","配送員の指示に従う","部署管理職の判断で決める"],
+ a:0,
+ e:"冷蔵食品・冷凍食品は食品表示ラベルに記載の保管温度を遵守します。ラベルに記載のない冷蔵・冷凍食品については別途規定の温度（魚介は4°C、その他は10°C、冷凍は−15°C以下）に従います（一般衛生管理プログラム 06条 C）。",
+ p:"🏷️ 食品表示ラベル記載の温度が最優先"},
+
+{c:"受領管理",t:false,
+ q:"納入車両のコンテナで異常が見つかった場合の判断として誤っているものはどれか？",
+ o:["汚れやゴミがあれば点検対象","虫やげっ歯類がいれば点検対象","悪臭がすれば点検対象","少量なら問題なしで受領可能"],
+ a:3,
+ e:"納入車両の点検で異常があれば、原材料や製品に損傷・包装破れの可能性を必ず点検します。「少量だから問題なし」と判断して受領することは認められません（一般衛生管理プログラム 06条 A・B）。",
+ p:"⚠️ 「少量だから大丈夫」は禁物。必ず点検実施"},
+
+{c:"保管管理",t:true,
+ q:"常温保管が可能な食品の保管温度として正しいものはどれか？",
+ o:["5〜15°C（換気場所）で保管","10〜21°C（旧基準）で保管","10〜25°C（換気場所）で保管","15〜30°C（換気場所）で保管"],
+ a:2,
+ e:"常温保管が可能な食品は10〜25°Cで保管します。一般衛生管理プログラム改訂により従来の10〜21°Cから10〜25°Cに変更されました（一般衛生管理プログラム 07条 C）。",
+ p:"🏠 常温＝10〜25°C（10〜21°Cは旧基準）"},
+
+{c:"保管管理",t:false,
+ q:"冷凍保管の仕掛品・製品の温度として正しいものはどれか？",
+ o:["−5°C以下で保管","−10°C以下で保管","−15°C以下で保管","−25°C以下で保管"],
+ a:2,
+ e:"冷凍保管の仕掛品・製品は−15°C以下で保管します。一般衛生管理プログラム改訂により従来の−18°Cから−15°Cに変更されています（一般衛生管理プログラム 10条 T）。",
+ p:"❄️ 冷凍保管＝−15°C以下"},
+
+{c:"保管管理",t:false,
+ q:"冷蔵保管の食品の温度基準として正しいものはどれか？",
+ o:["4°C以下で保管","6°C以下で保管","8°C以下で保管","10°C以下で保管"],
+ a:0,
+ e:"常温保管が可能な一部の製品を除き、すべての食品は4°C以下もしくは60°C以上で保管しなければなりません。これにより危険温度区域（4〜60°C）での放置を防ぎます（一般衛生管理プログラム 07条 C）。",
+ p:"🥬 冷蔵＝4°C以下 / 温蔵＝60°C以上"},
+
+{c:"保管管理",t:false,
+ q:"温かいまま保管する食品（ホールド）の温度基準として正しいものはどれか？",
+ o:["45°C以上で保管","50°C以上で保管","55°C以上で保管","60°C以上で保管"],
+ a:3,
+ e:"加熱調理後に温かいまま食べる食品は60°C（140°F）以上で保管します。45・50・55°Cは危険温度区域（4-60°C）内となりバクテリア増殖リスクがあります（Level 2 第7.4節）。",
+ p:"🔥 ホットホールド＝60°C以上"},
+
+{c:"保管管理",t:true,
+ q:"Non-RTE（要加熱）食品とRTE食品の保管方法として正しいものはどれか？",
+ o:["同じ棚で温度管理だけ徹底","ラベル管理だけでゾーニング不要","常に区分け（ゾーニング）して保管","冷蔵庫内なら混在保管可能"],
+ a:2,
+ e:"Non-RTE（喫食前に殺菌が必要な食品）の製品・原材料・仕掛品とRTE（調理済・加工済でそのまま喫食できる食品）の製品・原材料・仕掛品は、常に区分け（ゾーニング）して保管しなければなりません（一般衛生管理プログラム 07条 D）。",
+ p:"🚧 Non-RTEとRTEは必ずゾーニング"},
+
+{c:"保管管理",t:false,
+ q:"化学薬品と食品の保管に関するルールとして正しいものはどれか？",
+ o:["同じ冷蔵庫内で温度管理","食品と化学薬品は離して保管","化学薬品は常に食品の上に保管","同一容器に入れて統合保管"],
+ a:1,
+ e:"食品類は化学薬品と離して保管します。化学薬品による汚染が疑われる食品類は製造・販売に使用せずに廃棄します（一般衛生管理プログラム 07条 H）。",
+ p:"🧪 化学薬品は食品から離す。汚染疑いは廃棄"},
+
+{c:"保管管理",t:false,
+ q:"製造された商品・開封済み原材料の保管時の覆い方として正しいものはどれか？",
+ o:["通気性確保のため覆いは不要","清潔な布巾で軽くカバーする","ラップ・ビニール等で完全に覆う","次回使用まで自然乾燥させる"],
+ a:2,
+ e:"製造された商品、開封済みの原材料および仕掛品は包装するか、ラップやビニール、ステンレスカバー等で完全に覆った状態で保管します（一般衛生管理プログラム 07条 B）。",
+ p:"🛡️ 保管時は完全カバー（ラップ・ビニール・ステンレス）"},
+
+{c:"保管管理",t:false,
+ q:"畜種の異なる食肉製品の保管方法として正しいものはどれか？",
+ o:["同じ冷蔵庫で温度管理する","区分け（ゾーニング）して保管","すべて同じ棚に整列保管","購入順に重ねて並べ保管"],
+ a:1,
+ e:"畜種の異なる食肉製品・食肉原材料・食肉仕掛品は区分け（ゾーニング）して保管しなければなりません（一般衛生管理プログラム 07条 F）。",
+ p:"🥩 畜種違いは必ずゾーニング"},
+
+{c:"保管管理",t:false,
+ q:"製品・原材料・仕掛品の上下の保管位置として正しいものはどれか？",
+ o:["上下に重ねて保管しても問題ない","他の品が上に落ちないよう保管","管理者の判断で適宜配置","空間効率重視で上下重ね"],
+ a:1,
+ e:"製品・原材料・仕掛品が他の製品・原材料・仕掛品の上に落ちないように保管しなければなりません。落下による汚染や破損を防ぐためです（一般衛生管理プログラム 07条 G）。",
+ p:"⬇️ 上に落ちないよう保管（汚染防止）"},
+
+{c:"保管管理",t:false,
+ q:"消費期限・賞味期限・使用期限の延長に関するルールはどれか？",
+ o:["一切延長してはならない","管理職判断で延長可能となる","本社承認があれば延長可能","安全確認後に1回のみ延長可"],
+ a:2,
+ e:"製品・原材料・仕掛品において、定められた消費期限、賞味期限、使用期限を延長してはなりません。一切の例外はなし（一般衛生管理プログラム 07条 I）。",
+ p:"⛔ 期限延長は一切禁止（例外なし）"},
+
+{c:"保管管理",t:true,
+ q:"冷凍庫が温度異常を起こした際の冷凍保管仕掛品の退避温度として正しいものはどれか？",
+ o:["−18°C以下で保管","−15°C以下で保管","4°C以下に切替","室温で一時保管"],
+ a:1,
+ e:"温度異常時、冷凍保管の仕掛品・製品は−15°C以下で保管できる安全な保管庫に移動させます。一般衛生管理プログラム改訂により−18°Cから−15°Cに変更されています（一般衛生管理プログラム 10条 T）。",
+ p:"🚨 冷凍庫異常時：仕掛品・製品は−15°C以下の別庫へ"},
+
+{c:"保管管理",t:false,
+ q:"製造終了後の食品表示ラベル貼付時間として正しいものはどれか？",
+ o:["容器包装完了後の当日中","出荷前日までに貼り付け","陳列直前に商品へ貼付","製造から72時間以内"],
+ a:0,
+ e:"製品は容器包装完了後の当日中に食品表示ラベルを現物に貼り付けます。製造終了後1時間以内にラベル貼付できない場合は、使用期限ラベルで代用可能です（一般衛生管理プログラム 07条 J）。",
+ p:"🏷️ 食品表示ラベルは容器包装完了の当日中"},
+
+{c:"保管管理",t:false,
+ q:"原材料・仕掛品の使用期限ラベル（コードデートラベル）貼付タイミングはどれか？",
+ o:["受領した瞬間に貼り付ける","開封後の初回使用完了時点で貼付","在庫切れになる直前に貼り付け","管理職の判断で随時貼り付け"],
+ a:1,
+ e:"原材料・仕掛品は開封後初めての使用完了後に使用期限ラベル（コードデートラベル）を現物、保管している冷蔵庫の扉、または保管しているラックに貼り付けます（一般衛生管理プログラム 07条 J）。",
+ p:"📅 コードデートは「初回使用完了後」に貼付"},
+
+{c:"保管管理",t:false,
+ q:"冷蔵庫・冷凍庫等の庫内温度の点検頻度として正しいものはどれか？",
+ o:["1日1回点検","2時間ごとに点検","4時間ごとに点検","8時間ごとに点検"],
+ a:1,
+ e:"すべての冷蔵庫・冷凍庫は2時間ごとに温度を点検し、Temp Check Walk Logに記録します。各倉庫店ごとに割り当てられたフォルダに保管します（一般衛生管理プログラム 10条 S）。",
+ p:"⏰ 冷蔵庫・冷凍庫の温度点検：2時間ごと"},
+
+{c:"保管管理",t:false,
+ q:"営業終了時に翌日販売できない製品がある場合の処理として正しいものはどれか？",
+ o:["翌朝に再点検して判断","デストロイシートに記録して廃棄","冷凍庫で長期保存に切替","値引き表示で当日中に販売継続"],
+ a:1,
+ e:"営業終了時に翌日以降販売できない製品がある場合は、デストロイシートに記録して廃棄します。翌日の製造作業で使用できない原材料・仕掛品はデストロイシートまたはデモシートに記録して廃棄（一般衛生管理プログラム 07条 K・L）。",
+ p:"📝 翌日販売不可品：デストロイシート記録→廃棄"},
+
+{c:"保管管理",t:false,
+ q:"期限切れ製品をすぐに廃棄できない場合の保管方法として正しいものはどれか？",
+ o:["他の食品と混在して保管する","廃棄品表示を付け完全ゾーニング","常温で別エリアにて管理する","所定の冷凍庫に移管して保管"],
+ a:1,
+ e:"期限が切れた製品・原材料・仕掛品をすぐに廃棄できない場合は、廃棄品表示を付けたうえで、他の食品と完全に区分け（ゾーニング）して保管します（一般衛生管理プログラム 07条 M）。",
+ p:"🚧 期限切れ品：廃棄表示＋完全ゾーニング"},
+
+{c:"保管管理",t:false,
+ q:"冷蔵庫の温度異常が続く場合の対応として正しいものはどれか？",
+ o:["そのまま使用継続し様子見","安全温度の別保管庫に移動","室温で乾燥保管に切替","冷凍庫で代替保管する"],
+ a:1,
+ e:"温度の異常が続く場合は、原材料・仕掛品・製品を次の安全な取扱い温度を超えないように使用できる保管庫に移動させます。未開封冷蔵=ラベル温度以下、開封済=4°C以下、冷凍仕掛・製品=−15°C以下（一般衛生管理プログラム 10条 T）。",
+ p:"🔄 温度異常継続：安全温度の別保管庫へ移動"},
+
+{c:"保管管理",t:false,
+ q:"保管庫内の備品の清掃頻度として正しいものはどれか？",
+ o:["週に1回以上","月に1回以上","3か月に1回以上","半年に1回以上"],
+ a:1,
+ e:"保管庫内の備品は最低でも月に1回清掃します。食品接触面は毎日の製造作業終了時、その他の備品は最低でも3か月に1回清掃します（一般衛生管理プログラム 10条 C）。",
+ p:"🧹 保管庫備品＝月1回以上 / 食品接触面＝毎日 / その他＝3か月"},
+
+{c:"解凍",t:false,
+ q:"コストコで認可されている解凍方法に該当しないものはどれか？",
+ o:["クーラー解凍（4°C以下管理）","室温での自然解凍（屋外含む）","21°C以下の飲用水での流水解凍","電子レンジで決められた手順で解凍"],
+ a:1,
+ e:"認可されている解凍方法は①クーラー解凍（4°C以下）②電子レンジ解凍③流水解凍（21°C以下）④加熱調理の一部として⑤氷水解凍（スペックシート明記時）。室温解凍はスペックシート明記時かつ加熱殺菌前提のみで、屋外解凍は認可されません（Level 2 第7.6節）。",
+ p:"✅ 認可解凍：クーラー・電子レンジ・流水・加熱・氷水"},
+
+{c:"解凍",t:false,
+ q:"流水解凍時の水温の上限として正しいものはどれか？",
+ o:["15°C以下","21°C以下","25°C以下","30°C以下"],
+ a:1,
+ e:"流水解凍時の水温は21°C以下の飲用可能な流水でなければなりません。これより高い温度では危険温度区域に長時間入る可能性があります（一般衛生管理プログラム 08条 N）。",
+ p:"💧 流水解凍＝21°C以下の飲用可能な流水"},
+
+{c:"解凍",t:true,
+ q:"解凍が完了した原材料の定義として正しいものはどれか？",
+ o:["表面温度が0°C以上かつ使用可能","中心部まで完全に解け切った状態","冷蔵庫で保管できる温度になる","室温と同等の温度に達する状態"],
+ a:0,
+ e:"解凍完了は、原材料の表面温度が0°C以上かつ製造に使用できる状態となることです。重要：解凍された製品・原材料・仕掛品の再凍結は不可（一般衛生管理プログラム 08条 N）。",
+ p:"🌡️ 解凍完了＝表面0°C以上＋使用可能。再凍結NG"},
+
+{c:"解凍",t:false,
+ q:"流水解凍で使用してはならないシンクはどれか？",
+ o:["食品準備専用の1槽シンク","食品準備専用の2槽シンク","洗浄消毒専用の3槽・4槽","冷凍解凍専用の特設シンク"],
+ a:2,
+ e:"流水解凍は食品準備専用シンク（1槽もしくは2槽シンク）でのみ行います。洗浄消毒専用の3槽・4槽シンクは流水解凍のための使用は不可です（一般衛生管理プログラム 08条 N）。",
+ p:"🚱 流水解凍：1槽・2槽OK / 3槽・4槽NG"},
+
+{c:"解凍",t:false,
+ q:"流水解凍が完了した原材料の処理として正しいものはどれか？",
+ o:["必ず冷凍庫で再凍結処理する","常温で2時間まで放置可能","製造作業終了時まで放置OK","1時間以内不使用→クーラー移動"],
+ a:3,
+ e:"流水解凍が完了した原材料は1時間以内に製造に使用する場合を除き、クーラーで温度管理をしなければなりません。再凍結は不可です（一般衛生管理プログラム 08条 N）。",
+ p:"⏰ 流水解凍後：1時間以内使用 or クーラー保管"},
+
+{c:"解凍",t:false,
+ q:"クーラー解凍中の原材料の管理として正しいものはどれか？",
+ o:["解凍中であることを明確に表示","解凍開始日のみ記録すれば十分","密封してわからないようにする","在庫整理のため目立たなく保管"],
+ a:0,
+ e:"クーラーに保管されている解凍中の原材料は解凍中であることを明確にし、コードデートラベル等で解凍開始日と解凍完了日（目安）を明確にします（一般衛生管理プログラム 08条 N）。",
+ p:"🏷️ クーラー解凍：「解凍中」表示＋開始日・完了日明記"},
+
+{c:"解凍",t:false,
+ q:"室温解凍の取り扱いとして正しいものはどれか？",
+ o:["暑い時期以外は実施可能","スペックシート明記時のみ可","管理職判断で常に可能","冷蔵不要食材はすべて可"],
+ a:1,
+ e:"室温解凍はスペックシート（レシピ）に明記されている場合以外は不可です。さらに解凍後の調理工程で加熱殺菌がある場合のみに限ります（一般衛生管理プログラム 08条 N）。",
+ p:"⛔ 室温解凍：スペック明記時＋加熱殺菌ありの2条件"},
+
+{c:"解凍",t:false,
+ q:"氷水解凍が認められる主な部署として正しいものはどれか？",
+ o:["D61 MEAT部門の食肉解凍時","D63 SERVICE DELI部門","D64 FISH部門の鮮魚刺身類","D88 FOOD COURT部門"],
+ a:2,
+ e:"同割合で実施される氷水解凍はスペックシート（レシピ）に明記されている場合のみ可、基本的にはD64 FISH部門で鮮魚刺身類の鮮度を保つ場合のみ可です（一般衛生管理プログラム 08条 N）。",
+ p:"🐟 氷水解凍：D64 FISH（鮮魚刺身）が基本"},
+
+{c:"解凍",t:true,
+ q:"解凍された製品・原材料・仕掛品の再凍結に関するルールはどれか？",
+ o:["原則禁止（再凍結は不可とする）","品質を保つため必ず再凍結する","24時間以内なら再凍結が可能","保管温度を下げれば再凍結が可能"],
+ a:0,
+ e:"解凍された製品・原材料・仕掛品の再凍結は不可です。一度解凍すると組織が破壊され、再凍結時にバクテリア増殖や品質劣化のリスクが大きくなるためです（一般衛生管理プログラム 08条 N）。",
+ p:"🚫 再凍結禁止（品質低下＋衛生リスク）"},
+
+{c:"解凍",t:false,
+ q:"解凍が完了した原材料の保管期限の準拠先として正しいものはどれか？",
+ o:["Use By Date List準拠","管理職の口頭による指示","元のラベルの賞味期限まで","製造日から1週間以内まで"],
+ a:0,
+ e:"解凍が完了した原材料の保管期限はUse By Date Listに準拠します。各部署で個別のリスト（D61・D62・D63・D64・D88）が用意されています（一般衛生管理プログラム 08条 O）。",
+ p:"📅 解凍後保管期限はUse By Date Listに従う"},
+
+{c:"FIFO・期限管理",t:false,
+ q:"FIFO（先入先出）の正しい運用方法として正しいものはどれか？",
+ o:["最新入荷品を最も取りやすい位置に","最も取りやすい位置に期限最短品を配置","購入順に無作為に陳列する","使用頻度の高い品を手前に配置"],
+ a:1,
+ e:"FIFO（First-In First-Out）は最も取りやすい位置に賞味期限・消費期限が最短のものを置き、取りにくい位置に進むにつれて期限が後になる食品を置くことです（Level 2 第7.4節）。",
+ p:"📦 FIFO＝期限最短品を手前に。古い順から使う"},
+
+{c:"FIFO・期限管理",t:true,
+ q:"使用期限ラベル（コードデート）の貼付場所として該当しないものはどれか？",
+ o:["原材料・仕掛品の現物に貼付","保管中の冷蔵庫の扉に貼付","保管しているラックに貼付","担当者の名札に貼付管理"],
+ a:3,
+ e:"コードデートラベルは原材料・仕掛品の現物、または保管している冷蔵庫の扉、または保管しているラックに貼り付けます。担当者の名札は貼付場所として認められません（一般衛生管理プログラム 07条 J）。",
+ p:"🏷️ コードデート：現物 / 冷蔵庫扉 / ラックの3か所"},
+
+{c:"FIFO・期限管理",t:false,
+ q:"原材料・仕掛品の製造使用期限として正しいものはどれか？",
+ o:["コードデート記載日の翌日まで","コードデート記載日の前日まで","コードデート記載日の1週間後","製造担当者の判断で延長可能"],
+ a:1,
+ e:"原材料・仕掛品はコードデートラベルに記載された日付の前日もしくは記載されている日時までしか製造に使用・製品化してはなりません（一般衛生管理プログラム 08条 I）。",
+ p:"📅 コードデート日付の「前日」まで使用可"},
+
+{c:"FIFO・期限管理",t:false,
+ q:"食品表示ラベルが製造から1時間以内に貼付できない場合の対応はどれか？",
+ o:["翌日に貼付すれば問題ない","使用期限ラベルで代用可能","一度冷凍庫保管に切替える","その商品は廃棄処分する"],
+ a:2,
+ e:"製造終了後1時間以内に食品表示ラベルを貼り付けられない場合は、使用期限ラベルで代用することができます（一般衛生管理プログラム 07条 J）。",
+ p:"🔄 食品表示ラベル間に合わず→使用期限ラベルで代用可"},
+
+{c:"FIFO・期限管理",t:false,
+ q:"時間管理が必要な原材料・仕掛品の使用期限記載方法として正しいものはどれか？",
+ o:["日付のみ記載すれば十分","使用可能時間まで具体記載","担当者のサインで管理する","電子データのみで管理する"],
+ a:1,
+ e:"時間管理が必要な原材料・仕掛品には使用可能な時間まで具体的にコードデートラベルに記載します。Time Management ルールに従います（一般衛生管理プログラム 07条 J）。",
+ p:"⏰ 時間管理品：時間まで具体的に記載"},
+
+{c:"FIFO・期限管理",t:false,
+ q:"使用期限管理の基準として遵守すべきリストはどれか？",
+ o:["各従業員の経験に基づく判断","購買部のUse By Date List","本社の総合管理基準に準拠する","保健所の指導要綱に従って判断"],
+ a:1,
+ e:"使用期限は購買部各部門が作成しているUse By Date Listを遵守しなければなりません。D61 MEAT・D62 BAKERY・D63 SERVICE DELI・D64 FISH・D88 FOOD COURTそれぞれに専用リストがあります（一般衛生管理プログラム 07条 J）。",
+ p:"📋 期限管理＝購買部のUse By Date List"},
+
+{c:"FIFO・期限管理",t:true,
+ q:"開封後の原材料・仕掛品を再使用する際の点検事項として誤っているものはどれか？",
+ o:["コードデートラベルの記載確認","使用期限が切れていないかの再点検","見た目だけで使用可否を判断","1日の作業終了時にも同様の点検"],
+ a:2,
+ e:"開封後の原材料・仕掛品を製造に再使用する際はコードデートラベルが間違っていないか・使用期限が切れていないかを再点検します。1日の作業終了後も同様の点検が必要です。見た目だけの判断は不可（一般衛生管理プログラム 07条 J）。",
+ p:"🔍 再使用時：見た目NG、ラベル＋期限を必ず再点検"},
+
+{c:"FIFO・期限管理",t:false,
+ q:"翌日の製造作業で使用できない原材料・仕掛品の処理として正しいものはどれか？",
+ o:["そのまま冷凍庫で長期保存にする","デストロイ/デモシート記録後廃棄","次回出勤者への引き継ぎをする","管理者の自宅にて消費する処理"],
+ a:1,
+ e:"翌日の製造作業で使用できない原材料・仕掛品がある場合は、デストロイシートまたはデモシートに記録して廃棄します（一般衛生管理プログラム 07条 K）。",
+ p:"📝 使用不可原材料：デストロイ/デモシート記録→廃棄"},
+
+{c:"FIFO・期限管理",t:false,
+ q:"FCトッピング用ダイスタマネギの使用可能時間はどれか？",
+ o:["製造後2時間まで","製造後4時間まで","製造後6時間まで","製造後8時間まで"],
+ a:2,
+ e:"フードコートでトッピングとして使用されているダイスタマネギは、微生物検査の結果により、最長でも6時間までしか使用することができません（一般衛生管理プログラム 08条 K-d）。",
+ p:"🧅 FCトッピングダイスタマネギ：最大6時間"},
+
+{c:"FIFO・期限管理",t:false,
+ q:"記録書類に保管期間が明示されていない場合の最低保管期間はどれか？",
+ o:["3か月以上","6か月以上","1年以上","3年以上"],
+ a:2,
+ e:"記録書類に保管期間が明示されていない場合は、最低でも1年間はその記録を保管します。記録書類に保管期間が明示されている場合はその保管期間に従います（一般衛生管理プログラム 15条 H）。",
+ p:"📁 記録保管：最低1年（明示があればそれに従う）"},
+
+{c:"FIFO・期限管理",t:false,
+ q:"記録の訂正方法として正しいものはどれか？",
+ o:["修正テープで塗りつぶす","修正ペンで上書きする","二重線で消し正記入する","消しゴムで消し再記入する"],
+ a:2,
+ e:"記録を訂正する場合は二重線で消し正しい文字や数字を記入します。修正テープや修正ペンの使用、塗りつぶし、改ざんは禁止です。訂正後はフレッシュ部門の管理職または責任者が訂正内容を記録・点検します（一般衛生管理プログラム 15条 D・E）。",
+ p:"✏️ 訂正＝二重線＋正記入。修正テープ・ペンは禁止"},
+
+{c:"FIFO・期限管理",t:false,
+ q:"記録の空欄項目への記入方法として正しいものはどれか？",
+ o:["空白のままにしておく","斜線/・締めマーク〆・バツ×","管理者の確認サインを記入","「不明」と記載しておく"],
+ a:1,
+ e:"空欄の項目には斜線「／」や締めマーク「〆」、バツ印「×」を用い、記録の量が不足していないことを明確にします（一般衛生管理プログラム 15条 F）。",
+ p:"📝 空欄は「/」「〆」「×」で記入。空白NG"},
+
+{c:"ゾーニング",t:false,
+ q:"ゾーニング（区分け）の正しい定義はどれか？",
+ o:["食品の見た目で分類する","特性に応じて機器・備品分け","価格帯で食品を区別する","製造日時で食品を分類する"],
+ a:1,
+ e:"区分け（ゾーニング）とは、製品・原材料・仕掛品といった食品の特性に合わせて、ラック・パレット、台車などの作業機器ならびに備品を分けて使用・管理することです（一般衛生管理プログラム 07条 E）。",
+ p:"🚧 ゾーニング＝食品特性で機器・備品を分ける"},
+
+{c:"ゾーニング",t:false,
+ q:"ゾーニングが必須となる食品の組み合わせとして該当しないものはどれか？",
+ o:["Non-RTEとRTE食品の区分け","異なる畜種の食肉同士の区分け","同じ原材料の異なるロット区分","化学薬品と食品の区分け管理"],
+ a:2,
+ e:"ゾーニング必須：①Non-RTEとRTE②異なる畜種の食肉③化学薬品と食品。同じ原材料の異なるロット同士はゾーニング必須対象ではなく、通常のFIFO管理で十分です（一般衛生管理プログラム 07条 D・F・H）。",
+ p:"🚧 ゾーニング必須：Non-RTE/RTE・畜種違い・薬品/食品"},
+
+{c:"ゾーニング",t:true,
+ q:"D63デリ部門のオーブンルームでの作業ゾーニングルールとして正しいものはどれか？",
+ o:["色違いエプロンの同時作業可","赤・青・白エプロンの同時禁止","管理職許可時は同時可能","ヘアネットの色で区別"],
+ a:1,
+ e:"交差汚染防止のため、赤（加熱済）・青（生鶏肉）・白（生牛肉/豚肉）エプロン着用スタッフは、同じ製造場所で同時に作業してはなりません。色違いエプロンの同時作業は禁止です（一般衛生管理プログラム 04条 G）。",
+ p:"⚠️ D63オーブンルーム：色違いエプロンの同時作業禁止"},
+
+{c:"ゾーニング",t:false,
+ q:"製造場の床から包装されていない食品を置く際の最低位置はどれか？",
+ o:["ラックの最下段に置く","ラックの最下段は避ける","床面に直接置いてOK","管理職の判断による"],
+ a:1,
+ e:"製造中において、包装されていない食品があらゆるラックならびにカートの最下段に置かれていないことが、コンタミネーション予防の好例です。床からの跳ね水や汚染を防ぐためです（一般衛生管理プログラム 08条 B）。",
+ p:"⬆️ 包装なし食品はラック最下段に置かない"},
+
+{c:"ゾーニング",t:false,
+ q:"異物混入防止のためのストレージラック使用方法として正しいものはどれか？",
+ o:["ラック上部から挿入下部から取出","常にラック中央段に配置する","使用頻度順に上下を入替する","色別に上下を分けて配置する"],
+ a:0,
+ e:"異物混入を防ぐため、包装されていない食品が載っているトレイをストレージラックに一時保管する際には、ラック上部からトレイを挿入し、容器包装時にはラックの下部から取り出し包装を行います（一般衛生管理プログラム 08条 B）。",
+ p:"↕️ ストレージラック：上から挿入→下から取出（異物落下防止）"}
+];
+let cur=0,ans=new Array(Q.length).fill(null),done=new Array(Q.length).fill(false);
+const L=['A','B','C','D','E'];
+function start(){document.getElementById('start').style.display='none';document.getElementById('quiz').style.display='block';load(0);}
+function load(i){
+  cur=i;const q=Q[i],tot=Q.length;
+  document.getElementById('qn').textContent=`問題 ${i+1} / ${tot}`;
+  document.getElementById('qcat').textContent=q.c;
+  document.getElementById('qt').textContent=q.q;
+  document.getElementById('pt').textContent=`${i+1} / ${tot}`;
+  document.getElementById('pbi').style.width=((i+1)/tot*100)+'%';
+  const tr=document.getElementById('trap');tr.className=q.t?'trap on':'trap';
+  const o=document.getElementById('opts');o.innerHTML='';
+  q.o.forEach((opt,j)=>{
+    const d=document.createElement('div');d.className='opt';
+    d.innerHTML=`<span class="ol">${L[j]}</span><span>${opt}</span>`;
+    d.onclick=()=>pick(j);o.appendChild(d);
+  });
+  const e=document.getElementById('exp');e.style.display='none';e.className='exp';
+  if(done[i])show(ans[i],q.a,q.e,q.p);
+  document.getElementById('pb').disabled=i===0;
+  const last=i===tot-1;
+  document.getElementById('nb').style.display=last?'none':'inline-block';
+  document.getElementById('sub').style.display=last?'inline-block':'none';
+}
+function pick(j){
+  if(done[cur])return;
+  ans[cur]=j;done[cur]=true;
+  show(j,Q[cur].a,Q[cur].e,Q[cur].p);
+}
+function show(sel,cor,et,pt){
+  const os=document.querySelectorAll('.opt');
+  os.forEach(o=>o.classList.add('dis'));
+  os[cor].classList.add('cor');
+  if(sel!==cor)os[sel].classList.add('wrg');else os[sel].classList.add('cor');
+  const e=document.getElementById('exp');e.style.display='block';
+  const ok=sel===cor;e.className='exp'+(ok?'':' we');
+  e.innerHTML=`<div class="et">${ok?'✓ 正解！':'✗ 不正解'}</div>${et}`+(pt?`<div class="ep">${pt}</div>`:'');
+}
+function next(){if(cur<Q.length-1)load(cur+1);}
+function prev(){if(cur>0)load(cur-1);}
+function submit(){
+  const tot=Q.length;let c=0,u=0;
+  Q.forEach((q,i)=>{if(ans[i]===null)u++;else if(ans[i]===q.a)c++;});
+  const w=tot-c-u,sc=Math.round(c/tot*100);
+  document.getElementById('quiz').style.display='none';
+  document.getElementById('result').style.display='block';
+  document.getElementById('pbi').style.width='100%';
+  document.getElementById('pt').textContent=`${tot} / ${tot}`;
+  document.getElementById('sp').textContent=sc;
+  document.getElementById('rc').textContent=c;
+  document.getElementById('rw').textContent=w;
+  document.getElementById('ru').textContent=u;
+  const p=sc>=85;
+  document.getElementById('rtt').textContent=p?'合格 PASS':'不合格 FAIL';
+  document.getElementById('rtt').style.color=p?'var(--correct)':'var(--wrong)';
+  document.getElementById('rm').textContent=p?`🎉 合格ライン（85点）突破！\n正解率 ${sc}% — 本番も大丈夫！`:`合格まであと${85-sc}点。\n解説の💡ポイントを確認して再チャレンジ！`;
+  setTimeout(()=>{const a=document.getElementById('arc');a.style.transition='stroke-dashoffset 1.5s ease';a.style.strokeDashoffset=534-(sc/100)*534;a.style.stroke=p?'var(--correct)':'var(--wrong)';},100);
+}
+function review(){
+  const s=document.getElementById('rvs');
+  s.style.display=s.style.display==='none'?'block':'none';
+  if(s.innerHTML.trim()!==''&&s.style.display==='none')return;
+  let h='<div class="rvt">解答レビュー — 全問</div>';
+  Q.forEach((q,i)=>{
+    const ok=ans[i]===q.a,cl=ok?'rc':'rw';
+    const at=ans[i]===null?'未回答':`${L[ans[i]]}. ${q.o[ans[i]]}`;
+    const pp=q.p?`<div style="margin-top:6px;padding:6px 10px;background:rgba(251,191,36,.08);border-left:3px solid var(--gold);border-radius:4px;font-size:.78rem;color:var(--gold)">${q.p}</div>`:'';
+    h+=`<div class="rvi ${cl}"><div style="font-size:.72rem;margin-bottom:7px;color:var(--accent);font-family:'Syne',sans-serif">${i+1}問目 — ${q.c}${q.t?' ⚠':''}</div><div class="rvq">${q.q}</div><div><div class="ral">あなたの回答</div><div class="${ok?'rac':'raw'}" style="font-size:.85rem">${at}</div>${!ok?`<div class="ral" style="margin-top:7px">正解</div><div class="rac" style="font-size:.85rem">${L[q.a]}. ${q.o[q.a]}</div>`:''}<div class="ral" style="margin-top:7px">解説</div><div style="opacity:.8;font-size:.82rem;line-height:1.7">${q.e}</div>${pp}</div></div>`;
+  });
+  s.innerHTML=h;
+}
+function retry(){
+  ans=new Array(Q.length).fill(null);done=new Array(Q.length).fill(false);
+  document.getElementById('result').style.display='none';
+  document.getElementById('arc').style.strokeDashoffset=534;
+  document.getElementById('rvs').style.display='none';document.getElementById('rvs').innerHTML='';
+  document.getElementById('quiz').style.display='block';
+  document.getElementById('pbi').style.width='1%';load(0);
+}
+</script>
+</body>
+</html>

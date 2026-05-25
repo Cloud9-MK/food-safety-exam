@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>コストコ フードセーフティー 模擬試験 Level 2 — Vol.1</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Syne:wght@700;800&display=swap');
+:root{
+  --bg:#08090D;--card:#10121A;--border:#1E2130;
+  --purple:#5B4FE9;--accent:#A78BFA;--gold:#FBBF24;
+  --text:#F1F0FF;--muted:#6B7280;
+  --correct:#10B981;--wrong:#EF4444;--selected:#1E40AF;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;}
+#header{
+  background:linear-gradient(135deg,#1E1B4B 0%,#3730A3 60%,#5B4FE9 100%);
+  padding:13px 26px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 4px 24px rgba(91,79,233,.4);
+  border-bottom:2px solid var(--accent);
+}
+#header h1{font-family:'Syne',sans-serif;font-size:1.5rem;letter-spacing:2px;color:#fff;font-weight:800;}
+.hd-sub{font-size:.62rem;color:rgba(255,255,255,.6);letter-spacing:2px;margin-bottom:2px;}
+.vol-badge{background:var(--gold);color:#111;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:800;padding:3px 10px;border-radius:4px;letter-spacing:2px;margin-left:10px;}
+#pw{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+#pt{font-size:.78rem;color:rgba(255,255,255,.85);}
+#pbo{width:180px;height:5px;background:rgba(255,255,255,.18);border-radius:3px;overflow:hidden;}
+#pbi{height:100%;width:0%;background:var(--accent);border-radius:3px;transition:width .4s;}
+#start{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90vh;padding:40px 20px;text-align:center;}
+.vl{font-family:'Syne',sans-serif;font-size:.78rem;letter-spacing:5px;color:var(--accent);margin-bottom:14px;}
+.bt{font-family:'Syne',sans-serif;font-size:clamp(2.6rem,6.5vw,4.5rem);color:#fff;letter-spacing:2px;line-height:1.1;margin-bottom:8px;font-weight:800;}
+.bt span{color:var(--accent);}
+.tl{font-size:.9rem;color:var(--gold);letter-spacing:1px;margin-bottom:6px;}
+.bs{font-size:.8rem;color:var(--muted);margin-bottom:40px;}
+.ig{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:480px;margin-bottom:40px;}
+.ic{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.ic .n{font-family:'Syne',sans-serif;font-size:2.4rem;color:var(--accent);line-height:1;font-weight:700;}
+.ic .l{font-size:.68rem;color:var(--muted);margin-top:4px;}
+.sb{background:var(--purple);color:#fff;border:1px solid var(--accent);padding:16px 56px;font-size:1rem;font-weight:700;border-radius:8px;cursor:pointer;letter-spacing:2px;transition:all .15s;box-shadow:0 4px 24px rgba(91,79,233,.5);}
+.sb:hover{background:#4338CA;transform:translateY(-2px);}
+#quiz{display:none;padding:28px 20px;max-width:820px;margin:0 auto;}
+.qm{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.qn{font-family:'Syne',sans-serif;font-size:1rem;color:var(--gold);letter-spacing:2px;font-weight:700;}
+.qcat{font-size:.67rem;background:var(--border);color:var(--muted);padding:4px 12px;border-radius:20px;}
+.trap{display:none;font-size:.65rem;background:rgba(239,68,68,.15);color:#F87171;border:1px solid rgba(239,68,68,.3);padding:3px 10px;border-radius:20px;margin-right:6px;}
+.trap.on{display:inline-block;}
+.qt{font-size:1rem;line-height:1.9;font-weight:500;margin-bottom:22px;padding:22px;background:var(--card);border:1px solid var(--border);border-radius:12px;border-left:4px solid var(--accent);}
+.opts{display:flex;flex-direction:column;gap:10px;}
+.opt{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:15px 18px;cursor:pointer;display:flex;align-items:flex-start;gap:12px;transition:border-color .15s,background .15s,transform .1s;font-size:.93rem;line-height:1.65;}
+.opt:hover:not(.dis){border-color:#334;background:#13151F;transform:translateX(4px);}
+.ol{min-width:27px;height:27px;background:var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--muted);flex-shrink:0;margin-top:1px;transition:background .15s,color .15s;}
+.opt.sel{border-color:var(--selected);background:rgba(30,64,175,.18);}
+.opt.sel .ol{background:var(--selected);color:#fff;}
+.opt.cor{border-color:var(--correct);background:rgba(16,185,129,.1);}
+.opt.cor .ol{background:var(--correct);color:#fff;}
+.opt.wrg{border-color:var(--wrong);background:rgba(239,68,68,.1);}
+.opt.wrg .ol{background:var(--wrong);color:#fff;}
+.opt.dis{cursor:default;}
+.exp{display:none;margin-top:16px;padding:18px 20px;background:#061410;border:1px solid var(--correct);border-radius:10px;font-size:.88rem;line-height:1.9;color:#A7F3D0;}
+.exp.we{background:#140606;border-color:var(--wrong);color:#FECACA;}
+.exp .et{font-weight:700;margin-bottom:6px;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;}
+.exp .ep{margin-top:10px;padding:8px 12px;background:rgba(251,191,36,.08);border-left:3px solid var(--gold);border-radius:4px;font-size:.82rem;color:var(--gold);}
+.nr{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
+.nb{padding:11px 28px;border:none;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all .15s;}
+.nb.p{background:var(--purple);color:#fff;border:1px solid var(--accent);}
+.nb.p:hover{background:#4338CA;}
+.nb.s{background:var(--border);color:var(--text);}
+.nb.s:hover{background:#252840;}
+.nb:disabled{opacity:.35;cursor:not-allowed;}
+#result{display:none;padding:50px 20px;max-width:680px;margin:0 auto;text-align:center;}
+.sr{width:200px;height:200px;margin:0 auto 28px;position:relative;}
+.sr svg{transform:rotate(-90deg);}
+.sr .st{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.sp{font-family:'Syne',sans-serif;font-size:3.2rem;line-height:1;color:var(--text);font-weight:800;}
+.sl{font-size:.65rem;color:var(--muted);}
+.rt{font-family:'Syne',sans-serif;font-size:2.2rem;letter-spacing:2px;margin-bottom:8px;font-weight:800;}
+.rm{color:var(--muted);margin-bottom:28px;line-height:1.8;white-space:pre-line;}
+.rsg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+.rsc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.rsn{font-family:'Syne',sans-serif;font-size:2rem;line-height:1;font-weight:700;}
+.rsl{font-size:.68rem;color:var(--muted);margin-top:4px;}
+.rb{background:var(--purple);color:#fff;border:1px solid var(--accent);padding:14px 44px;font-size:.95rem;font-weight:700;border-radius:8px;cursor:pointer;letter-spacing:2px;transition:all .15s;margin:8px;}
+.rb:hover{background:#4338CA;}
+.rvs{text-align:left;margin-top:44px;}
+.rvt{font-family:'Syne',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--gold);margin-bottom:18px;font-weight:700;}
+.rvi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:10px;}
+.rvi.rw{border-color:rgba(239,68,68,.35);}
+.rvi.rc{border-color:rgba(16,185,129,.22);}
+.rvq{font-size:.88rem;margin-bottom:10px;line-height:1.6;}
+.ral{color:var(--muted);font-size:.72rem;margin-bottom:3px;}
+.rac{color:var(--correct);font-weight:500;}
+.raw{color:var(--wrong);}
+</style>
+<!-- PWA-INJECT-START -->
+<link rel="manifest" href="./manifest.json" />
+<meta name="theme-color" content="#E31837" />
+<meta name="application-name" content="FoodSafety模試" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="FoodSafety模試" />
+<link rel="apple-touch-icon" href="./icons/icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png" />
+<link rel="shortcut icon" href="./icons/icon-64.png" />
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function (e) {
+        console.warn('SW register failed:', e);
+      });
+    });
+  }
+</script>
+<!-- PWA-INJECT-END -->
+</head>
+<body>
+<div id="header">
+  <div><div class="hd-sub">COSTCO WHOLESALE JAPAN</div><h1>FOOD SAFETY EXAM <span class="vol-badge">VOL.5</span></h1></div>
+  <div id="pw"><span id="pt">0 / 61</span><div id="pbo"><div id="pbi"></div></div></div>
+</div>
+<div id="start">
+  <div class="vl">VOLUME 5 — PASS GUARANTEE EDITION</div>
+  <div class="bt">模擬試験<br><span>第5弾</span></div>
+  <div class="tl">⚡ 絶対合格のために設計された100問</div>
+  <div class="bs">本番で出やすい・間違えやすい・数値が似ているポイントを厳選</div>
+  <div class="ig">
+    <div class="ic"><div class="n">61</div><div class="l">問題数</div></div>
+    <div class="ic"><div class="n">4-5</div><div class="l">択問題</div></div>
+    <div class="ic"><div class="n">85</div><div class="l">合格点</div></div>
+  </div>
+  <button class="sb" onclick="start()">試験開始</button>
+</div>
+<div id="quiz">
+  <div class="qm">
+    <span class="qn" id="qn">問題 1 / 61</span>
+    <div style="display:flex;align-items:center;">
+      <span class="trap" id="trap">⚠ ひっかけ注意</span>
+      <span class="qcat" id="qcat"></span>
+    </div>
+  </div>
+  <div class="qt" id="qt"></div>
+  <div class="opts" id="opts"></div>
+  <div class="exp" id="exp"></div>
+  <div class="nr">
+    <button class="nb s" id="pb" onclick="prev()">◀ 前へ</button>
+    <button class="nb p" id="nb" onclick="next()">次へ ▶</button>
+    <button class="nb p" id="sub" onclick="submit()" style="display:none">結果を見る</button>
+  </div>
+</div>
+<div id="result">
+  <div class="sr">
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="85" fill="none" stroke="#1E2130" stroke-width="13"/>
+      <circle id="arc" cx="100" cy="100" r="85" fill="none" stroke="#5B4FE9" stroke-width="13"
+        stroke-linecap="round" stroke-dasharray="534" stroke-dashoffset="534"/>
+    </svg>
+    <div class="st"><div class="sp" id="sp">0</div><div class="sl">点</div></div>
+  </div>
+  <div class="rt" id="rtt">—</div>
+  <div class="rm" id="rm"></div>
+  <div class="rsg">
+    <div class="rsc"><div class="rsn" id="rc" style="color:var(--correct)">0</div><div class="rsl">正解</div></div>
+    <div class="rsc"><div class="rsn" id="rw" style="color:var(--wrong)">0</div><div class="rsl">不正解</div></div>
+    <div class="rsc"><div class="rsn" id="ru" style="color:var(--gold)">0</div><div class="rsl">未回答</div></div>
+  </div>
+  <button class="rb" onclick="retry()">もう一度挑戦</button>
+  <button class="rb" style="background:var(--border);border-color:var(--border)" onclick="review()">間違いを確認</button>
+  <div class="rvs" id="rvs" style="display:none"></div>
+</div>
+<script>
+const Q=[
+{c:"基礎知識",t:false,
+ q:"食品安全管理における「危険温度区域（Danger Zone）」の温度範囲はどれか？",
+ o:["0°C〜37°Cの範囲","4°C〜60°Cの範囲","5°C〜65°Cの範囲","10°C〜70°Cの範囲"],
+ a:1,
+ e:"危険温度区域は4°C〜60°C（40°F〜140°F）です。この範囲で病原性バクテリアが急速に増殖します。最適増殖温度はヒトの体温に近い37°C付近です（Level 2 第7.1節）。",
+ p:"🌡️ 4°C〜60°C：覚え方は「4から60」シックスティーン上昇"},
+
+{c:"基礎知識",t:true,
+ q:"FATTOMの6要素のうち、バクテリア増殖の「水分」を示すものはどれか？",
+ o:["F（Food：食品の栄養成分）","A（Acidity：食品の酸性度）","M（Moisture：食品の水分活性）","T（Temperature：周囲の温度）"],
+ a:2,
+ e:"FATTOM = Food（食品）/ Acidity（酸性度）/ Temperature（温度）/ Time（時間）/ Oxygen（酸素）/ Moisture（水分）の6要素。水分は「M」が示します。「F」は食品、「T」は温度または時間で水分ではないため要注意（Level 2 第3.3節）。",
+ p:"⚠️ FATTOMの「T」は温度と時間の両方を含む。水分は「M」で別物"},
+
+{c:"基礎知識",t:false,
+ q:"バクテリア増殖の6条件「FATTOM」の正しい組み合わせはどれか？",
+ o:["Food / Acidity / Time / Temperature / Oxygen / Moisture","Fat / Acidity / Toxin / Temperature / Oxygen / Mineral","Food / Air / Time / Texture / Oil / Moisture","Food / Acid / Tannin / Temperature / Oxygen / Mass"],
+ a:0,
+ e:"FATTOMはバクテリア増殖の6条件：F=Food（食品の栄養）/ A=Acidity（酸性度）/ T=Time（時間）/ T=Temperature（温度）/ O=Oxygen（酸素）/ M=Moisture（水分）。Tが2つあり、時間と温度の両方を表すのがポイント（Level 2 第3.3節）。",
+ p:"🧬 FATTOM 6要素：食品・酸性度・時間・温度・酸素・水分（Tは2つ）"},
+
+{c:"個人衛生",t:false,
+ q:"製造場内での私物の持ち込みに関するルールとして正しいものはどれか？",
+ o:["腕時計と結婚指輪は着用可能","スマートフォンの持ち込みは可能","メモ帳は破れがなければ持ち込み可","個人の水筒ボトルの持ち込みは可"],
+ a:2,
+ e:"製造場内には、落丁する恐れがなくかつ破れのないメモ帳以外の私物を持ち込んではなりません。腕時計・指輪などのアクセサリーはすべて禁止、水分補給は各部門支給の水のみ可能で個人ボトル不可です（一般衛生管理プログラム 04条 L〜N）。",
+ p:"📝 持込可はメモ帳（破れなし・落丁なし）のみ。水は支給品限定"},
+
+{c:"個人衛生",t:false,
+ q:"D63デリ部門のオーブンルームにおけるエプロン色分けの正しい組み合わせはどれか？",
+ o:["赤＝生肉用、青＝加熱済み用","赤＝加熱済み用、青＝生鶏肉用","白＝生鶏肉用、青＝生牛肉用","黄＝生肉用、白＝加熱済み用"],
+ a:1,
+ e:"D63デリ部門のオーブンルームでは、赤エプロン＝加熱調理済みの食品を取り扱うとき、青エプロン＝生の鶏肉を取り扱うとき、白エプロン＝生の牛肉または豚肉を取り扱うときです。これらは同じ場所で同時作業してはなりません（一般衛生管理プログラム 04条 G）。",
+ p:"🎨 赤＝Ready（加熱済）、青＝Chicken（鶏）、白＝White meat（牛・豚）"},
+
+{c:"健康管理",t:false,
+ q:"フレッシュ部門の従業員が受ける腸内細菌PCR検査の頻度として正しいものはどれか？",
+ o:["入社時のみ実施する","半年に1回実施する","3か月に1回実施する","月に1回実施する"],
+ a:3,
+ e:"フレッシュ部門に所属するすべての従業員は、月に1回腸内細菌PCR検査を受けます。検査項目は赤痢・サルモネラ属菌（腸チフス・パラチフスを含む）・腸管出血性大腸菌O-157です（一般衛生管理プログラム 03条 J）。",
+ p:"📅 月1回PCR検査。3項目：赤痢・サルモネラ・O-157"},
+
+{c:"健康管理",t:true,
+ q:"腸内細菌検査で「擬陽性」の結果が出た従業員の対応として正しいものはどれか？",
+ o:["本人の同意が得られれば製造作業を継続できる","陰性確定までフレッシュ部門の作業は停止する","マスクと手袋を着用すれば作業を継続できる","3日間の経過観察の後に判断する"],
+ a:1,
+ e:"擬陽性または陽性の結果が判明した時点で、プレップルームやクーラー・フリーザー内作業などフレッシュ部門の原材料・仕掛品・商品に触れる業務には従事させてはなりません。最終結果が陰性となるまで作業制限を継続します。マスクや手袋では代替できません（一般衛生管理プログラム 03条 K）。",
+ p:"🚫 擬陽性も陽性扱い。陰性確定まで作業停止、装備で代替不可"},
+
+{c:"手洗い",t:false,
+ q:"製造場内の手洗いシンクで実施する手洗いの最低時間として正しいものはどれか？",
+ o:["非接触式タイマーで15秒以上","非接触式タイマーで30秒以上","非接触式タイマーで45秒以上","非接触式タイマーで60秒以上"],
+ a:1,
+ e:"手洗いマニュアルに従い、非接触式タイマーを使用して最低30秒間手を洗わなければなりません。15秒では短く、45秒・60秒は基準ではありません（一般衛生管理プログラム 02条 H）。",
+ p:"⏱️ 30秒。タイマー必須・マニュアル参照"},
+
+{c:"手洗い",t:false,
+ q:"手洗い専用シンクでの使用が認められていない作業はどれか？",
+ o:["流温水とハンドソープでの手指の洗浄","手指消毒後のペーパータオルでの乾燥","使い捨て手袋を着用する前の予備洗い","生野菜や果物の洗浄消毒の前処理作業"],
+ a:3,
+ e:"手洗いシンクは手の洗浄以外のあらゆる作業に使用してはなりません。野菜・果物の消毒は食品準備専用シンク（1槽・2槽）で実施します。3槽・4槽シンクの使用は不可です（一般衛生管理プログラム 02条 D・E、08条 L）。",
+ p:"🚰 手洗いシンクは手専用。野菜消毒は食品準備シンクで"},
+
+{c:"ドレスコード",t:false,
+ q:"D88フードコート部門で生のプルコギビーフを取り扱う際に着用するエプロンの色はどれか？",
+ o:["青色のエプロン","白色のエプロン","黄色のエプロン","濃紺色のエプロン"],
+ a:3,
+ e:"D88フードコート部門では、青＝コンディメント補充・カウンター業務、白＝商品製造時、黄＝サニテーション・清掃時、濃紺＝生のプルコギビーフ取扱時です（一般衛生管理プログラム 04条 H）。",
+ p:"🎨 D88：青コンディ・白製造・黄清掃・濃紺プルコギ"},
+
+{c:"ドレスコード",t:false,
+ q:"別の種類の食品に作業が移る際のエプロンの正しい取扱いはどれか？",
+ o:["アルコール噴霧で消毒すれば継続使用可","洗浄もしくは交換しなければならない","汚れが目立つ場合のみ交換すればよい","ペーパータオルで拭き取れば継続使用可"],
+ a:1,
+ e:"別の種類の食品に作業が移るときは、エプロンを必ず洗浄もしくは交換しなければなりません。アレルゲンや畜種・喫食方法が変わる際は3槽・4槽シンクでの洗浄消毒もしくは交換が必須で、噴霧消毒や拭き取りでの代替は認められません（一般衛生管理プログラム 04条 E・F）。",
+ p:"🔄 食品変更時は洗浄or交換。アルコール噴霧では代替不可"},
+
+{c:"基礎知識",t:false,
+ q:"潜在的に危険性のある食品（PHF）に該当しないものはどれか？",
+ o:["加熱不十分な食肉・カットメロン","牛乳・乳製品・殻付きの卵","生もしくは加熱済みの魚介類","乾燥豆・乾燥パスタ・乾麺類"],
+ a:3,
+ e:"PHF（Potentially Hazardous Food）は水分活性が高く病原性バクテリアが増殖しやすい食品。乾燥豆・乾燥パスタ・乾麺は水分活性が低く、調理前はPHFに該当しません。ただし加熱調理後は水分を含みPHFとなります（Level 2 第2.2節）。",
+ p:"💧 PHFの鍵は「水分」。乾物は調理前まではPHFではない"},
+
+{c:"基礎知識",t:false,
+ q:"RTE食品（Ready To Eat Food）の特徴として最も適切なものはどれか？",
+ o:["加熱調理しなければ喫食できない食品","冷凍保存が必須となる食品の総称","喫食前の処理を必要とせず食べられる食品","冷蔵保存期間が長く設定された加工食品"],
+ a:2,
+ e:"RTE食品は、喫食前の処理（洗浄消毒・加熱調理など）を必要とせず、そのまま食べられる食品です。サラダ・チーズ・生ハム・加熱済み総菜などが該当し、二次汚染が直接食中毒に繋がるため取扱に細心の注意が必要です（Level 2 第2.2節）。",
+ p:"🥗 RTE＝そのまま食べられる。二次汚染リスクが直撃"},
+
+{c:"基礎知識",t:true,
+ q:"バクテリアの増殖に最も適したpH範囲として正しいものはどれか？",
+ o:["pH 1.0〜3.0（強酸性）","pH 4.6〜7.5（弱酸性〜中性）","pH 8.0〜10.0（弱アルカリ性）","pH 11.0〜14.0（強アルカリ性）"],
+ a:1,
+ e:"主な病原性バクテリアはpH 4.6〜7.5の食品を好みます。カットメロンがこのpH帯に該当します。レモンジュースや穀物酢のような酸性食品（pH 4.5未満）ではバクテリア増殖が困難になります。カビや酵母はpH 4.5未満でも生存可能です（Level 2 第3.3節）。",
+ p:"🍋 pH 4.6未満は酸性で防御効果。バクテリアは弱酸〜中性が好み"},
+
+{c:"基礎知識",t:false,
+ q:"バクテリアの増殖に必要な水分活性（Water Activity）の最低値はどれか？",
+ o:["0.50以上の水分活性","0.65以上の水分活性","0.85以上の水分活性","0.95以上の水分活性"],
+ a:2,
+ e:"病原性バクテリアの増殖には水分活性0.85以上が必要です。純水は1.0、生鮮食品は0.99です。0.85未満ではバクテリアは増殖できません。ただし耐乾性カビは0.60まで生存可能です（Level 2 第3.3節）。",
+ p:"💧 バクテリア=0.85以上 / 耐乾性カビ=0.60以上"},
+
+{c:"基礎知識",t:false,
+ q:"バクテリアの二分裂による増殖で最短の所要時間はどれか？",
+ o:["5〜10分の周期","10〜20分の周期","30〜60分の周期","60〜120分の周期"],
+ a:1,
+ e:"バクテリアは二分裂（1個→2個→4個→8個…）で増殖し、最短10〜20分で2倍になります。数時間で数百万個まで増殖可能なため、危険温度区域（4〜60°C）に長時間放置することは絶対避けなければなりません（Level 2 第3.3節）。",
+ p:"⏰ 最短10〜20分で倍増。数時間で数百万個に"},
+
+{c:"基礎知識",t:true,
+ q:"リステリア菌の特性として他の主な病原性バクテリアと異なる点はどれか？",
+ o:["芽胞を形成して加熱に耐える特性","酸素がない環境のみで増殖する","4°C以下の低温でも増殖が可能","塩分濃度が高い環境でしか増殖しない"],
+ a:2,
+ e:"リステリア菌は4°C以下でも増殖可能という特殊な菌です。多くの病原性バクテリアは4-60°Cの危険温度区域で増殖しますが、冷蔵庫内でも増殖するリステリアには特に注意が必要です。芽胞は形成せず、通性嫌気性です（Level 2 第3.3節・3.4節）。",
+ p:"❄️ リステリアは冷蔵庫でも増殖。RTE食品で特に注意"},
+
+{c:"基礎知識",t:false,
+ q:"食中毒の原因となる「危害」の3分類として正しいものはどれか？",
+ o:["細菌的・ウイルス的・寄生虫的","加熱的・冷却的・保管的","生物的・化学的・物理的","内部的・外部的・環境的"],
+ a:2,
+ e:"食品の危害は①生物的危害（細菌・ウイルス・寄生虫）②化学的危害（自然毒・農薬・洗剤・アレルゲン）③物理的危害（ガラス片・金属・毛髪等の異物）の3つに分類されます（Level 2 第2.1節）。",
+ p:"🔬 危害3分類：生物・化学・物理"},
+
+{c:"基礎知識",t:false,
+ q:"カビや酵母など真菌類が生存可能なpHの最低値はどれか？",
+ o:["pH 2.0未満でも生存可能","pH 3.5未満でも生存可能","pH 4.5未満でも生存可能","pH 5.5未満でも生存可能"],
+ a:2,
+ e:"カビや酵母などの真菌類は、pH 4.5未満でも生存可能です。バクテリアはpH 4.6未満で増殖困難ですが、真菌類はより酸性の食品でも増殖できるため、酸性食品の腐敗原因となります（Level 2 第3.3節）。",
+ p:"🍄 真菌類はpH 4.5未満でも生存。バクテリアの境界線とは別"},
+
+{c:"基礎知識",t:false,
+ q:"バクテリアの増殖に最適な温度として正しいものはどれか？",
+ o:["約20°C（室温に近い温度）","約37°C（ヒトの体温に近い温度）","約45°C（やや高めの温度）","約55°C（ホールド温度に近い温度）"],
+ a:1,
+ e:"多くの病原性バクテリアは4-60°Cの危険温度区域で増殖しますが、最適増殖温度はヒトの体温とほぼ同じ37°C付近です。45°C・55°Cはホールド温度（60°C以上）に近いため増殖が抑制され始めます（Level 2 第3.3節）。",
+ p:"🌡️ 最適増殖温度=37°C（体温）。だから食中毒が起こりやすい"},
+
+{c:"基礎知識",t:false,
+ q:"FATTOMの6要素を構成しないものはどれか？",
+ o:["Acidity（食品の酸性度）","Time（増殖の時間軸）","Fermentation（発酵作用）","Moisture（食品の水分）"],
+ a:2,
+ e:"FATTOM = Food / Acidity / Temperature / Time / Oxygen / Moisture の6要素です。Fermentation（発酵）はFATTOMに含まれません。バクテリア増殖の6条件を覚える際は「F=食品、A=酸性度、T=温度・時間、O=酸素、M=水分」と分解して覚えると確実です（Level 2 第3.3節）。",
+ p:"📚 FATTOM = 食品・酸・温度・時間・酸素・水分"},
+
+{c:"個人衛生",t:false,
+ q:"製造場内でアクセサリー類が禁止されている主な理由として最も適切なものはどれか？",
+ o:["労働災害を防止するための安全対策","従業員間の格差を防ぐ平等対策のため","紛失防止のための財産管理上の対策","物理的異物混入リスクと衛生面のため"],
+ a:3,
+ e:"アクセサリー類禁止の主な理由は、破損した際の物理的異物混入リスクと、装飾品自体がバクテリアの温床となる衛生面の懸念です。腕時計・指輪・ピアス等すべて禁止で、サプライヤーや防虫業者など外部関係者も対象です（一般衛生管理プログラム 04条 C）。",
+ p:"💍 異物混入＋雑菌温床のリスク。例外なし全員対象"},
+
+{c:"個人衛生",t:false,
+ q:"製造場入室時のヘアネット着用ルールとして正しいものはどれか？",
+ o:["食品製造に従事する従業員のみ着用","見学者は10分以内なら着用不要","管理職は判断によって着用を省略可","製造場に入室する全員が着用必須"],
+ a:3,
+ e:"製造場に入室するすべての従業員、サプライヤー、防虫施工業者などの外部関係者も含め全員がヘアネットを着用しなければなりません。食品製造に携わらない場合でも着用は必須です（一般衛生管理プログラム 04条 B・C）。",
+ p:"👒 ヘアネット＝入室する人全員。例外なし"},
+
+{c:"個人衛生",t:true,
+ q:"製造場での水分補給に関するルールとして正しいものはどれか？",
+ o:["各フレッシュ部門支給の水のみ可能","蓋付きマイボトルなら個人持参可","市販ペットボトル飲料の持ち込み可","休憩時間外は水分補給を控える"],
+ a:0,
+ e:"製造場内では各フレッシュ部門から支給された水のみを飲用できます。個人の水筒ボトルや市販ペットボトル飲料の持ち込みは不可。開封後のボトルは原材料を汚染しないよう専用ストレージラックで管理します（一般衛生管理プログラム 04条 M）。",
+ p:"💧 支給品の水のみOK。個人持参は不可（マイボトルもダメ）"},
+
+{c:"個人衛生",t:false,
+ q:"化学薬品（洗浄剤等）使用時に必要な個人用防護具（PPE）として正しいものはどれか？",
+ o:["必要に応じてゴーグルとビニールグローブ","常時着用が必須となる防毒マスク","化学物質防護衣と長靴を必ず装着","使い捨て手袋とサージカルマスクのみ"],
+ a:0,
+ e:"洗浄剤などの化学薬品使用時は、個人用防護具であるゴーグルやビニールグローブを必要に応じて着用しなければなりません。化学薬品の種類と濃度に応じて適切なPPEを選定します（一般衛生管理プログラム 04条 I）。",
+ p:"🥽 化学薬品扱う時はゴーグル＋手袋。状況に応じて選択"},
+
+{c:"個人衛生",t:false,
+ q:"製造場で使用するメモ帳の要件として正しいものはどれか？",
+ o:["食品安全担当者の事前承認を受ける","プラスチック表紙で防水加工されたもの","ステンレス製カバーに収納されたもの","落丁する恐れがなく破れがないもの"],
+ a:3,
+ e:"製造場内には、落丁する恐れのないかつ破れのないメモ帳以外の私物を持ち込んではなりません。Memo Pad Ruleに従い、紙切れの異物混入を防ぐことが目的です（一般衛生管理プログラム 04条 L）。",
+ p:"📝 メモ帳は落丁・破れがないものに限る"},
+
+{c:"個人衛生",t:false,
+ q:"フリーザージャケットや包丁、カッティンググローブの取扱いとして正しいものはどれか？",
+ o:["各従業員が個人で購入し持参する","私物を持ち込み社内ロッカーで保管","各部署が用意し私物は使用しない","前任者からの引き継ぎ品を使用する"],
+ a:2,
+ e:"フリーザー用ジャケット、あらゆる筆記用具や包丁、カッティンググローブや軍手などの製造作業に使用する備品は、各部署で用意し、私物は使用しません。私物使用は衛生管理上のリスクとなるため禁止です（一般衛生管理プログラム 04条 N）。",
+ p:"🔪 製造用備品は各部署支給品のみ。私物使用は禁止"},
+
+{c:"個人衛生",t:false,
+ q:"未使用エプロン類の保管方法として正しいものはどれか？",
+ o:["化学薬品や食品から離れた場所で保管","使用頻度の高い場所に集約して保管","製造場の中央エリアで管理者が保管","ロッカールーム内に個人ごとに保管"],
+ a:0,
+ e:"未使用のエプロン類は化学薬品や食品に触れることで汚染されてはならず、保管時はそれらから離して保管しなければなりません（一般衛生管理プログラム 04条 J）。",
+ p:"👕 未使用エプロンは化学薬品・食品から離して保管"},
+
+{c:"個人衛生",t:false,
+ q:"手を拭く際に使用してはならないものはどれか？",
+ o:["使い捨てのハンドペーパータオル","エプロンや白衣などの作業着","手洗いシンク備え付けの専用タオル","清潔なペーパータオル（ロール式）"],
+ a:1,
+ e:"手を拭く際にエプロンや白衣などの作業着を使用してはなりません。必ず使い捨てのハンドペーパータオルを用いる必要があります。エプロンで手を拭くと汚染が広がるためです（一般衛生管理プログラム 02条 I）。",
+ p:"🧻 手拭きは使い捨てペーパーのみ。エプロン拭きは禁止"},
+
+{c:"健康管理",t:false,
+ q:"健康・服装チェックシートの記入対象者として正しいものはどれか？",
+ o:["サプライヤーや業者を含む入室者全員","フレッシュ部門の正社員のみが対象","常駐スタッフのうち希望者のみが対象","健康診断未受診者のみが追加で対象"],
+ a:0,
+ e:"サプライヤーや防虫施工業者などの外部関係者も含め、すべての入室者が入室時に健康・服装チェックシートに記入しなければなりません。各フレッシュ部門の管理職は全員が記入するよう指導する義務があります（一般衛生管理プログラム 03条 B）。",
+ p:"✍️ 入室者全員が対象（外部業者も含む）"},
+
+{c:"健康管理",t:false,
+ q:"食品取扱いを禁止される感染症として正しい組み合わせはどれか？",
+ o:["花粉症・じんましん・湿疹・喘息","高血圧・糖尿病・心疾患・腎疾患","A型肝炎・赤痢菌・サルモネラ・ノロ","頭痛・肩こり・腰痛・四肢の痺れ"],
+ a:2,
+ e:"食品汚染を防ぐため、A型肝炎・E型肝炎・赤痢菌・サルモネラ属菌・出血性大腸菌・ノロウイルス・アメーバ赤痢・細菌性赤痢と診断された従業員はあらゆる食品に触れてはなりません（一般衛生管理プログラム 03条 H）。",
+ p:"🚫 8感染症は食品接触禁止：肝炎(A/E)・赤痢系・サル・出血性・ノロ"},
+
+{c:"健康管理",t:true,
+ q:"腸内細菌PCR検査で「陽性疑い（擬陽性）」となった場合の手順として誤っているものはどれか？",
+ o:["判明時点でフレッシュ作業に従事させない","予備の採便キットで本人が再採便する","本人が可能な限り最短で再検査に送付","症状がなければ通常業務を継続できる"],
+ a:3,
+ e:"誤りは「症状がなくても継続不可」。擬陽性または陽性が判明した時点でフレッシュ部門の原材料・仕掛品・商品に触れる業務には従事させてはなりません。陰性確定まで作業制限を継続します（一般衛生管理プログラム 03条 K）。",
+ p:"⚠️ 擬陽性=即作業停止。症状有無は判断基準にならない"},
+
+{c:"健康管理",t:true,
+ q:"フレッシュ部門の腸内細菌PCR検査の検査項目として正しい組み合わせはどれか？",
+ o:["ノロウイルス・ロタウイルス・A型肝炎ウイルス","カンピロバクター・黄色ブドウ球菌・ボツリヌス","赤痢・サルモネラ属菌・腸管出血性大腸菌O-157","リステリア・セレウス菌・ウェルシュ菌・腸炎ビブリオ"],
+ a:2,
+ e:"月1回のPCR検査項目は①赤痢②サルモネラ属菌（腸チフス・パラチフスを含む）③腸管出血性大腸菌O-157の3項目です（一般衛生管理プログラム 03条 J）。",
+ p:"🔬 PCR3項目：赤痢・サル・O-157"},
+
+{c:"健康管理",t:false,
+ q:"健康・服装チェックシートの異常時の対応として正しいものはどれか？",
+ o:["本人判断で帰宅か就業を決定する","各部署の管理職が是正措置を実施する","人事部門に連絡し指示を仰ぐ","産業医の判断を待ってから対応する"],
+ a:1,
+ e:"健康状態や服装などに異常がある際、入室者はチェックシートに記録すると同時に管理職に申し出る必要があります。各部署の管理職が是正措置を実施し、その内容を健康チェックシートに記載します（一般衛生管理プログラム 03条 F）。",
+ p:"👨‍💼 異常時：本人申告＋管理職の是正措置＋記録"},
+
+{c:"健康管理",t:false,
+ q:"腸内細菌検査の結果報告を受け取る担当者として正しいものはどれか？",
+ o:["本社の人事部門担当者と産業医","各倉庫店の副倉庫店長とアドミMgr","フードセーフティー部門のVPとAGM","検査機関の担当者と労働基準監督官"],
+ a:1,
+ e:"検査会社からの検査結果の報告連絡を受ける担当者は、各倉庫店の副倉庫店長ならびにアドミニストレーション部門のマネージャーです。腸内細菌管理表に記録され、結果に応じて作業復帰または継続制限を判断します（一般衛生管理プログラム 03条 K）。",
+ p:"📞 報告先：副倉庫店長＋アドミMgr"},
+
+{c:"健康管理",t:false,
+ q:"感染症診断結果の保管場所として正しいものはどれか？",
+ o:["当該従業員の人事ファイルに保管","各部署の業務記録ファイルに編入","本社フードセーフティーDBに登録","産業医保管の医療記録に追記する"],
+ a:0,
+ e:"感染症と診断された従業員は所属部署のマネージャー以上に医師の診断内容を報告し、すべての診断結果は従業員の人事ファイルに保管されます（一般衛生管理プログラム 03条 I）。",
+ p:"📁 感染症診断結果は人事ファイルへ保管"},
+
+{c:"健康管理",t:false,
+ q:"健康チェックシートの管理サイクルとして正しいものはどれか？",
+ o:["週1回まとめて回収し管理者が点検","月初に1か月分を一括回収し保管","終業時に毎日回収・翌日新規記入","四半期ごとにまとめて本社へ提出"],
+ a:2,
+ e:"終業時には健康チェックシートを回収して、翌日の始業時には新しい健康チェックシートに記入しなければなりません。当該記録はデイリーで回収し、各フレッシュ部門の責任のもとで保管します（一般衛生管理プログラム 03条 G）。",
+ p:"📋 毎日：終業時回収＋翌朝新規記入"},
+
+{c:"手洗い",t:false,
+ q:"製造場での手洗いが必要なタイミングとして正しいものはどれか？",
+ o:["出勤後の入室時のみ実施すれば十分","昼食前と昼食後の2回実施で十分","ゴミに触れた直後と床落下品拾った後","シフト終了時にまとめて1回実施"],
+ a:2,
+ e:"手洗いが必要なタイミングは多数あります。①出勤後の製造場入室直後②ブレイクからの戻り③トイレ・水分補給後の戻り④ゴミ箱・廃棄物に触った直後⑤ゴミ庫から戻った後⑥床に落ちたものを拾った後⑦身体（鼻・頭髪等）に触った後⑧ドアノブ・電話機等に触れた後（一般衛生管理プログラム 02条 C）。",
+ p:"🤲 手洗いは「汚染の可能性がある行動の直後」毎回必須"},
+
+{c:"手洗い",t:true,
+ q:"手洗いシンクに常時備えなければならないものとして正しい組み合わせはどれか？",
+ o:["冷水・固形石鹸・布タオル・消毒液","お湯・粉石鹸・エアタオル・除菌スプレー","中性水・ハンドジェル・蒸しタオル・香料","温水・ハンドソープ・タイマー・ペーパー"],
+ a:3,
+ e:"手洗い用シンクには、温水の水道水・エコラボ社製認可ハンドソープ・非接触式タイマー・使い捨てハンドペーパータオル・ハンドペーパータオル捨て用ゴミ箱・手洗いマニュアルが備えられていなければなりません（一般衛生管理プログラム 02条 F）。",
+ p:"🧼 手洗いシンク6点セット：温水・ハンドソープ・タイマー・ペーパー・ゴミ箱・マニュアル"},
+
+{c:"手洗い",t:true,
+ q:"製造場での手指消毒（アルコール等）と手洗いの関係として正しいものはどれか？",
+ o:["手指消毒は手洗いの代替手段になる","手洗いの後に手指消毒を追加で実施","手指消毒のみで手洗いを省略可能","手洗いは月数回・通常は手指消毒のみ"],
+ a:1,
+ e:"手指消毒は手洗いの代替にはなりません。手洗いで物理的に汚れと病原体を除去した後に、補助的に手指消毒を実施します。手洗いを省略してアルコール消毒だけで済ますことは認められていません（Level 2 第6.2節・6.3節）。",
+ p:"⚠️ 手指消毒≠手洗い。必ず手洗いが先、消毒は補助"},
+
+{c:"手洗い",t:false,
+ q:"製造場入室直後に必ず実施しなければならない行動として正しいものはどれか？",
+ o:["食品や備品に触れる前に手を洗う","同僚への挨拶と業務指示の確認","ヘアネットの装着状態を再確認","持ち込み物のチェック表記入"],
+ a:0,
+ e:"フレッシュ部門の製造場に入室した際には必ず手を洗います。手を洗う前に製造場内で使用する食品や備品などに触れてはなりません。これは食品安全の最も基本的なルールです（一般衛生管理プログラム 02条 A・B）。",
+ p:"🚪 入室→直行で手洗い。食品も備品も触る前"},
+
+{c:"手洗い",t:false,
+ q:"手洗いに使用するハンドソープとして正しいものはどれか？",
+ o:["エコラボ社製の認可されたハンドソープ","薬局で購入できる薬用ハンドソープ","一般家庭用の固形石鹸（無香料タイプ）","各従業員の好みの個人用ハンドソープ"],
+ a:0,
+ e:"手洗いには、エコラボ社製の認可されたハンドソープを使用しなければなりません。他社製品や個人持参の石鹸は使用不可です（一般衛生管理プログラム 02条 F）。",
+ p:"🧴 ハンドソープはエコラボ社製認可品限定"},
+
+{c:"手洗い",t:false,
+ q:"食品準備専用の1槽・2槽シンクで実施してはならない作業はどれか？",
+ o:["野菜・果物の洗浄消毒","冷凍原材料の流水解凍","従業員の手洗い","原材料の下処理作業"],
+ a:2,
+ e:"食品準備専用の1槽・2槽シンクで手を洗ってはなりません。手洗いは必ず手洗い専用シンクで実施します。1槽・2槽シンクは食品の洗浄消毒・流水解凍・下処理用です（一般衛生管理プログラム 02条 E）。",
+ p:"🚱 食品準備シンクで手洗いは禁止。専用シンクで"},
+
+{c:"手洗い",t:false,
+ q:"洗浄消毒専用の3槽・4槽シンクで実施してはならない作業はどれか？",
+ o:["調理器具・備品類の洗浄消毒","エプロンの洗浄消毒・交換作業","備品をサニタイザーに浸漬する","食品準備のための野菜洗浄消毒"],
+ a:3,
+ e:"3槽・4槽シンクは洗浄消毒専用で、食品準備用ではありません。野菜・果物の消毒や流水解凍は食品準備専用シンク（1槽・2槽）で実施し、3槽・4槽シンクの使用は不可です（一般衛生管理プログラム 02条 E、08条 L）。",
+ p:"🚿 3槽/4槽=器具洗浄専用 / 1槽/2槽=食品準備専用"},
+
+{c:"手洗い",t:false,
+ q:"すすぎ後の手の乾燥方法として正しいものはどれか？",
+ o:["使い捨てペーパータオルで拭く","自然乾燥で水分を蒸発させる","ジェットタオル（温風乾燥機）使用","エプロンの清潔な部分で拭き取る"],
+ a:0,
+ e:"手を拭く際は必ず使い捨てのハンドペーパータオルを用います。エプロンや白衣などの作業着で拭いてはなりません。使用後のペーパータオルはその場でゴミ箱に廃棄します（一般衛生管理プログラム 02条 I）。",
+ p:"🧻 乾燥は使い捨てペーパー専用。エプロン拭きNG"},
+
+{c:"ドレスコード",t:false,
+ q:"D88フードコート部門のサニテーション・清掃作業時に着用するエプロンの色はどれか？",
+ o:["青色のエプロン","白色のエプロン","黄色のエプロン","濃紺色のエプロン"],
+ a:2,
+ e:"D88フードコート部門のエプロン使い分けは、青＝コンディメント補充・カウンター業務、濃紺＝生のプルコギビーフ、白＝商品製造、黄＝サニテーション・清掃作業です（一般衛生管理プログラム 04条 H）。",
+ p:"🎨 D88清掃時=黄色エプロン（青コンディ・白製造・濃紺プルコギ）"},
+
+{c:"ドレスコード",t:true,
+ q:"D63デリ部門のオーブンルームでの同時作業に関するルールとして正しいものはどれか？",
+ o:["赤エプロン同士なら同時作業可能","青エプロンと白エプロンは同時可能","赤・青・白エプロンの同時作業は禁止","管理職の許可があれば同時作業可能"],
+ a:2,
+ e:"交差汚染防止のため、赤（加熱済み）・青（生鶏肉）・白（生牛肉/豚肉）のエプロン着用スタッフは、同じ製造場所で同時に作業してはなりません。色違いのエプロン同士の同時作業は禁止です（一般衛生管理プログラム 04条 G）。",
+ p:"⚠️ 異色エプロンの同時作業は禁止（色ごとにタイミングをずらす）"},
+
+{c:"ドレスコード",t:false,
+ q:"原材料の畜種が変更される際のエプロン取扱いとして正しいものはどれか？",
+ o:["アルコール噴霧消毒で代替可能とする","3槽・4槽シンクで洗浄消毒か交換","汚れの状態を見て管理職が判断する","次回のシフトまで継続使用が可能"],
+ a:1,
+ e:"原材料・仕掛品・製品の種類（畜種や喫食方法を含む）が変更される場合、エプロンは必ず3槽・4槽シンクで洗浄消毒もしくは交換しなければなりません（一般衛生管理プログラム 04条 F）。",
+ p:"🥩 畜種変更時：3槽/4槽シンクで洗浄消毒 or 交換"},
+
+{c:"ドレスコード",t:false,
+ q:"製造場入室時のヘアネットの装着範囲として正しいものはどれか？",
+ o:["前頭部のみカバーすれば十分","体毛が完全に覆われる範囲","装着の有無は個人で判断","長髪者のみ装着が必須となる"],
+ a:1,
+ e:"製造場に入室する際には、体毛が完全に覆われるようヘアネットを着用しなければなりません。ヒゲがある場合はヒゲネットも併用し、髪の長さや本数に関わらず全員が常時着用です（Level 2 第6.1節、一般衛生管理プログラム 04条 B）。",
+ p:"👒 ヘアネットは体毛完全カバー。ヒゲはヒゲネット併用"},
+
+{c:"ドレスコード",t:false,
+ q:"エプロン類が破損や汚染を生じた場合の対応として正しいものはどれか？",
+ o:["次回シフトまで使用継続可","速やかに新しいものに交換","汚れた部分を切り取って使用","管理職の承認後にのみ交換可"],
+ a:1,
+ e:"エプロン、スモック、手袋などは清潔で衛生的な方法で使用・保管し、汚れや汚染、破損などが生じた場合はすみやかに交換しなければなりません（一般衛生管理プログラム 04条 K）。",
+ p:"🔄 汚れ・破損エプロンは即交換"},
+
+{c:"ドレスコード",t:false,
+ q:"D88フードコート部門のレジ・商品提供カウンター業務時のエプロンはどれか？",
+ o:["青色のエプロン","白色のエプロン","黄色のエプロン","濃紺色のエプロン"],
+ a:0,
+ e:"D88フードコート部門の青エプロンは、コンディメントテーブルへの調味料補充時、レジや商品提供を含むカウンター業務時に着用します（一般衛生管理プログラム 04条 H）。",
+ p:"🎨 D88カウンター業務=青エプロン"},
+
+{c:"従業員教育",t:false,
+ q:"Food Safety Training Level 1の受講頻度と対象者として正しいものはどれか？",
+ o:["倉庫店全従業員が3年に1回受講","倉庫店全従業員が1年に1回受講","管理職のみが3年に1回受講","フレッシュ部門のみが半年に1回受講"],
+ a:1,
+ e:"倉庫店で勤務するすべての従業員は、1年に1度Food Safety Training Level 1を受講しなければなりません。倉庫店内の各PCにアプリとしてインストールされており、最後のテストで80%以上のスコア達成が必要です（一般衛生管理プログラム 05条 A・C）。",
+ p:"📚 Level 1=全従業員・年1回・合格80%"},
+
+{c:"従業員教育",t:false,
+ q:"Food Safety Training Level 2の受講頻度と対象者として正しいものはどれか？",
+ o:["全従業員が3年に1回受講・80%合格","Mgr以上+FreshSupが3年1回85点","AGMとGMのみが毎年受講・90点合格","バイヤーのみ半年に1回受講・80点"],
+ a:1,
+ e:"サニテーションを評価する管理職（マネージャー以上）ならびにフレッシュ部門のスーパーバイザーは、Food Safety Training Level 2を3年に1度合格しなければなりません。合格には85点以上が必要です（一般衛生管理プログラム 05条 H・J）。",
+ p:"📚 Level 2=Mgr以上+Sup・3年に1回・合格85点"},
+
+{c:"従業員教育",t:true,
+ q:"Food Safety Training Level 1とLevel 2の合格点として正しいものはどれか？",
+ o:["Level 1=80% / Level 2=85点","Level 1=85% / Level 2=90点","Level 1=70% / Level 2=75点","Level 1=90% / Level 2=80点"],
+ a:0,
+ e:"Level 1の合格点は80%、Level 2の合格点は85点です。混同しやすいので注意。Level 2の方が管理職対象のため、より高い合格基準が設定されています（一般衛生管理プログラム 05条 C・J）。",
+ p:"🎯 Level 1=80% / Level 2=85点（混同しがち）"},
+
+{c:"従業員教育",t:false,
+ q:"デイリーインスペクションプログラムの完了タイミングとして正しいものはどれか？",
+ o:["製造作業終了後すぐに完了させる","製造作業終了の1時間以上前に完了","営業終了の30分前までに完了","翌日の朝の業務開始前までに完了"],
+ a:1,
+ e:"デイリーインスペクションは、製造作業が終了する1時間以上前に完了させる必要があります。NEHA Food Safety Training Level 2に合格している管理職以上の職位の者が実施します（一般衛生管理プログラム 05条 M）。",
+ p:"🔍 製造終了の「1時間以上前」に完了"},
+
+{c:"従業員教育",t:false,
+ q:"Food Safety Training Level 2の受講状況の管理部門として正しいものはどれか？",
+ o:["本社人事＋本社FS＋倉庫店アドミ","本社人事のみが一元管理","各部署の管理職のみが管理","本社フードセーフティー部門のみ"],
+ a:0,
+ e:"Food Safety Training Level 2の資格取得状況は、本社人事部、本社フードセーフティー部門、倉庫店アドミニストレーション部門の3部門で管理しなければなりません（一般衛生管理プログラム 05条 K）。",
+ p:"📊 Level 2管理：本社人事＋本社FS＋倉庫店アドミの3部門"},
+
+{c:"食中毒概要",t:false,
+ q:"食中毒の「ハイリスク群」として該当しないものはどれか？",
+ o:["65歳以上の高齢者","妊婦ならびに胎児","健康な20-40代の成人","免疫力が低下している人"],
+ a:2,
+ e:"食中毒のハイリスク群は①高齢者②妊婦・胎児③乳幼児・児童④基礎疾患を持っている人（免疫力低下）です。健康な成人は重症化リスクが低いとされますが、誰でも食中毒は発症するため油断は禁物です（Level 2 第2.4節）。",
+ p:"👥 ハイリスク群：高齢者・妊婦・乳幼児・免疫低下者"},
+
+{c:"食中毒概要",t:false,
+ q:"食中毒の主な症状として最も典型的なものはどれか？",
+ o:["発疹・かゆみ・湿疹などの皮膚症状","腹痛・下痢・嘔吐・発熱・頭痛","咳・くしゃみ・鼻水などの呼吸器症状","関節痛・筋肉痛・倦怠感などの全身症状"],
+ a:1,
+ e:"食中毒の主な症状は消化器系を中心に①腹痛・下痢②嘔吐・吐き気③発熱④頭痛です。多くは喫食後数時間〜数日で発症し、24-48時間続くことが多いですが、1週間以上続くこともあります（Level 2 第2.4節）。",
+ p:"🤢 食中毒の典型症状：腹痛・下痢・嘔吐・発熱・頭痛"},
+
+{c:"食中毒概要",t:true,
+ q:"リステリア菌とA型肝炎ウイルスの潜伏期間として正しいものはどれか？",
+ o:["リステリア=24時間 / A型肝炎=48時間","リステリア=1日-3日 / A型肝炎=1週間","リステリア=1日-10週 / A型肝炎=2-8週","リステリア=数か月 / A型肝炎=数年間"],
+ a:2,
+ e:"リステリアモノサイトゲネスの潜伏期間は1日から10週間と非常に長く、A型肝炎ウイルスの潜伏期間は2-8週間です。潜伏期間が長い病原体は感染源の特定が困難になります（Level 2 第2.4節）。",
+ p:"⏰ リステリア=1日-10週 / A型肝炎=2-8週（共に長め）"},
+
+{c:"食中毒概要",t:false,
+ q:"食中毒症状の継続期間として最も一般的なものはどれか？",
+ o:["1-2時間程度の急性症状","24-48時間が多く1週間以上も","常に1か月以上慢性的に続く","症状は出ても1週間で完治する"],
+ a:1,
+ e:"食中毒の有症期間は24-48時間が多いですが、1週間以上続くこともあります。さらに重篤な場合は数か月〜何年も継続し、腎機能障害や麻痺などの重篤な健康被害を引き起こし、最終的に死亡する可能性もあります（Level 2 第2.4節）。",
+ p:"⏳ 多くは24-48時間。長期化・重症化も"},
+
+{c:"食中毒概要",t:false,
+ q:"食中毒予防の「三原則」として正しいものはどれか？",
+ o:["見る・嗅ぐ・捨てるの三原則","つけない・増やさない・やっつける","冷やす・温める・乾燥させる","洗う・消毒する・保管するの三原則"],
+ a:1,
+ e:"食中毒予防の三原則は①つけない（手洗い・交差汚染防止）②増やさない（温度管理）③やっつける（十分な加熱）です。シンプルですが食品安全の基本中の基本で、すべての作業の根底にあります。",
+ p:"🛡️ 食中毒予防3原則：つけない・増やさない・やっつける"}
+];
+let cur=0,ans=new Array(Q.length).fill(null),done=new Array(Q.length).fill(false);
+const L=['A','B','C','D','E'];
+function start(){document.getElementById('start').style.display='none';document.getElementById('quiz').style.display='block';load(0);}
+function load(i){
+  cur=i;const q=Q[i],tot=Q.length;
+  document.getElementById('qn').textContent=`問題 ${i+1} / ${tot}`;
+  document.getElementById('qcat').textContent=q.c;
+  document.getElementById('qt').textContent=q.q;
+  document.getElementById('pt').textContent=`${i+1} / ${tot}`;
+  document.getElementById('pbi').style.width=((i+1)/tot*100)+'%';
+  const tr=document.getElementById('trap');tr.className=q.t?'trap on':'trap';
+  const o=document.getElementById('opts');o.innerHTML='';
+  q.o.forEach((opt,j)=>{
+    const d=document.createElement('div');d.className='opt';
+    d.innerHTML=`<span class="ol">${L[j]}</span><span>${opt}</span>`;
+    d.onclick=()=>pick(j);o.appendChild(d);
+  });
+  const e=document.getElementById('exp');e.style.display='none';e.className='exp';
+  if(done[i])show(ans[i],q.a,q.e,q.p);
+  document.getElementById('pb').disabled=i===0;
+  const last=i===tot-1;
+  document.getElementById('nb').style.display=last?'none':'inline-block';
+  document.getElementById('sub').style.display=last?'inline-block':'none';
+}
+function pick(j){
+  if(done[cur])return;
+  ans[cur]=j;done[cur]=true;
+  show(j,Q[cur].a,Q[cur].e,Q[cur].p);
+}
+function show(sel,cor,et,pt){
+  const os=document.querySelectorAll('.opt');
+  os.forEach(o=>o.classList.add('dis'));
+  os[cor].classList.add('cor');
+  if(sel!==cor)os[sel].classList.add('wrg');else os[sel].classList.add('cor');
+  const e=document.getElementById('exp');e.style.display='block';
+  const ok=sel===cor;e.className='exp'+(ok?'':' we');
+  e.innerHTML=`<div class="et">${ok?'✓ 正解！':'✗ 不正解'}</div>${et}`+(pt?`<div class="ep">${pt}</div>`:'');
+}
+function next(){if(cur<Q.length-1)load(cur+1);}
+function prev(){if(cur>0)load(cur-1);}
+function submit(){
+  const tot=Q.length;let c=0,u=0;
+  Q.forEach((q,i)=>{if(ans[i]===null)u++;else if(ans[i]===q.a)c++;});
+  const w=tot-c-u,sc=Math.round(c/tot*100);
+  document.getElementById('quiz').style.display='none';
+  document.getElementById('result').style.display='block';
+  document.getElementById('pbi').style.width='100%';
+  document.getElementById('pt').textContent=`${tot} / ${tot}`;
+  document.getElementById('sp').textContent=sc;
+  document.getElementById('rc').textContent=c;
+  document.getElementById('rw').textContent=w;
+  document.getElementById('ru').textContent=u;
+  const p=sc>=85;
+  document.getElementById('rtt').textContent=p?'合格 PASS':'不合格 FAIL';
+  document.getElementById('rtt').style.color=p?'var(--correct)':'var(--wrong)';
+  document.getElementById('rm').textContent=p?`🎉 合格ライン（85点）突破！\n正解率 ${sc}% — 本番も大丈夫！`:`合格まであと${85-sc}点。\n解説の💡ポイントを確認して再チャレンジ！`;
+  setTimeout(()=>{const a=document.getElementById('arc');a.style.transition='stroke-dashoffset 1.5s ease';a.style.strokeDashoffset=534-(sc/100)*534;a.style.stroke=p?'var(--correct)':'var(--wrong)';},100);
+}
+function review(){
+  const s=document.getElementById('rvs');
+  s.style.display=s.style.display==='none'?'block':'none';
+  if(s.innerHTML.trim()!==''&&s.style.display==='none')return;
+  let h='<div class="rvt">解答レビュー — 全問</div>';
+  Q.forEach((q,i)=>{
+    const ok=ans[i]===q.a,cl=ok?'rc':'rw';
+    const at=ans[i]===null?'未回答':`${L[ans[i]]}. ${q.o[ans[i]]}`;
+    const pp=q.p?`<div style="margin-top:6px;padding:6px 10px;background:rgba(251,191,36,.08);border-left:3px solid var(--gold);border-radius:4px;font-size:.78rem;color:var(--gold)">${q.p}</div>`:'';
+    h+=`<div class="rvi ${cl}"><div style="font-size:.72rem;margin-bottom:7px;color:var(--accent);font-family:'Syne',sans-serif">${i+1}問目 — ${q.c}${q.t?' ⚠':''}</div><div class="rvq">${q.q}</div><div><div class="ral">あなたの回答</div><div class="${ok?'rac':'raw'}" style="font-size:.85rem">${at}</div>${!ok?`<div class="ral" style="margin-top:7px">正解</div><div class="rac" style="font-size:.85rem">${L[q.a]}. ${q.o[q.a]}</div>`:''}<div class="ral" style="margin-top:7px">解説</div><div style="opacity:.8;font-size:.82rem;line-height:1.7">${q.e}</div>${pp}</div></div>`;
+  });
+  s.innerHTML=h;
+}
+function retry(){
+  ans=new Array(Q.length).fill(null);done=new Array(Q.length).fill(false);
+  document.getElementById('result').style.display='none';
+  document.getElementById('arc').style.strokeDashoffset=534;
+  document.getElementById('rvs').style.display='none';document.getElementById('rvs').innerHTML='';
+  document.getElementById('quiz').style.display='block';
+  document.getElementById('pbi').style.width='1%';load(0);
+}
+</script>
+</body>
+</html>

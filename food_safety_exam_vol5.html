@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>コストコ フードセーフティー 模擬試験 Level 2 — Vol.5</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Syne:wght@700;800&display=swap');
+:root{
+  --bg:#08090D;--card:#10121A;--border:#1E2130;
+  --purple:#5B4FE9;--accent:#A78BFA;--gold:#FBBF24;
+  --text:#F1F0FF;--muted:#6B7280;
+  --correct:#10B981;--wrong:#EF4444;--selected:#1E40AF;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;}
+#header{
+  background:linear-gradient(135deg,#1E1B4B 0%,#3730A3 60%,#5B4FE9 100%);
+  padding:13px 26px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 4px 24px rgba(91,79,233,.4);
+  border-bottom:2px solid var(--accent);
+}
+#header h1{font-family:'Syne',sans-serif;font-size:1.5rem;letter-spacing:2px;color:#fff;font-weight:800;}
+.hd-sub{font-size:.62rem;color:rgba(255,255,255,.6);letter-spacing:2px;margin-bottom:2px;}
+.vol-badge{background:var(--gold);color:#111;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:800;padding:3px 10px;border-radius:4px;letter-spacing:2px;margin-left:10px;}
+#pw{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+#pt{font-size:.78rem;color:rgba(255,255,255,.85);}
+#pbo{width:180px;height:5px;background:rgba(255,255,255,.18);border-radius:3px;overflow:hidden;}
+#pbi{height:100%;width:0%;background:var(--accent);border-radius:3px;transition:width .4s;}
+#start{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90vh;padding:40px 20px;text-align:center;}
+.vl{font-family:'Syne',sans-serif;font-size:.78rem;letter-spacing:5px;color:var(--accent);margin-bottom:14px;}
+.bt{font-family:'Syne',sans-serif;font-size:clamp(2.6rem,6.5vw,4.5rem);color:#fff;letter-spacing:2px;line-height:1.1;margin-bottom:8px;font-weight:800;}
+.bt span{color:var(--accent);}
+.tl{font-size:.9rem;color:var(--gold);letter-spacing:1px;margin-bottom:6px;}
+.bs{font-size:.8rem;color:var(--muted);margin-bottom:40px;}
+.ig{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:480px;margin-bottom:40px;}
+.ic{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.ic .n{font-family:'Syne',sans-serif;font-size:2.4rem;color:var(--accent);line-height:1;font-weight:700;}
+.ic .l{font-size:.68rem;color:var(--muted);margin-top:4px;}
+.sb{background:var(--purple);color:#fff;border:1px solid var(--accent);padding:16px 56px;font-size:1rem;font-weight:700;border-radius:8px;cursor:pointer;letter-spacing:2px;transition:all .15s;box-shadow:0 4px 24px rgba(91,79,233,.5);}
+.sb:hover{background:#4338CA;transform:translateY(-2px);}
+#quiz{display:none;padding:28px 20px;max-width:820px;margin:0 auto;}
+.qm{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.qn{font-family:'Syne',sans-serif;font-size:1rem;color:var(--gold);letter-spacing:2px;font-weight:700;}
+.qcat{font-size:.67rem;background:var(--border);color:var(--muted);padding:4px 12px;border-radius:20px;}
+.trap{display:none;font-size:.65rem;background:rgba(239,68,68,.15);color:#F87171;border:1px solid rgba(239,68,68,.3);padding:3px 10px;border-radius:20px;margin-right:6px;}
+.trap.on{display:inline-block;}
+.qt{font-size:1rem;line-height:1.9;font-weight:500;margin-bottom:22px;padding:22px;background:var(--card);border:1px solid var(--border);border-radius:12px;border-left:4px solid var(--accent);}
+.opts{display:flex;flex-direction:column;gap:10px;}
+.opt{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:15px 18px;cursor:pointer;display:flex;align-items:flex-start;gap:12px;transition:border-color .15s,background .15s,transform .1s;font-size:.93rem;line-height:1.65;}
+.opt:hover:not(.dis){border-color:#334;background:#13151F;transform:translateX(4px);}
+.ol{min-width:27px;height:27px;background:var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--muted);flex-shrink:0;margin-top:1px;transition:background .15s,color .15s;}
+.opt.sel{border-color:var(--selected);background:rgba(30,64,175,.18);}
+.opt.sel .ol{background:var(--selected);color:#fff;}
+.opt.cor{border-color:var(--correct);background:rgba(16,185,129,.1);}
+.opt.cor .ol{background:var(--correct);color:#fff;}
+.opt.wrg{border-color:var(--wrong);background:rgba(239,68,68,.1);}
+.opt.wrg .ol{background:var(--wrong);color:#fff;}
+.opt.dis{cursor:default;}
+.exp{display:none;margin-top:16px;padding:18px 20px;background:#061410;border:1px solid var(--correct);border-radius:10px;font-size:.88rem;line-height:1.9;color:#A7F3D0;}
+.exp.we{background:#140606;border-color:var(--wrong);color:#FECACA;}
+.exp .et{font-weight:700;margin-bottom:6px;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;}
+.exp .ep{margin-top:10px;padding:8px 12px;background:rgba(251,191,36,.08);border-left:3px solid var(--gold);border-radius:4px;font-size:.82rem;color:var(--gold);}
+.nr{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
+.nb{padding:11px 28px;border:none;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all .15s;}
+.nb.p{background:var(--purple);color:#fff;border:1px solid var(--accent);}
+.nb.p:hover{background:#4338CA;}
+.nb.s{background:var(--border);color:var(--text);}
+.nb.s:hover{background:#252840;}
+.nb:disabled{opacity:.35;cursor:not-allowed;}
+#result{display:none;padding:50px 20px;max-width:680px;margin:0 auto;text-align:center;}
+.sr{width:200px;height:200px;margin:0 auto 28px;position:relative;}
+.sr svg{transform:rotate(-90deg);}
+.sr .st{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.sp{font-family:'Syne',sans-serif;font-size:3.2rem;line-height:1;color:var(--text);font-weight:800;}
+.sl{font-size:.65rem;color:var(--muted);}
+.rt{font-family:'Syne',sans-serif;font-size:2.2rem;letter-spacing:2px;margin-bottom:8px;font-weight:800;}
+.rm{color:var(--muted);margin-bottom:28px;line-height:1.8;white-space:pre-line;}
+.rsg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+.rsc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.rsn{font-family:'Syne',sans-serif;font-size:2rem;line-height:1;font-weight:700;}
+.rsl{font-size:.68rem;color:var(--muted);margin-top:4px;}
+.rb{background:var(--purple);color:#fff;border:1px solid var(--accent);padding:14px 44px;font-size:.95rem;font-weight:700;border-radius:8px;cursor:pointer;letter-spacing:2px;transition:all .15s;margin:8px;}
+.rb:hover{background:#4338CA;}
+.rvs{text-align:left;margin-top:44px;}
+.rvt{font-family:'Syne',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--gold);margin-bottom:18px;font-weight:700;}
+.rvi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:10px;}
+.rvi.rw{border-color:rgba(239,68,68,.35);}
+.rvi.rc{border-color:rgba(16,185,129,.22);}
+.rvq{font-size:.88rem;margin-bottom:10px;line-height:1.6;}
+.ral{color:var(--muted);font-size:.72rem;margin-bottom:3px;}
+.rac{color:var(--correct);font-weight:500;}
+.raw{color:var(--wrong);}
+</style>
+<!-- PWA-INJECT-START -->
+<link rel="manifest" href="./manifest.json" />
+<meta name="theme-color" content="#E31837" />
+<meta name="application-name" content="FoodSafety模試" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="FoodSafety模試" />
+<link rel="apple-touch-icon" href="./icons/icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png" />
+<link rel="shortcut icon" href="./icons/icon-64.png" />
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function (e) {
+        console.warn('SW register failed:', e);
+      });
+    });
+  }
+</script>
+<!-- PWA-INJECT-END -->
+</head>
+<body>
+<div id="header">
+  <div><div class="hd-sub">COSTCO WHOLESALE JAPAN</div><h1>FOOD SAFETY EXAM <span class="vol-badge">VOL.5</span></h1></div>
+  <div id="pw"><span id="pt">0 / 60</span><div id="pbo"><div id="pbi"></div></div></div>
+</div>
+<div id="start">
+  <div class="vl">VOLUME 5 — PASS GUARANTEE EDITION</div>
+  <div class="bt">模擬試験<br><span>第5弾</span></div>
+  <div class="tl">⚡ 絶対合格のために設計された100問</div>
+  <div class="bs">本番で出やすい・間違えやすい・数値が似ているポイントを厳選</div>
+  <div class="ig">
+    <div class="ic"><div class="n">60</div><div class="l">問題数</div></div>
+    <div class="ic"><div class="n">4-5</div><div class="l">択問題</div></div>
+    <div class="ic"><div class="n">85</div><div class="l">合格点</div></div>
+  </div>
+  <button class="sb" onclick="start()">試験開始</button>
+</div>
+<div id="quiz">
+  <div class="qm">
+    <span class="qn" id="qn">問題 1 / 60</span>
+    <div style="display:flex;align-items:center;">
+      <span class="trap" id="trap">⚠ ひっかけ注意</span>
+      <span class="qcat" id="qcat"></span>
+    </div>
+  </div>
+  <div class="qt" id="qt"></div>
+  <div class="opts" id="opts"></div>
+  <div class="exp" id="exp"></div>
+  <div class="nr">
+    <button class="nb s" id="pb" onclick="prev()">◀ 前へ</button>
+    <button class="nb p" id="nb" onclick="next()">次へ ▶</button>
+    <button class="nb p" id="sub" onclick="submit()" style="display:none">結果を見る</button>
+  </div>
+</div>
+<div id="result">
+  <div class="sr">
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="85" fill="none" stroke="#1E2130" stroke-width="13"/>
+      <circle id="arc" cx="100" cy="100" r="85" fill="none" stroke="#5B4FE9" stroke-width="13"
+        stroke-linecap="round" stroke-dasharray="534" stroke-dashoffset="534"/>
+    </svg>
+    <div class="st"><div class="sp" id="sp">0</div><div class="sl">点</div></div>
+  </div>
+  <div class="rt" id="rtt">—</div>
+  <div class="rm" id="rm"></div>
+  <div class="rsg">
+    <div class="rsc"><div class="rsn" id="rc" style="color:var(--correct)">0</div><div class="rsl">正解</div></div>
+    <div class="rsc"><div class="rsn" id="rw" style="color:var(--wrong)">0</div><div class="rsl">不正解</div></div>
+    <div class="rsc"><div class="rsn" id="ru" style="color:var(--gold)">0</div><div class="rsl">未回答</div></div>
+  </div>
+  <button class="rb" onclick="retry()">もう一度挑戦</button>
+  <button class="rb" style="background:var(--border);border-color:var(--border)" onclick="review()">間違いを確認</button>
+  <div class="rvs" id="rvs" style="display:none"></div>
+</div>
+<script>
+const Q=[
+{c:"HACCP",t:false,
+ q:"HACCPの正式名称として正しいものはどれか？",
+ o:["Health Analysis Critical Control Point","Hazard Analysis Critical Control Point","High Accuracy Cooking Control Procedure","Hygiene Assessment Control & Check Protocol"],
+ a:1,
+ e:"HACCPはHazard Analysis and Critical Control Point（ハサップ・危害分析重要管理点方式）の略称。1960年代にアメリカ航空宇宙局（NASA）で生まれ、2004年にEUで義務化、2021年6月から日本でも食品衛生法で完全義務化されました（Level 2 第11.1節）。",
+ p:"📚 HACCP=Hazard Analysis & Critical Control Point"},
+
+{c:"HACCP",t:false,
+ q:"HACCPの分析対象範囲として正しいものはどれか？",
+ o:["原材料受領から販売までの全工程","製造作業のみが対象範囲る形","販売後の消費者宅まで対象に含む","原材料の購入交渉から対象範囲"],
+ a:0,
+ e:"HACCPの対象範囲には、食品（原材料）を受領してから、保管、加工、包装などを経て食品（商品）が出荷されるまでが含まれます。各工程における食中毒の危害や効果的な対策の運用を分析します（Level 2 第11.2節）。",
+ p:"🎯 HACCP範囲：原材料受領～販売まで全工程"},
+
+{c:"HACCP",t:true,
+ q:"HACCPとPRP（一般衛生管理プログラム）の関係として正しいものはどれか？",
+ o:["HACCPはPRPの一部であるの方法ででの運用","PRPはHACCPが効果的に機能するための前提条件","両者は独立した別個のシステムの方法でする形式","PRPはHACCP導入後に整備で良い"],
+ a:1,
+ e:"PRP（Pre-requisite Programs）はHACCPが効果的に運用されるための前提条件です。HACCP単体では機能せず、PRPが遵守された上で初めて機能します。PRPはHACCPの土台です（Level 2 第11.2節・11.3節）。",
+ p:"🏛️ PRP=HACCPの土台。先にPRP→次にHACCP"},
+
+{c:"HACCP",t:false,
+ q:"HACCP運用の「7原則・12手順」のうち「原則1（手順6）」に該当するものはどれか？",
+ o:["HACCPチームの編成","製品説明書の作成の方法で","危害分析（HA）の方法で","重要管理点（CCP）の決定"],
+ a:2,
+ e:"手順1-5は準備段階で、手順6が「原則1：危害分析（Hazard Analysis）」です。各工程の危害要因（生物的・化学的・物理的）を列挙し、それぞれの管理手段を見つけます（Level 2 第11.4節）。",
+ p:"🔍 原則1（手順6）=危害分析（HA）"},
+
+{c:"HACCP",t:false,
+ q:"HACCP運用の手順7（原則2）に該当するものはどれか？",
+ o:["危害分析の実施の方法で","重要管理点（CCP）の決定","管理基準（CL）の決定","モニタリング方法の設定"],
+ a:1,
+ e:"原則2（手順7）はCCP（Critical Control Point）の決定。危害要因を除去・低減するうえで特に重要な工程を決めます。例：加熱殺菌・金属探知機。原則3=CL設定、原則4=モニタリング、原則5=改善措置、原則6=検証、原則7=記録保存（Level 2 第11.4節）。",
+ p:"🎯 原則2=CCP決定（加熱殺菌・金属探知機など）"},
+
+{c:"HACCP",t:false,
+ q:"HACCP運用の準備段階「手順1」として正しいものはどれか？",
+ o:["HACCPチームの編成","危害分析の実施の方法で","CCP の決定の方法で","記録方法の設定の方法で"],
+ a:0,
+ e:"手順1はHACCPチームの編成。製品を作るために必要な情報を集められるよう、各部門から担当者を集めます。手順1-5は準備、手順6以降が原則1-7（実際のHACCP運用）となります（Level 2 第11.4節）。",
+ p:"👥 手順1=HACCPチーム編成（準備段階）"},
+
+{c:"HACCP",t:true,
+ q:"HACCP運用の「原則3：管理基準（CL）」の例として最も適切なものはどれか？",
+ o:["HACCPチームの役割分担とする","温度・時間・大きさ・速度等の数値基準","製造担当者の経験年数の方法でる形","バイヤーの承認サインの方法でる形"],
+ a:1,
+ e:"管理基準（CL: Critical Limit）はCCPを適切に管理するための数値基準。例：温度63°C、時間30分、大きさ5cm、速度100rpmなど、測定可能で客観的な指標が必要です（Level 2 第11.4節）。",
+ p:"📊 CL=温度・時間・大きさ・速度などの数値基準"},
+
+{c:"PRP",t:false,
+ q:"PRP（一般衛生管理プログラム）に含まれる項目として該当しないものはどれか？",
+ o:["従業員教育・個人衛生","機器設備の清掃・メンテナンス","財務管理・原価計算の方法で","防虫防鼠・水質管理の方法で"],
+ a:2,
+ e:"PRPの内容は①従業員教育②機器・設備類の清掃③機器・設備類のメンテナンス④防虫防鼠⑤水質管理⑥ゴミの取扱い⑦個人衛生⑧食品の取扱い⑨リコール・製品回収。財務管理は含まれません（Level 2 第11.3節）。",
+ p:"🏛️ PRP9項目：教育・清掃・メンテ・防虫・水質・ゴミ・衛生・食品・リコール"},
+
+{c:"PRP",t:false,
+ q:"コストコのHACCPチームの構成として正しいものはどれか？",
+ o:["購買部・オペレーション部・FS部の3部門","本社人事部のみで構成の方法ででの運用","各倉庫店の店長のみのみで対応での運用","本社経営陣のみで構成の方法ででの運用"],
+ a:0,
+ e:"HACCPチームは①購買部門（AGMM・各フレッシュ部門のバイヤー・アシスタントバイヤー）②オペレーション部門（フレッシュ部門担当のRM・AM）③フードセーフティー部門（部門管理職・実務者）の3部門で構成されます（一般衛生管理プログラム 01条 A）。",
+ p:"👥 HACCPチーム：購買＋オペ＋FS の3部門構成"},
+
+{c:"PRP",t:false,
+ q:"HACCPチームへの参加要件として正しいものはどれか？",
+ o:["JFIC主催のHACCP講習会受講必須","入社3年以上の経験必須の方法でる形","管理職資格保有が必須の要件","TOEIC700点以上必須での運用"],
+ a:0,
+ e:"HACCPチームに所属する際には、JFIC（一般財団法人食品産業センター等）が主催するHACCP講習会を受講しなければなりません。経験年数や英語力は要件ではありません（一般衛生管理プログラム 01条 B）。",
+ p:"📚 HACCPチーム参加：JFIC講習会の受講が必須"},
+
+{c:"HACCP",t:false,
+ q:"HACCPの「原則5：改善措置」の例として最も適切なものはどれか？",
+ o:["加熱不足品の追加焼成・金属探知機再実施","製造ライン全体の停止と再起動を実施","製造責任者の交代のみで対応での運用","全製品の自主回収のみで対応での運用"],
+ a:0,
+ e:"原則5は「改善措置の設定」。モニタリングの結果、CLを逸脱していた場合に実施すべき措置を決定します。例：加熱不足品の追加焼成、金属検出品の金属探知機再実施など、即時かつ実行可能な是正措置です（Level 2 第11.4節）。",
+ p:"🔧 原則5=改善措置（追加焼成・再金探など即時是正）"},
+
+{c:"HACCP",t:false,
+ q:"コストコのCCP工程の代表例として正しいものはどれか？",
+ o:["原材料の納入確認の方法で","加熱殺菌（パスツール殺菌）","製品の冷蔵保管の方法で","製品の容器包装の方法で"],
+ a:1,
+ e:"コストコのCCPは加熱殺菌工程です。Non-RTEで加熱調理なしの生食肉・魚介類を加熱殺菌する場合、スペックシート明記条件・CCP管理表・畜肉鮮魚巻貝63°C/30分・二枚貝85-90°C/90秒等を遵守。CCPはロットごとに必ず記録します（一般衛生管理プログラム 08条 R-V）。",
+ p:"🎯 コストコのCCP代表＝加熱殺菌工程"},
+
+{c:"HACCP",t:true,
+ q:"HACCPの手順5「製造現場の確認」で実施することとして正しいものはどれか？",
+ o:["工程図と実際の差異を確認・修正","従業員の労働時間を確認る形","機器の電気使用量を確認る形","原材料の購入価格を確認る形"],
+ a:0,
+ e:"手順5「製造現場の確認」では①製造工程図に基づき作業者とモノの動きを確認②製造工程図と実際の製造に差異がないか確認③差異があれば工程図を実際に合わせて修正します。労働時間や価格は対象外です（Level 2 第11.4節）。",
+ p:"🔍 手順5：現場と工程図の差異確認＋修正"},
+
+{c:"PRP",t:false,
+ q:"PRP（一般衛生管理プログラム）の主な役割として正しいものはどれか？",
+ o:["HACCP導入の代替手段である","HACCPが効果的機能する前提条件","製品の販売促進手段の方法でる形","従業員の能力評価手段として"],
+ a:1,
+ e:"PRPはHACCPが効果的に運用されるための前提条件です。商品や取り扱う食品の特性に応じて中身が異なります。ハード面（施設・設備保守）とソフト面（教育訓練・期限管理・リコール）を明記します（Level 2 第11.3節）。",
+ p:"🏛️ PRP=HACCPの効果を担保する前提条件"},
+
+{c:"HACCP",t:false,
+ q:"日本でHACCPが完全義務化された時期として正しいものはどれか？",
+ o:["2015年4月から義務化された","2018年6月から義務化された","2021年6月から食品衛生法改正","2024年4月から義務化された"],
+ a:2,
+ e:"日本では2021年6月から「食品衛生法」にHACCPについて明記され完全義務化となりました。EUは2004年に義務化、コストコは創設時からグローバルポリシーに基づきHACCPに準じた管理を実施してきました（Level 2 第11.1節）。",
+ p:"📅 日本のHACCP完全義務化＝2021年6月"},
+
+{c:"リコール",t:false,
+ q:"コストコにおけるリコール実施の決定権者として正しいものはどれか？",
+ o:["倉庫店GMが単独で決定権を持つ","VPおよびCountry Managerが","各部門マネージャーが決定する","本社人事部が決定の運用とするする形式"],
+ a:1,
+ e:"リコールを実施するかどうかは、バイスプレジデント（VP）ならびにカントリーマネージャー（Country Manager）が決定します。倉庫店は本社からの指示に従って必要な対応を行います（一般衛生管理プログラム 16条 B・C）。",
+ p:"👔 リコール決定権：VP＋Country Manager"},
+
+{c:"リコール",t:true,
+ q:"リコール対象品の開示先として正しいものはどれか？",
+ o:["コストコホームページとオンラインで開示","社内のみで情報を共有する形式","保健所のみに通報・報告する","従業員向けメールで通知の方法でる形"],
+ a:0,
+ e:"リコールならびに製品回収の対象品はコストコホームページにおいても開示します（コストコオンライン）。社内サイトに過去の製品や社内通達も含めてすべて掲載されています（一般衛生管理プログラム 16条 D・E）。",
+ p:"🌐 リコール対象品：HPで一般公開＋社内サイト掲載"},
+
+{c:"リコール",t:false,
+ q:"リコール時の倉庫店の役割として正しいものはどれか？",
+ o:["独自判断で回収を開始","事後報告で本社へ連絡","管理職判断で対応を決定","本社からの指示に従って対応"],
+ a:3,
+ e:"リコールが決定した場合、倉庫店は本社からの指示に従って必要な対応を行います。独自判断や事後報告は不可で、本社の指示系統に従うことが原則です（一般衛生管理プログラム 16条 C）。",
+ p:"📞 倉庫店：本社指示に従って対応（独自判断NG）"},
+
+{c:"リコール",t:false,
+ q:"T&Hプログラム不合格品を使用したRTE製品の対応として正しいものはどれか？",
+ o:["加熱処理して販売を継続する","値引きセールで早期処分する","リコール回収を実施する","本社の事後報告のみで対応"],
+ a:2,
+ e:"テスト&ホールドプログラム完了前の野菜類もしくはT&Hプログラムにおいて不合格であった野菜類のロットを使用したサラダ等のRTE製品は、リコール回収しなければなりません（一般衛生管理プログラム 08条 K-a）。",
+ p:"🚨 T&H不合格野菜使用のRTE品＝リコール対象"},
+
+{c:"リコール",t:false,
+ q:"CCP工程で食中毒の可能性がある問い合わせを受けた際の対応として正しいものはどれか？",
+ o:["倉庫店GMが単独で判断対応","本社FSへGoogleフォームで共有","保健所へ即時通報のみで対応","該当製品の回収を独自判断の方法で"],
+ a:1,
+ e:"CCP工程がある製品で生じた食中毒にかかわる可能性のあるメンバーからのご意見・問い合わせについては、倉庫店担当者がグーグルフォームから製品名・状態・焼成温度を含む記録の記載状況などを本社フードセーフティー部門に共有しなければなりません（一般衛生管理プログラム 08条 T）。",
+ p:"📝 CCP関連の問合せ→Googleフォームで本社FS共有"},
+
+{c:"リコール",t:true,
+ q:"リコール対象品の過去履歴の管理として正しいものはどれか？",
+ o:["倉庫店ごとに個別管理の方法で","社内サイトで過去製品含めすべて掲載","担当者の記憶のみに依存の方法で","紙ベースのみで管理の方法で"],
+ a:1,
+ e:"社内サイトに、過去の製品や社内通達も含めてすべて掲載しています。これにより追跡可能性とトレースを確保し、再発防止に活用します（一般衛生管理プログラム 16条 E）。",
+ p:"💻 リコール履歴：社内サイトで一元管理（過去含む）"},
+
+{c:"施設管理",t:false,
+ q:"食品製造施設に求められる条件として該当しないものはどれか？",
+ o:["飲料適性のある水と安全な排水","従業員休憩室とロッカー設備","高級な内装と外観デザイン","効果的な防虫防鼠管理"],
+ a:2,
+ e:"食品製造施設に求められる条件には①各種危害防止②飲料適性ある水＋安全な排水③食品・化学薬品・廃棄物の保管管理④適切な照明＋換気⑤手洗いシンク⑥洗浄消毒設備⑦従業員休憩室＋ロッカー⑧防虫防鼠管理⑨温度管理機器等が含まれます。高級内装は要件ではありません（Level 2 第10節）。",
+ p:"🏭 施設要件：水・排水・照明・換気・シンク・休憩室・防虫防鼠"},
+
+{c:"施設管理",t:false,
+ q:"食品接触面の清掃頻度として正しいものはどれか？",
+ o:["3か月に1回の大掃除","週に1回まとめて清掃","月に1回定期清掃","毎日の製造作業終了時"],
+ a:3,
+ e:"清掃頻度は①食品接触面=毎日の製造作業終了時②保管庫内の備品=最低月1回③その他の備品=最低3か月に1回が基本です（一般衛生管理プログラム 10条 C）。",
+ p:"🧼 食品接触面：毎日終了時／保管庫備品：月1／その他：3か月1"},
+
+{c:"施設管理",t:false,
+ q:"製造場内の機器類運搬時のジャッキ・フォークリフト使用ルールとして正しいものはどれか？",
+ o:["自由に使用できるの方法で","最低限の使用＋清潔な状態必須","管理職の許可で使用の方法で","使用は禁止されている"],
+ a:1,
+ e:"原材料を含むあらゆる備品の運搬にジャッキやフォークリフトを使用する場合、製造場内ではパレット移動などの最低限の使用にとどめます。備品運搬機械は清潔でなければならず、使用後製造場内に放置してはなりません（一般衛生管理プログラム 10条 D）。",
+ p:"🚜 ジャッキ等：最低限使用＋清潔＋放置NG"},
+
+{c:"施設管理",t:true,
+ q:"プレップルーム（D61・D64・D63コールド等）の室温管理基準として正しいものはどれか？",
+ o:["15°C以下を維持","10°C以下を維持","5°C以下を維持","室温管理は不要"],
+ a:1,
+ e:"D61とD64のプレップルームならびにD63のコールドプレップルーム、チキンプレップルーム（存在する倉庫店のみ）は室温が10°C以下であることを点検しなければなりません（一般衛生管理プログラム 10条 Q）。",
+ p:"🌡️ プレップルーム室温：10°C以下を維持"},
+
+{c:"施設管理",t:false,
+ q:"スライサーや包丁など硬質異物混入リスク機器の点検タイミングはどれか？",
+ o:["月に1回の定期点検","あらゆる作業開始前に点検","週に1回の定期点検","使用後にまとめて点検"],
+ a:1,
+ e:"スライサーや包丁など硬質異物が混入するリスクが高い機器・設備類はあらゆる作業の開始前に割れ欠けなどの破損箇所がないことを点検します。破損があれば製造に使用せず、フレッシュ部門管理職に報告します（一般衛生管理プログラム 10条 M）。",
+ p:"🔪 スライサー・包丁：作業開始前に毎回点検"},
+
+{c:"施設管理",t:false,
+ q:"包丁殺菌庫の紫外線灯の交換頻度として正しいものはどれか？",
+ o:["1か月に1回交換","3か月に1回交換","最低6か月に1回交換","1年に1回交換"],
+ a:2,
+ e:"包丁殺菌庫を使用する場合、殺菌紫外線灯は最低6か月に1度交換しなければなりません。交換日や次回交換予定日を明確に示し、その日付を殺菌庫に貼り付けます（一般衛生管理プログラム 10条 N）。",
+ p:"💡 包丁殺菌庫の紫外線灯：最低6か月に1回交換"},
+
+{c:"施設管理",t:false,
+ q:"ATP Swab Test（清掃状況評価）の実施主体として正しいものはどれか？",
+ o:["各倉庫店が独自判断で実施","本社FSからの指示時に実施","保健所の立入時のみ実施","外部監査会社が随時実施"],
+ a:1,
+ e:"本社フードセーフティーから指示があった際には、ATP Swab Testを清掃終了後に実施し、清掃状況を評価します。ATP対象箇所・判定数値（RLUs）・拭き取り方法は本社の指示に従います。結果は本社FS担当者から倉庫店にフィードバックします（一般衛生管理プログラム 10条 W）。",
+ p:"🧪 ATP Swab Test：本社FS指示時に実施"},
+
+{c:"施設管理",t:false,
+ q:"フードコート部門のソフトクリーム検査の頻度として正しいものはどれか？",
+ o:["毎週実施の方法で","毎月実施の方法で","3か月に1回実施","半年に1回実施"],
+ a:2,
+ e:"フードコート部門はSOPに基づき、3か月に1回ソフトクリーム検査を清掃精度の評価のために行います。不合格・再清掃の際は、3か月間連続で合格しなければなりません（一般衛生管理プログラム 10条 X）。",
+ p:"🍦 FCソフトクリーム検査：3か月に1回（不合格時は3か月連続合格必要）"},
+
+{c:"防虫防鼠",t:false,
+ q:"コストコにおける防虫防鼠プログラムの委託先として正しいものはどれか？",
+ o:["イカリ消毒株式会社に委託","各倉庫店が個別契約","本社直営で実施の方法で","保健所が定期実施の方法で"],
+ a:0,
+ e:"防虫防鼠プログラムはイカリ消毒株式会社に委託します。しかし、イカリ消毒に防虫防鼠管理のすべてを委譲するのではなく、各倉庫店も主体的に防虫防鼠管理に取り組まなければなりません（一般衛生管理プログラム 12条 A）。",
+ p:"🏢 防虫防鼠委託：イカリ消毒（＋倉庫店も主体的取組）"},
+
+{c:"防虫防鼠",t:false,
+ q:"食品製造施設で確認される主なペスト（有害小動物）として該当しないものはどれか？",
+ o:["ラットやマウスなどげっ歯類","ハト・スズメ・カラスなど鳥類","ハエ・ゴキブリなど昆虫","ミツバチや蝶など花粉媒介者"],
+ a:3,
+ e:"食品製造施設の主なペストは①げっ歯類（ラット・マウス）②鳥類（ハト・スズメ・カラス）③昆虫（ハエ・ゴキブリ・チャタテムシ）です。ミツバチや蝶はペストではなく、生態系に有益な存在です（Level 2 第9.1節）。",
+ p:"🐀🐦🐜 ペスト3種：げっ歯・鳥類・昆虫"},
+
+{c:"防虫防鼠",t:true,
+ q:"ペストが生存するために必要な条件として該当しないものはどれか？",
+ o:["食品の存在の方法で","水分の存在の方法で","温かい設備の存在","電気設備の存在"],
+ a:3,
+ e:"ペストが生存するために必要な条件は①食品②水分③温かい設備④身を潜めることができる設備の4つです。電気設備の有無は直接的な生存条件ではありません（Level 2 第9.1節）。",
+ p:"🏚️ ペスト生存4条件：食品・水分・温かさ・隠れ場所"},
+
+{c:"防虫防鼠",t:false,
+ q:"防虫防鼠関連書類で倉庫店が一元管理すべきものとして正しいものはどれか？",
+ o:["1つのファイルで一元管理","部門ごとに個別ファイル管理","電子データのみで管理","本社で一括管理の方法で"],
+ a:0,
+ e:"倉庫店において、防虫防鼠に関連する書類はすべて1つのファイルで一元管理されなければなりません。アドミニストレーション部門が管理します（一般衛生管理プログラム 12条 C・D）。",
+ p:"📁 防虫防鼠書類：1つのファイルで一元管理（アドミ部門）"},
+
+{c:"防虫防鼠",t:false,
+ q:"防虫防鼠の月次有害生物防除施工実施報告書に含まれる項目として該当しないものはどれか？",
+ o:["発見された害虫・げっ歯類の種類","殺虫剤の散布有無・薬剤名・使用量","従業員の給与計算明細の方法で","指摘事項に対する改善内容"],
+ a:2,
+ e:"有害生物防除施工実施報告書には①発見害虫・げっ歯類の種類・発生場所②殺虫剤散布有無③薬剤名・使用量④指摘事項⑤改善内容⑥業者・店舗の署名が含まれます。給与明細は含まれません（一般衛生管理プログラム 12条 E）。",
+ p:"📋 防虫防鼠報告：害虫種・薬剤・指摘・改善・署名"},
+
+{c:"防虫防鼠",t:false,
+ q:"製造場内でコストコ従業員が殺虫剤を使用する場合のルールとして正しいものはどれか？",
+ o:["緊急時のみ使用可能","管理職の許可で使用可能","コストコ従業員は使用禁止","本社承認で使用可能"],
+ a:2,
+ e:"製造場内において、コストコの従業員は殺虫剤を使用してはなりません。殺虫剤等の危険な化学薬品の使用は、特別に訓練されている業者（イカリ消毒）に依頼するのが最良です（一般衛生管理プログラム 12条 G、Level 2 第9.2節）。",
+ p:"🚫 製造場内：コストコ従業員の殺虫剤使用は禁止"},
+
+{c:"防虫防鼠",t:false,
+ q:"ペスト侵入の兆候として確認すべき項目として正しいものはどれか？",
+ o:["従業員の体調変化のみ","気温の上昇・湿度の変化","照明の明るさ・電気代の増加","死骸・包装の破れ・糞や卵・幼虫"],
+ a:3,
+ e:"ペストが侵入した際の主要な兆候は①死骸②包装の破れや破損③糞や卵、幼虫などの生息していた可能性のある痕跡です。ゴミ廃棄時等に従業員がこれらを確認できるよう教育することが重要です（Level 2 第9.2節）。",
+ p:"🔍 ペスト兆候：死骸・包装破れ・糞・卵・幼虫"},
+
+{c:"防虫防鼠",t:true,
+ q:"防虫防鼠プログラムの効果的な設置に必要な要素として該当しないものはどれか？",
+ o:["ドアスクリーン・カーテン等の入室規制","受領時の食品検査のみで対応","従業員の手当支給制度の方法で","施設の修繕・保全のみで対応"],
+ a:2,
+ e:"効果的な防虫防鼠プログラムに必要な要素は①ドアスクリーン・カーテン等の入室規制②受領時の食品検査③施設清潔保持・ゴミ処理④施設修繕・保全⑤ライトトラップ・粘着シート等のペスト管理機器です。手当支給制度は無関係です（Level 2 第9.2節）。",
+ p:"🛡️ 防虫防鼠要素：入室規制・食品検査・清潔・修繕・管理機器"},
+
+{c:"水質管理",t:false,
+ q:"コストコ施設で使用する水の基本として正しいものはどれか？",
+ o:["地下水を煮沸して使用","ペットボトル水のみ使用","井戸水を浄化して使用","上水直結の水道水を使用"],
+ a:3,
+ e:"基本的には、上水直結の水道水を使用します。施設内の水は飲用適で安全でなければならず、汚染原因にならないよう年1回外部検査機関に依頼し水質検査を実施します（一般衛生管理プログラム 14条 A・B）。",
+ p:"💧 基本＝上水直結の水道水（年1回水質検査）"},
+
+{c:"水質管理",t:false,
+ q:"水質検査の実施頻度として正しいものはどれか？",
+ o:["月1回内部点検の方法で","年1回外部検査機関へ依頼","3年に1回の定期検査","異常時のみ実施の方法で"],
+ a:1,
+ e:"汚染の原因にならないようにするために年1回外部検査機関に依頼し水質検査を実施します。記録は倉庫店アドミニストレーション部門で保管され、最低1年間保管します（一般衛生管理プログラム 14条 B・D・E）。",
+ p:"📅 水質検査：年1回・外部機関・記録1年保管"},
+
+{c:"水質管理",t:true,
+ q:"貯水槽を設置している場合の清掃頻度として正しいものはどれか？",
+ o:["月に1回の自主清掃","異常時のみ清掃の方法で","3年に1回の定期清掃","年1回外部専門業者に依頼"],
+ a:3,
+ e:"貯水槽を設置している場合は外部専門業者に依頼し、年1回清掃を実施しなければなりません。清掃記録は倉庫店アドミニストレーション部門で保管します（一般衛生管理プログラム 14条 C・D）。",
+ p:"🚿 貯水槽清掃：年1回・外部専門業者へ依頼"},
+
+{c:"水質管理",t:false,
+ q:"水質検査記録と貯水槽清掃記録の保管期間として正しいものはどれか？",
+ o:["最低1年間保管する","最低3年間保管する","最低5年間保管する","永久保管が必要"],
+ a:0,
+ e:"水質検査記録および貯水槽の清掃記録は倉庫店アドミニストレーション部門にて保管し、これらの記録は最低でも1年間保管しなければなりません（一般衛生管理プログラム 14条 E）。",
+ p:"📁 水質・貯水槽記録：最低1年間保管"},
+
+{c:"記録管理",t:false,
+ q:"記録記入に使用してはならない筆記用具として正しいものはどれか？",
+ o:["キャップなしのボールペンの方法で","鉛筆・シャープペン・フリクションペン","ノック式ボールペンの方法で","ジェルインクペンのみで対応"],
+ a:1,
+ e:"異物混入のリスクを考慮し、キャップが付いていないボールペンなど脱着可能な部品がない筆記用具を使用します。容易に訂正ができる鉛筆・シャープペン・フリクションボールペンは使用してはなりません（一般衛生管理プログラム 15条 B）。",
+ p:"✏️ 使用NG：鉛筆・シャープ・フリクション（訂正容易だから）"},
+
+{c:"記録管理",t:false,
+ q:"記録書類のバインダー素材として正しいものはどれか？",
+ o:["アルミ製またはステンレス製","紙製バインダーの方法で","プラスチック製バインダー","木製バインダーの方法で"],
+ a:0,
+ e:"書類の記入に用いるバインダーは異物混入防止のため、アルミ製またはステンレス製のものを使用します。紙製およびプラスチック製のバインダーの使用は不可です（一般衛生管理プログラム 15条 C）。",
+ p:"📁 バインダー：アルミorステンレス。紙・プラはNG"},
+
+{c:"記録管理",t:true,
+ q:"記録を訂正する場合の正しい方法はどれか？",
+ o:["修正テープで塗り潰す","修正ペンで塗り潰すの方法で","二重線で消し正しい内容を記入","元の記入を消しゴムで消す"],
+ a:2,
+ e:"記録を訂正する場合は二重線で消し正しい文字や数字を記入します。修正テープや修正ペンで塗りつぶす行為や改ざんは厳禁です。訂正の際はフレッシュ部門管理職や責任者が訂正内容を点検し妥当性を保証します（一般衛生管理プログラム 15条 D・E）。",
+ p:"✏️ 訂正方法：二重線＋正しい内容（修正テープ/ペンNG）"},
+
+{c:"記録管理",t:false,
+ q:"記録の空欄項目への記入方法として正しいものはどれか？",
+ o:["空白のままにしておくの方法ででの運用","斜線「/」・締めマーク「〆」・バツ「×」","「不明」と記載するのみで対応での運用","管理者のサインで全て埋める"],
+ a:1,
+ e:"空欄の項目には斜線「/」や締めマーク「〆」、バツ印「×」を用い、記録の量が不足していないことを明確にします。空白のままにすると改ざんや記入漏れと判断されるリスクがあります（一般衛生管理プログラム 15条 F）。",
+ p:"✏️ 空欄処理：/〆×で埋めて記入完了を示す"},
+
+{c:"記録管理",t:false,
+ q:"記録書類に保管期間が明示されていない場合の保管期間として正しいものはどれか？",
+ o:["記入後すぐ廃棄可能","最低でも3年間は保管","最低でも5年間は保管","最低でも1年間は保管"],
+ a:3,
+ e:"記録書類に保管期間が明示されていない場合は、最低でも1年間はその記録を保管しなければなりません。保管期間が明示されている場合はその期間に従います（一般衛生管理プログラム 15条 H）。",
+ p:"📁 保管期間未明示：最低1年間（明示あれば期間に従う）"},
+
+{c:"記録管理",t:false,
+ q:"記録書類の整理方法として正しいものはどれか？",
+ o:["古い書類を上に保管の方法でる形","最新書類を最上位に・種類ごとに保管","ランダムに保管しても問題ない","日付順関係なく保管の方法でる形"],
+ a:1,
+ e:"記録は最新の書類がもっとも上に来るように日付管理をします。記録書類はその種類ごとにまとめて保管・管理しなければなりません（一般衛生管理プログラム 15条 I）。",
+ p:"📁 整理：最新が最上位＋種類ごとに分類"},
+
+{c:"記録管理",t:false,
+ q:"記録の点検時に管理職・責任者が確認すべき項目として該当しないものはどれか？",
+ o:["基準の逸脱や記録漏れがないか","分かりやすい文字・数字で記載されているか","記入者の労働時間と残業状況の方法で","記録内容が不明な場合の調査の方法で"],
+ a:2,
+ e:"フレッシュ部門の管理職やサインする責任者は、基準の逸脱や記録漏れがないか・分かりやすい文字や数字で記載されているか必ず点検します。記録内容が不明な場合は実際に記録した担当者に調査し記録内容を保証します。労働時間は対象外です（一般衛生管理プログラム 15条 G）。",
+ p:"📋 点検：逸脱・漏れ・読みやすさ・不明時調査の4点"},
+
+{c:"ゴミ管理",t:false,
+ q:"廃棄物用容器（ゴミ箱）の材質として正しいものはどれか？",
+ o:["汚液が漏れない不浸透性材質","紙製の使い捨て容器","透明アクリル容器の方法で","木製の通気容器の方法で"],
+ a:0,
+ e:"廃棄物用の容器（ゴミ箱など）は汚液が漏れないように不浸透性の材質のものを用います。紙製や木製では汚液漏れリスクがあり不適です（一般衛生管理プログラム 11条 A）。",
+ p:"🗑️ ゴミ箱：不浸透性材質（汚液漏れ防止）"},
+
+{c:"ゴミ管理",t:true,
+ q:"ゴミ庫での作業完了後の対応として正しいものはどれか？",
+ o:["そのまま製造場に戻って良い","上着のみ脱げば良い","シャワーを浴びる必要がある","製造場再入室時に手洗い実施"],
+ a:3,
+ e:"ゴミ庫での作業完了後に製造場内に再度入室する際は、手洗いの管理基準に基づき手洗いを実施しなくてはなりません。ゴミ庫で廃棄物を処理する際は、汚染防止のため白衣・帽子等製造場で使用するものは着用してはなりません（一般衛生管理プログラム 11条 C-f・g）。",
+ p:"🧼 ゴミ庫作業後：製造場再入室時に手洗い必須"},
+
+{c:"ゴミ管理",t:false,
+ q:"ゴミ庫の施錠管理として正しいものはどれか？",
+ o:["常時開放しておく","指定時間以外は完全施錠","日中のみ開錠の方法で","夜間のみ施錠の方法で"],
+ a:1,
+ e:"ゴミ庫は指定時間以外は完全に施錠されていなければなりません。指定時間以外で廃棄物を捨てる際は、管理職もしくは責任者に依頼しゴミ庫を開錠してもらいます（一般衛生管理プログラム 11条 D・E）。",
+ p:"🔒 ゴミ庫：指定時間以外は完全施錠"},
+
+{c:"ゴミ管理",t:false,
+ q:"ゴミ庫の清掃頻度として正しいものはどれか？",
+ o:["毎日清掃を実施する","週に1回清掃する","月に1回清掃する","汚れた時のみ清掃"],
+ a:0,
+ e:"ゴミ庫の清掃は毎日実施しなければなりません。ペスト発生源にならないよう、頻繁な清掃が必要です（一般衛生管理プログラム 11条 G）。",
+ p:"🧹 ゴミ庫清掃：毎日実施"},
+
+{c:"トイレ管理",t:false,
+ q:"トイレに常時備えなければならない備品として該当しないものはどれか？",
+ o:["温水・石鹸・ペーパータオル","ジェットタオルなどの乾燥手段","個人用タオルや布巾の方法で","使用可能な洗面台・トイレ"],
+ a:2,
+ e:"トイレには温水・石鹸・ペーパータオル・ジェットタオルなどの備品が常に使用できるようにします。洗面台・トイレは清潔で正しく機能する必要があります。個人用タオルや布巾は衛生上不適切です（一般衛生管理プログラム 13条 A・B）。",
+ p:"🚻 トイレ備品：温水・石鹸・ペーパー・ジェットタオル"},
+
+{c:"トイレ管理",t:false,
+ q:"トイレの点検頻度として正しいものはどれか？",
+ o:["1日1回点検の方法で","最低1時間に1回点検＋記録","4時間に1回点検の方法で","週に1回点検の方法で"],
+ a:1,
+ e:"トイレの備品状況・清潔さ・機能性を最低1時間に1回点検しなければなりません。点検内容はFLOORWALK CHECKLISTに記入します（一般衛生管理プログラム 13条 D）。",
+ p:"⏰ トイレ点検：最低1時間に1回＋記録"},
+
+{c:"トイレ管理",t:true,
+ q:"トイレ点検記録に使用する記入書類として正しいものはどれか？",
+ o:["Temp Check Walk Log","Daily Walk Sheet","Sanitation Log","FLOORWALK CHECKLIST"],
+ a:3,
+ e:"トイレ点検の記録はFLOORWALK CHECKLISTに記入します。Daily Walk Sheet・Sanitation Log・Temp Check Walk Logはそれぞれ別の用途の記録様式です（一般衛生管理プログラム 13条 D）。",
+ p:"📋 トイレ点検記録＝FLOORWALK CHECKLIST"},
+
+{c:"総合",t:true,
+ q:"次のうち「冷凍保管温度」の最新基準値（一般衛生管理プログラム）として正しいものはどれか？",
+ o:["−18°C以下（Level 2旧基準）","−15°C以下（仕掛品・製品）","−10°C以下で十分の方法で","−20°C以下が必須の方法で"],
+ a:1,
+ e:"冷凍食品（仕掛品・製品）の保管温度は−15°C以下です。−18°CはLevel 2 TEXTBOOKに記載の旧基準で、現行の一般衛生管理プログラム（2025年9月版）では−15°Cに改訂されています。受領時も「−15°C以下かつ冷凍状態」が新基準です（一般衛生管理プログラム 07条）。",
+ p:"🧊 最新冷凍基準＝−15°C以下（旧基準−18°Cから変更）"},
+
+{c:"総合",t:true,
+ q:"次のうち「常温保管温度」の最新基準値（一般衛生管理プログラム）として正しいものはどれか？",
+ o:["10〜21°C（Level 2旧基準","10〜25°Cの運用とする","15〜30°Cの運用とする","5〜20°Cの運用とする"],
+ a:1,
+ e:"常温保管温度は10〜25°Cです。10〜21°CはLevel 2 TEXTBOOKに記載の旧基準で、現行の一般衛生管理プログラムでは10〜25°Cに改訂されています。冷蔵食品4°C以下・冷凍食品−15°C以下と合わせて覚えましょう（一般衛生管理プログラム 07条 C）。",
+ p:"🌡️ 最新常温基準＝10〜25°C（旧基準10-21°Cから変更）"},
+
+{c:"総合",t:true,
+ q:"加熱基準と消毒条件の正しい組み合わせはどれか？",
+ o:["加熱85°C/5秒・ヨウ素50ppm/30秒","加熱65°C/15分・塩素100ppm/3分","加熱75°C/10秒・熱湯60°C/30秒","加熱63°C/30分・塩素200ppm/5分"],
+ a:3,
+ e:"加熱殺菌の基本基準は63°C/30分（畜肉・鮮魚・巻貝）、塩素消毒は200ppm/5分浸漬です。これらは両テキスト（一般衛生管理プログラムとLevel 2）共通の基準で、CCP管理上の重要数値です。二枚貝は85-90°C/90秒の別基準です（一般衛生管理プログラム 08条 R、Level 2 第8.5節）。",
+ p:"🔥 加熱63°C/30分＋塩素200ppm/5分（基本セット）"},
+
+{c:"総合",t:false,
+ q:"コストコのフードコート部門（D88）ガーリックシュリンプの加熱条件として正しいものはどれか？",
+ o:["中心温度63°C/30分以上","中心温度74°C/15秒以上","中心温度80°C/14秒以上","中心温度90°C/5秒以上"],
+ a:2,
+ e:"コストコのガーリックシュリンプ（生のエビ焼成）の加熱条件は中心温度80°C/14秒以上です。プルコギベイク・シーフードジャンバラヤ・グリルチキンも同条件80°C/14秒です（Level 2 第7.7節）。",
+ p:"🍤 ガーリックシュリンプ：80°C/14秒（他の80°C系商品と同条件）"},
+
+{c:"総合",t:true,
+ q:"再加熱の基準として正しいものはどれか？",
+ o:["63°C/30分・4時間以内に達成","74°C/15秒＋2時間以内に達成","80°C/14秒・1時間以内に達成","85°C/90秒・3時間以内に達成"],
+ a:1,
+ e:"再加熱の基準は中心温度74°C以上/保持時間15秒以上、再加熱開始から2時間以内に条件達成です。加熱殺菌（63°C/30分）とは異なる別基準なので混同しないよう注意（一般衛生管理プログラム 08条 W、Level 2 第7.9節）。",
+ p:"🔥 再加熱：74°C/15秒・2時間以内達成（加熱殺菌とは別）"}
+];
+let cur=0,ans=new Array(Q.length).fill(null),done=new Array(Q.length).fill(false);
+const L=['A','B','C','D','E'];
+function start(){document.getElementById('start').style.display='none';document.getElementById('quiz').style.display='block';load(0);}
+function load(i){
+  cur=i;const q=Q[i],tot=Q.length;
+  document.getElementById('qn').textContent=`問題 ${i+1} / ${tot}`;
+  document.getElementById('qcat').textContent=q.c;
+  document.getElementById('qt').textContent=q.q;
+  document.getElementById('pt').textContent=`${i+1} / ${tot}`;
+  document.getElementById('pbi').style.width=((i+1)/tot*100)+'%';
+  const tr=document.getElementById('trap');tr.className=q.t?'trap on':'trap';
+  const o=document.getElementById('opts');o.innerHTML='';
+  q.o.forEach((opt,j)=>{
+    const d=document.createElement('div');d.className='opt';
+    d.innerHTML=`<span class="ol">${L[j]}</span><span>${opt}</span>`;
+    d.onclick=()=>pick(j);o.appendChild(d);
+  });
+  const e=document.getElementById('exp');e.style.display='none';e.className='exp';
+  if(done[i])show(ans[i],q.a,q.e,q.p);
+  document.getElementById('pb').disabled=i===0;
+  const last=i===tot-1;
+  document.getElementById('nb').style.display=last?'none':'inline-block';
+  document.getElementById('sub').style.display=last?'inline-block':'none';
+}
+function pick(j){
+  if(done[cur])return;
+  ans[cur]=j;done[cur]=true;
+  show(j,Q[cur].a,Q[cur].e,Q[cur].p);
+}
+function show(sel,cor,et,pt){
+  const os=document.querySelectorAll('.opt');
+  os.forEach(o=>o.classList.add('dis'));
+  os[cor].classList.add('cor');
+  if(sel!==cor)os[sel].classList.add('wrg');else os[sel].classList.add('cor');
+  const e=document.getElementById('exp');e.style.display='block';
+  const ok=sel===cor;e.className='exp'+(ok?'':' we');
+  e.innerHTML=`<div class="et">${ok?'✓ 正解！':'✗ 不正解'}</div>${et}`+(pt?`<div class="ep">${pt}</div>`:'');
+}
+function next(){if(cur<Q.length-1)load(cur+1);}
+function prev(){if(cur>0)load(cur-1);}
+function submit(){
+  const tot=Q.length;let c=0,u=0;
+  Q.forEach((q,i)=>{if(ans[i]===null)u++;else if(ans[i]===q.a)c++;});
+  const w=tot-c-u,sc=Math.round(c/tot*100);
+  document.getElementById('quiz').style.display='none';
+  document.getElementById('result').style.display='block';
+  document.getElementById('pbi').style.width='100%';
+  document.getElementById('pt').textContent=`${tot} / ${tot}`;
+  document.getElementById('sp').textContent=sc;
+  document.getElementById('rc').textContent=c;
+  document.getElementById('rw').textContent=w;
+  document.getElementById('ru').textContent=u;
+  const p=sc>=85;
+  document.getElementById('rtt').textContent=p?'合格 PASS':'不合格 FAIL';
+  document.getElementById('rtt').style.color=p?'var(--correct)':'var(--wrong)';
+  document.getElementById('rm').textContent=p?`🎉 合格ライン（85点）突破！\n正解率 ${sc}% — 本番も大丈夫！`:`合格まであと${85-sc}点。\n解説の💡ポイントを確認して再チャレンジ！`;
+  setTimeout(()=>{const a=document.getElementById('arc');a.style.transition='stroke-dashoffset 1.5s ease';a.style.strokeDashoffset=534-(sc/100)*534;a.style.stroke=p?'var(--correct)':'var(--wrong)';},100);
+}
+function review(){
+  const s=document.getElementById('rvs');
+  s.style.display=s.style.display==='none'?'block':'none';
+  if(s.innerHTML.trim()!==''&&s.style.display==='none')return;
+  let h='<div class="rvt">解答レビュー — 全問</div>';
+  Q.forEach((q,i)=>{
+    const ok=ans[i]===q.a,cl=ok?'rc':'rw';
+    const at=ans[i]===null?'未回答':`${L[ans[i]]}. ${q.o[ans[i]]}`;
+    const pp=q.p?`<div style="margin-top:6px;padding:6px 10px;background:rgba(251,191,36,.08);border-left:3px solid var(--gold);border-radius:4px;font-size:.78rem;color:var(--gold)">${q.p}</div>`:'';
+    h+=`<div class="rvi ${cl}"><div style="font-size:.72rem;margin-bottom:7px;color:var(--accent);font-family:'Syne',sans-serif">${i+1}問目 — ${q.c}${q.t?' ⚠':''}</div><div class="rvq">${q.q}</div><div><div class="ral">あなたの回答</div><div class="${ok?'rac':'raw'}" style="font-size:.85rem">${at}</div>${!ok?`<div class="ral" style="margin-top:7px">正解</div><div class="rac" style="font-size:.85rem">${L[q.a]}. ${q.o[q.a]}</div>`:''}<div class="ral" style="margin-top:7px">解説</div><div style="opacity:.8;font-size:.82rem;line-height:1.7">${q.e}</div>${pp}</div></div>`;
+  });
+  s.innerHTML=h;
+}
+function retry(){
+  ans=new Array(Q.length).fill(null);done=new Array(Q.length).fill(false);
+  document.getElementById('result').style.display='none';
+  document.getElementById('arc').style.strokeDashoffset=534;
+  document.getElementById('rvs').style.display='none';document.getElementById('rvs').innerHTML='';
+  document.getElementById('quiz').style.display='block';
+  document.getElementById('pbi').style.width='1%';load(0);
+}
+</script>
+</body>
+</html>

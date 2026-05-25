@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>コストコ フードセーフティー 模擬試験 Level 2 — Vol.2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Syne:wght@700;800&display=swap');
+:root{
+  --bg:#08090D;--card:#10121A;--border:#1E2130;
+  --purple:#5B4FE9;--accent:#A78BFA;--gold:#FBBF24;
+  --text:#F1F0FF;--muted:#6B7280;
+  --correct:#10B981;--wrong:#EF4444;--selected:#1E40AF;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;}
+#header{
+  background:linear-gradient(135deg,#1E1B4B 0%,#3730A3 60%,#5B4FE9 100%);
+  padding:13px 26px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 4px 24px rgba(91,79,233,.4);
+  border-bottom:2px solid var(--accent);
+}
+#header h1{font-family:'Syne',sans-serif;font-size:1.5rem;letter-spacing:2px;color:#fff;font-weight:800;}
+.hd-sub{font-size:.62rem;color:rgba(255,255,255,.6);letter-spacing:2px;margin-bottom:2px;}
+.vol-badge{background:var(--gold);color:#111;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:800;padding:3px 10px;border-radius:4px;letter-spacing:2px;margin-left:10px;}
+#pw{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+#pt{font-size:.78rem;color:rgba(255,255,255,.85);}
+#pbo{width:180px;height:5px;background:rgba(255,255,255,.18);border-radius:3px;overflow:hidden;}
+#pbi{height:100%;width:0%;background:var(--accent);border-radius:3px;transition:width .4s;}
+#start{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90vh;padding:40px 20px;text-align:center;}
+.vl{font-family:'Syne',sans-serif;font-size:.78rem;letter-spacing:5px;color:var(--accent);margin-bottom:14px;}
+.bt{font-family:'Syne',sans-serif;font-size:clamp(2.6rem,6.5vw,4.5rem);color:#fff;letter-spacing:2px;line-height:1.1;margin-bottom:8px;font-weight:800;}
+.bt span{color:var(--accent);}
+.tl{font-size:.9rem;color:var(--gold);letter-spacing:1px;margin-bottom:6px;}
+.bs{font-size:.8rem;color:var(--muted);margin-bottom:40px;}
+.ig{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:480px;margin-bottom:40px;}
+.ic{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.ic .n{font-family:'Syne',sans-serif;font-size:2.4rem;color:var(--accent);line-height:1;font-weight:700;}
+.ic .l{font-size:.68rem;color:var(--muted);margin-top:4px;}
+.sb{background:var(--purple);color:#fff;border:1px solid var(--accent);padding:16px 56px;font-size:1rem;font-weight:700;border-radius:8px;cursor:pointer;letter-spacing:2px;transition:all .15s;box-shadow:0 4px 24px rgba(91,79,233,.5);}
+.sb:hover{background:#4338CA;transform:translateY(-2px);}
+#quiz{display:none;padding:28px 20px;max-width:820px;margin:0 auto;}
+.qm{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.qn{font-family:'Syne',sans-serif;font-size:1rem;color:var(--gold);letter-spacing:2px;font-weight:700;}
+.qcat{font-size:.67rem;background:var(--border);color:var(--muted);padding:4px 12px;border-radius:20px;}
+.trap{display:none;font-size:.65rem;background:rgba(239,68,68,.15);color:#F87171;border:1px solid rgba(239,68,68,.3);padding:3px 10px;border-radius:20px;margin-right:6px;}
+.trap.on{display:inline-block;}
+.qt{font-size:1rem;line-height:1.9;font-weight:500;margin-bottom:22px;padding:22px;background:var(--card);border:1px solid var(--border);border-radius:12px;border-left:4px solid var(--accent);}
+.opts{display:flex;flex-direction:column;gap:10px;}
+.opt{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:15px 18px;cursor:pointer;display:flex;align-items:flex-start;gap:12px;transition:border-color .15s,background .15s,transform .1s;font-size:.93rem;line-height:1.65;}
+.opt:hover:not(.dis){border-color:#334;background:#13151F;transform:translateX(4px);}
+.ol{min-width:27px;height:27px;background:var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--muted);flex-shrink:0;margin-top:1px;transition:background .15s,color .15s;}
+.opt.sel{border-color:var(--selected);background:rgba(30,64,175,.18);}
+.opt.sel .ol{background:var(--selected);color:#fff;}
+.opt.cor{border-color:var(--correct);background:rgba(16,185,129,.1);}
+.opt.cor .ol{background:var(--correct);color:#fff;}
+.opt.wrg{border-color:var(--wrong);background:rgba(239,68,68,.1);}
+.opt.wrg .ol{background:var(--wrong);color:#fff;}
+.opt.dis{cursor:default;}
+.exp{display:none;margin-top:16px;padding:18px 20px;background:#061410;border:1px solid var(--correct);border-radius:10px;font-size:.88rem;line-height:1.9;color:#A7F3D0;}
+.exp.we{background:#140606;border-color:var(--wrong);color:#FECACA;}
+.exp .et{font-weight:700;margin-bottom:6px;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;}
+.exp .ep{margin-top:10px;padding:8px 12px;background:rgba(251,191,36,.08);border-left:3px solid var(--gold);border-radius:4px;font-size:.82rem;color:var(--gold);}
+.nr{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
+.nb{padding:11px 28px;border:none;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all .15s;}
+.nb.p{background:var(--purple);color:#fff;border:1px solid var(--accent);}
+.nb.p:hover{background:#4338CA;}
+.nb.s{background:var(--border);color:var(--text);}
+.nb.s:hover{background:#252840;}
+.nb:disabled{opacity:.35;cursor:not-allowed;}
+#result{display:none;padding:50px 20px;max-width:680px;margin:0 auto;text-align:center;}
+.sr{width:200px;height:200px;margin:0 auto 28px;position:relative;}
+.sr svg{transform:rotate(-90deg);}
+.sr .st{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.sp{font-family:'Syne',sans-serif;font-size:3.2rem;line-height:1;color:var(--text);font-weight:800;}
+.sl{font-size:.65rem;color:var(--muted);}
+.rt{font-family:'Syne',sans-serif;font-size:2.2rem;letter-spacing:2px;margin-bottom:8px;font-weight:800;}
+.rm{color:var(--muted);margin-bottom:28px;line-height:1.8;white-space:pre-line;}
+.rsg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+.rsc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.rsn{font-family:'Syne',sans-serif;font-size:2rem;line-height:1;font-weight:700;}
+.rsl{font-size:.68rem;color:var(--muted);margin-top:4px;}
+.rb{background:var(--purple);color:#fff;border:1px solid var(--accent);padding:14px 44px;font-size:.95rem;font-weight:700;border-radius:8px;cursor:pointer;letter-spacing:2px;transition:all .15s;margin:8px;}
+.rb:hover{background:#4338CA;}
+.rvs{text-align:left;margin-top:44px;}
+.rvt{font-family:'Syne',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--gold);margin-bottom:18px;font-weight:700;}
+.rvi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:10px;}
+.rvi.rw{border-color:rgba(239,68,68,.35);}
+.rvi.rc{border-color:rgba(16,185,129,.22);}
+.rvq{font-size:.88rem;margin-bottom:10px;line-height:1.6;}
+.ral{color:var(--muted);font-size:.72rem;margin-bottom:3px;}
+.rac{color:var(--correct);font-weight:500;}
+.raw{color:var(--wrong);}
+</style>
+<!-- PWA-INJECT-START -->
+<link rel="manifest" href="./manifest.json" />
+<meta name="theme-color" content="#E31837" />
+<meta name="application-name" content="FoodSafety模試" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="FoodSafety模試" />
+<link rel="apple-touch-icon" href="./icons/icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png" />
+<link rel="shortcut icon" href="./icons/icon-64.png" />
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function (e) {
+        console.warn('SW register failed:', e);
+      });
+    });
+  }
+</script>
+<!-- PWA-INJECT-END -->
+</head>
+<body>
+<div id="header">
+  <div><div class="hd-sub">COSTCO WHOLESALE JAPAN</div><h1>FOOD SAFETY EXAM <span class="vol-badge">VOL.5</span></h1></div>
+  <div id="pw"><span id="pt">0 / 60</span><div id="pbo"><div id="pbi"></div></div></div>
+</div>
+<div id="start">
+  <div class="vl">VOLUME 5 — PASS GUARANTEE EDITION</div>
+  <div class="bt">模擬試験<br><span>第5弾</span></div>
+  <div class="tl">⚡ 絶対合格のために設計された100問</div>
+  <div class="bs">本番で出やすい・間違えやすい・数値が似ているポイントを厳選</div>
+  <div class="ig">
+    <div class="ic"><div class="n">60</div><div class="l">問題数</div></div>
+    <div class="ic"><div class="n">4-5</div><div class="l">択問題</div></div>
+    <div class="ic"><div class="n">85</div><div class="l">合格点</div></div>
+  </div>
+  <button class="sb" onclick="start()">試験開始</button>
+</div>
+<div id="quiz">
+  <div class="qm">
+    <span class="qn" id="qn">問題 1 / 60</span>
+    <div style="display:flex;align-items:center;">
+      <span class="trap" id="trap">⚠ ひっかけ注意</span>
+      <span class="qcat" id="qcat"></span>
+    </div>
+  </div>
+  <div class="qt" id="qt"></div>
+  <div class="opts" id="opts"></div>
+  <div class="exp" id="exp"></div>
+  <div class="nr">
+    <button class="nb s" id="pb" onclick="prev()">◀ 前へ</button>
+    <button class="nb p" id="nb" onclick="next()">次へ ▶</button>
+    <button class="nb p" id="sub" onclick="submit()" style="display:none">結果を見る</button>
+  </div>
+</div>
+<div id="result">
+  <div class="sr">
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="85" fill="none" stroke="#1E2130" stroke-width="13"/>
+      <circle id="arc" cx="100" cy="100" r="85" fill="none" stroke="#5B4FE9" stroke-width="13"
+        stroke-linecap="round" stroke-dasharray="534" stroke-dashoffset="534"/>
+    </svg>
+    <div class="st"><div class="sp" id="sp">0</div><div class="sl">点</div></div>
+  </div>
+  <div class="rt" id="rtt">—</div>
+  <div class="rm" id="rm"></div>
+  <div class="rsg">
+    <div class="rsc"><div class="rsn" id="rc" style="color:var(--correct)">0</div><div class="rsl">正解</div></div>
+    <div class="rsc"><div class="rsn" id="rw" style="color:var(--wrong)">0</div><div class="rsl">不正解</div></div>
+    <div class="rsc"><div class="rsn" id="ru" style="color:var(--gold)">0</div><div class="rsl">未回答</div></div>
+  </div>
+  <button class="rb" onclick="retry()">もう一度挑戦</button>
+  <button class="rb" style="background:var(--border);border-color:var(--border)" onclick="review()">間違いを確認</button>
+  <div class="rvs" id="rvs" style="display:none"></div>
+</div>
+<script>
+const Q=[
+{c:"細菌",t:false,
+ q:"食中毒の大部分の原因となるバクテリアの分類として正しいものはどれか？",
+ o:["病原性バクテリアによるものが大部分","腐敗性バクテリアによるものが大部分","有益なバクテリアによるものが大部分","土壌性バクテリアによるものが大部分"],
+ a:0,
+ e:"バクテリアは①有益なバクテリア（ヨーグルト等）②病原性バクテリア③腐敗性バクテリアの3種類に分類され、食中毒の大部分は病原性バクテリアに起因します（Level 2 第3.1節）。",
+ p:"🦠 食中毒の原因＝病原性バクテリアが大部分"},
+
+{c:"細菌",t:false,
+ q:"加熱不十分な鶏肉や鶏卵が原因となる代表的な病原性バクテリアはどれか？",
+ o:["ボツリヌス菌（毒素型）","サルモネラ属菌（感染型）","ウェルシュ菌（毒素型）","黄色ブドウ球菌（毒素型）"],
+ a:1,
+ e:"サルモネラ属菌は加熱不十分な鶏肉・鶏卵・未殺菌牛乳が原因となる感染型バクテリアです。潜伏期間12-36時間で下痢・腹痛・嘔吐を引き起こします。耐乾性があり通性嫌気性です（Level 2 第3.4節）。",
+ p:"🥚 鶏肉・卵→サルモネラ。潜伏12-36時間"},
+
+{c:"細菌",t:true,
+ q:"腸管出血性大腸菌O-157の特徴として正しいものはどれか？",
+ o:["潜伏期間は数時間と非常に短い","冷凍下では完全に死滅し増殖せず","芽胞を形成し加熱殺菌に強い耐性","加熱不十分な牛肉・生野菜が主原因"],
+ a:3,
+ e:"E Coli O-157は加熱不十分な牛肉やサラダ等の生野菜が主原因の生体内毒素型バクテリア。潜伏期間3-8日で激しい腹痛と新鮮血を伴う下痢を引き起こします。芽胞は形成しませんが二次感染が起きやすいです（Level 2 第3.4節）。",
+ p:"🥩 O-157：牛肉・生野菜・潜伏3-8日・血便"},
+
+{c:"細菌",t:false,
+ q:"4°C以下の低温でも増殖可能な特殊な病原性バクテリアはどれか？",
+ o:["カンピロバクター菌（感染型）","腸炎ビブリオ菌（感染型）","セレウス菌（毒素型）","リステリア菌（感染型）"],
+ a:3,
+ e:"リステリア菌は4°C以下でも増殖可能な唯一の主要病原性バクテリアです。RTE食品・未殺菌乳製品・生野菜が原因で、潜伏期間1日-10週間、下痢や中枢神経症状を引き起こします。床や排水溝でも検出されます（Level 2 第3.4節）。",
+ p:"❄️ リステリアは冷蔵庫でも増殖。中枢神経症状に注意"},
+
+{c:"細菌",t:false,
+ q:"はちみつや真空パック食品が原因となる重篤な毒素型バクテリアはどれか？",
+ o:["黄色ブドウ球菌（毒素型）","腸炎ビブリオ菌（感染型）","ウェルシュ菌（毒素型）","ボツリヌス菌（毒素型）"],
+ a:3,
+ e:"ボツリヌス菌は偏性嫌気性で芽胞を形成、はちみつや真空パック食品で増殖します。視覚異常・嘔吐・呼吸困難を引き起こし、致死率2-20%と非常に高い毒素型バクテリアです（Level 2 第3.4節）。",
+ p:"⚠️ ボツリヌス：はちみつ・真空パック・致死率2-20%"},
+
+{c:"細菌",t:false,
+ q:"焼きめしやパスタが原因となる毒素型バクテリアはどれか？",
+ o:["セレウス菌（毒素型）","リステリア菌（感染型）","カンピロバクター菌","腸管出血性大腸菌O-157"],
+ a:0,
+ e:"セレウス菌は焼きめし・パスタ・食肉製品が原因の毒素型バクテリア。芽胞を形成し通性嫌気性で耐塩性もあります。潜伏期間1-6時間または8-16時間で腹痛・下痢・嘔吐を引き起こします（Level 2 第3.4節）。",
+ p:"🍝 セレウス：焼きめし・パスタ・芽胞形成"},
+
+{c:"細菌",t:false,
+ q:"芽胞型のバクテリアの特徴として正しいものはどれか？",
+ o:["通常の冷蔵保存で完全に死滅する","通常の加熱調理でも死滅しにくい","酸性食品では一切生存できない","低温下では絶対に増殖できない"],
+ a:1,
+ e:"芽胞型バクテリア（ボツリヌス菌・セレウス菌・ウェルシュ菌等）は加熱殺菌から守る保護層（芽胞）を持ち、通常の加熱調理では死滅しにくく食中毒の危険性が残ります（Level 2 第3.3節・3.4節）。",
+ p:"🛡️ 芽胞＝加熱に強い保護層。通常加熱では死なない"},
+
+{c:"細菌",t:false,
+ q:"ハムや乳製品が原因となり、潜伏期間が短い（1-6時間）バクテリアはどれか？",
+ o:["カンピロバクター菌（感染型）","黄色ブドウ球菌（毒素型）","ウェルシュ菌（毒素型）","サルモネラ属菌（感染型）"],
+ a:1,
+ e:"黄色ブドウ球菌はハムや乳製品が原因の毒素型バクテリア。芽胞は形成しませんが耐塩性・耐乾性があり、潜伏期間1-6時間と短く、吐き気・嘔吐・腹痛を引き起こします（Level 2 第3.4節）。",
+ p:"🥓 黄色ブドウ球菌：ハム・乳製品・潜伏1-6時間"},
+
+{c:"細菌",t:true,
+ q:"魚介類が原因となる好塩性のバクテリアはどれか？",
+ o:["腸炎ビブリオ菌（感染型）","カンピロバクター菌（感染型）","リステリア菌（感染型）","ウェルシュ菌（毒素型）"],
+ a:0,
+ e:"腸炎ビブリオ菌は魚介類が原因の感染型バクテリアで好塩性（塩分濃度の高い環境を好む）が特徴です。潜伏期間2-48時間で腹痛・下痢・嘔吐・発熱・頭痛を引き起こします（Level 2 第3.4節）。",
+ p:"🐟 腸炎ビブリオ：魚介類・好塩性・潜伏2-48時間"},
+
+{c:"細菌",t:false,
+ q:"感染型・毒素型・生体内毒素型の分類で「毒素型」に該当するバクテリアはどれか？",
+ o:["サルモネラ属菌（感染型）","腸管出血性大腸菌O-157型","黄色ブドウ球菌（毒素型）","カンピロバクター菌（感染）"],
+ a:2,
+ e:"毒素型：黄色ブドウ球菌・セレウス菌・ボツリヌス菌・ウェルシュ菌（食品中で毒素を産生）。感染型：サルモネラ・リステリア・カンピロバクター・腸炎ビブリオ（菌そのものが増殖）。生体内毒素型：O-157（体内で毒素産生）（Level 2 第3.4節）。",
+ p:"⚗️ 毒素型：黄色ブ・セレウス・ボツリヌス・ウェルシュ"},
+
+{c:"細菌",t:false,
+ q:"加熱不十分な鶏肉・豚肉、未殺菌牛乳が原因となる微好気性バクテリアはどれか？",
+ o:["ボツリヌス菌（毒素型）","カンピロバクター菌（感染型）","リステリア菌（感染型）","黄色ブドウ球菌（毒素型）"],
+ a:1,
+ e:"カンピロバクター菌は加熱不十分な鶏肉・豚肉、未殺菌牛乳が原因の感染型バクテリア。微好気性（少量の酸素で生育）で芽胞は形成せず、潜伏期間48-60時間で腹痛・下痢・嘔吐・発熱を引き起こします（Level 2 第3.4節）。",
+ p:"🐔 カンピロバクター：鶏肉・豚肉・微好気性"},
+
+{c:"細菌",t:false,
+ q:"バクテリアの増殖を加熱・冷凍によりコントロールする場合の効果として正しいものはどれか？",
+ o:["冷凍により完全死滅する","冷凍では不活化するが死滅しない","加熱では絶対死滅しない","室温で長期保存しても安全"],
+ a:1,
+ e:"冷凍ではバクテリアは不活化するものの死滅はせず、温度条件が適切になると再度増殖を開始します。多くは加熱調理で死滅しますが、芽胞型は加熱に強い保護層があるため死滅しません（Level 2 第3.3節）。",
+ p:"🧊 冷凍≠殺菌。芽胞型は加熱でも死なない"},
+
+{c:"細菌",t:false,
+ q:"通性嫌気性バクテリアの定義として正しいものはどれか？",
+ o:["酸素の有無に関係なく生育できる","酸素のない環境のみで生育する","少量の酸素環境のみで生育する","酸素豊富な環境のみで生育する"],
+ a:0,
+ e:"通性嫌気性バクテリアは酸素の有無に関係なく増殖できます。多くの病原性バクテリア（サルモネラ・リステリア・腸炎ビブリオ・E. coli O-157・セレウス・黄色ブドウ球菌）が該当し、酸素のない真空パックでも増殖可能なため要注意です（Level 2 第3.3節・3.4節）。",
+ p:"💨 通性嫌気性＝酸素の有無を問わず増殖。真空パックも危険"},
+
+{c:"細菌",t:false,
+ q:"酸素のない環境でしか生育できない病原性バクテリアはどれか？",
+ o:["黄色ブドウ球菌（通性嫌気性）","ボツリヌス菌（偏性嫌気性）","カンピロバクター菌（微好気性）","サルモネラ属菌（通性嫌気性）"],
+ a:1,
+ e:"偏性嫌気性バクテリアは酸素がない環境でしか生育できません。ボツリヌス菌・ウェルシュ菌が該当し、真空パック食品で増殖リスクが高くなります（Level 2 第3.3節・3.4節）。",
+ p:"🚫 偏性嫌気性＝ボツリヌス・ウェルシュ。真空パックで注意"},
+
+{c:"細菌",t:false,
+ q:"病原性微生物の主な汚染源として該当しないものはどれか？",
+ o:["屠殺された動物の皮や肉","河川や湖などの未処理の水","製造現場で使用する蒸留水","人の耳・鼻・喉・毛髪"],
+ a:2,
+ e:"主な汚染源は①加熱不十分な食材②未処理水（河川・湖）③土壌④人（耳・鼻・喉・毛髪・腸・化膿創）⑤害虫・ペット⑥空気・埃。蒸留水自体は通常無菌ですが、製造後の管理状態次第で汚染リスクは生じます（Level 2 第3.2節）。",
+ p:"⚠️ 汚染源：加熱不足・未処理水・土壌・人・害虫・空気"},
+
+{c:"細菌",t:false,
+ q:"「二次汚染」が起こりやすい場所として正しいものはどれか？",
+ o:["密封された未開封の包装内","冷蔵庫内の調味料の容器","まな板や包丁などの調理器具類","滅菌された業務用ガラス瓶"],
+ a:2,
+ e:"二次汚染（交差汚染）は、汚染された調理器具類（まな板・包丁・トング等）や手指、衣類などを介して別の食品へ病原性微生物が移ることです。バクテリアは自発的に移動できませんが、付着して別の場所へ運ばれます（Level 2 第3.2節）。",
+ p:"🔄 二次汚染：器具・手指・衣類経由が大半"},
+
+{c:"細菌",t:true,
+ q:"同じ食品に対して同じ作業を継続する場合、最低でも何時間ごとに洗浄・消毒すべきか？",
+ o:["1時間ごとに洗浄・消毒する","2時間ごとに洗浄・消毒する","4時間ごとに洗浄・消毒する","8時間ごとに洗浄・消毒する"],
+ a:2,
+ e:"同じ食品に対して同じ作業を継続して行うときは、最低でも4時間ごとに洗浄・消毒します。使用前・使用直後・著しく汚れたとき・取り扱う食品が変わるときも必須です（一般衛生管理プログラム 10条 V）。",
+ p:"⏰ 同じ作業継続中は4時間ごとに洗浄消毒"},
+
+{c:"細菌",t:false,
+ q:"バクテリアの増殖における理想的な温度はおおよそ何°Cか？",
+ o:["約25°C（室温に近い温度）","約30°C（やや温かい温度）","約37°C（ヒトの体温付近）","約45°C（やや高温の温度）"],
+ a:2,
+ e:"バクテリアの増殖における最も理想的な温度はヒトの体温とほぼ同じ約37°C（98.6°F）です。4°C未満または60°C以上では増殖が緩慢か停止します（Level 2 第3.3節）。",
+ p:"🌡️ 最適増殖=37°C（体温）。だから人間が食中毒に"},
+
+{c:"ウイルス・寄生虫",t:false,
+ q:"ウイルスとバクテリアの違いとして正しいものはどれか？",
+ o:["ウイルスは食品中で増殖できない","ウイルスはバクテリアより大きい","ウイルスはヒトに感染できない","ウイルスは加熱で死滅しない"],
+ a:0,
+ e:"ウイルスはバクテリアよりさらに小さく、食品中で増殖はできませんが、あらゆる食品に存在することはできます。ヒトや動物の生きた宿主の細胞内でのみ増殖します（Level 2 第3.5節）。",
+ p:"🦠 ウイルスは食品中で増殖不可。宿主細胞内のみで増殖"},
+
+{c:"ウイルス・寄生虫",t:false,
+ q:"ノロウイルスの特徴として正しいものはどれか？",
+ o:["アルコール消毒で完全に死滅する","微量でも食中毒の原因となる","一度感染すれば免疫が持続する","症状は1時間以内に治まる"],
+ a:1,
+ e:"ノロウイルスはごく微量でも食中毒の原因となります。エタノール耐性があり通常のアルコール消毒では死滅しにくく、ヒトの腸管のみで増殖、二次感染が起きやすい特徴があります。潜伏期間24-48時間（Level 2 第3.7節）。",
+ p:"⚠️ ノロは微量でも危険。アルコール耐性・二次感染しやすい"},
+
+{c:"ウイルス・寄生虫",t:false,
+ q:"A型肝炎ウイルスの潜伏期間として正しいものはどれか？",
+ o:["1〜3時間程度の短期間","24〜48時間の標準潜伏","7〜10日程度の中期潜伏","15〜50日と長い潜伏期間"],
+ a:3,
+ e:"A型肝炎ウイルスの潜伏期間は15-50日と長く、感染源の特定が困難になります。発熱・嘔吐・黄疸に伴う肝疾患を引き起こし、耐酸性で手洗いが予防に有効です。水や魚介類、RTE食品が原因（Level 2 第3.7節）。",
+ p:"⏰ A型肝炎：潜伏15-50日と長い。発症時には感染源不明に"},
+
+{c:"ウイルス・寄生虫",t:true,
+ q:"生の魚介類が原因となるアレルギー反応を示すこともある寄生虫はどれか？",
+ o:["アニサキス（線虫類）","クリプトスポリジウム","旋毛虫（線虫類）","ランブル鞭毛虫"],
+ a:0,
+ e:"アニサキスは生の魚介類が原因の寄生虫で、潜伏期間4-6時間で吐き気・嘔吐を引き起こします。アレルギー反応を示す場合もあり、海洋哺乳類が終宿主です（Level 2 第3.7節）。",
+ p:"🐟 アニサキス：生魚介・アレルギーも・終宿主=海洋哺乳類"},
+
+{c:"ウイルス・寄生虫",t:false,
+ q:"加熱不十分な豚肉や野生動物の肉が原因となる寄生虫はどれか？",
+ o:["アニサキス（線虫類）","クリプトスポリジウム","ランブル鞭毛虫","旋毛虫（線虫類）"],
+ a:3,
+ e:"旋毛虫は加熱不十分な豚肉や野生動物の肉が原因の寄生虫。潜伏期間2-28日で腹痛・下痢・嘔吐・吐き気を引き起こし、骨格筋に分散します。南極以外の陸地に生息（Level 2 第3.7節）。",
+ p:"🐗 旋毛虫：豚肉・野生肉・骨格筋に分散"},
+
+{c:"ウイルス・寄生虫",t:false,
+ q:"乳幼児がハイリスク群となるウイルスはどれか？",
+ o:["A型肝炎ウイルス","E型肝炎ウイルス","ロタウイルス","ノロウイルス"],
+ a:2,
+ e:"ロタウイルスは非常に感染力が強く、特に乳幼児がハイリスク群となります。水・魚介類・生野菜が原因で、潜伏期間24-36時間で下痢・嘔吐・発熱を引き起こします（Level 2 第3.7節）。",
+ p:"👶 ロタウイルス：乳幼児ハイリスク・感染力強い"},
+
+{c:"ウイルス・寄生虫",t:false,
+ q:"寄生虫の生命活動の特徴として正しいものはどれか？",
+ o:["食品中で自己増殖可能","冷凍状態でも増殖する","酸性食品で活発に増殖","宿主に依存して生命活動"],
+ a:3,
+ e:"寄生虫はヒトや動物などの宿主に依存して生命活動を行います。食品に潜む寄生虫は複雑なライフサイクルを持ち、人間に寄生する前に複数の宿主を経由していることがあります。適切な加熱と個人衛生で排除可能です（Level 2 第3.6節）。",
+ p:"🔬 寄生虫＝宿主依存。食品中では自己増殖しない"},
+
+{c:"ウイルス・寄生虫",t:false,
+ q:"ウイルス感染を予防するための最も重要な行動はどれか？",
+ o:["食品の冷凍保存を徹底する","適切な手洗いと体調不良時の業務不参加","アルコール消毒のみを行う","生鮮食品の購入を避ける"],
+ a:1,
+ e:"適切な手洗いと体調不良の際には食品製造業務に従事しないことが、食品を通じたウイルス感染を予防するうえで重要です。ノロウイルスはアルコール耐性のため消毒のみでは不十分です（Level 2 第3.5節）。",
+ p:"🤲 ウイルス予防：手洗い＋体調管理が基本"},
+
+{c:"化学的危害",t:false,
+ q:"化学的危害として該当しないものはどれか？",
+ o:["過剰な食品添加物","殺虫剤・農薬","ガラス片・金属片","キノコや魚介類の自然毒"],
+ a:2,
+ e:"化学的危害には①環境内の金属②過度な農薬③動物用医薬品④洗浄・消毒用製品⑤自然毒（キノコ・カビ・魚介類）⑥食品アレルゲンが含まれます。ガラス片・金属片は物理的危害に分類されます（Level 2 第4.1節）。",
+ p:"⚗️ 化学的危害：添加物・農薬・薬・洗剤・自然毒・アレルゲン"},
+
+{c:"化学的危害",t:false,
+ q:"温帯地域の魚類（フエダイ等）に含まれる自然毒はどれか？",
+ o:["ヒスタミン中毒（魚）","麻痺性貝毒（貝由来）","シガテラ毒（温帯魚）","アフラトキシン（カビ）"],
+ a:2,
+ e:"シガテラ毒は温帯地域に生息するフエダイやイシガキダイ等に含まれる自然毒です。毒性のある藻をエサにして蓄積し、喫食者にシガテラ中毒（下痢・嘔吐）を引き起こします（Level 2 第4.1節・4.2節）。",
+ p:"🐟 シガテラ：温帯魚（フエダイ・イシガキ）"},
+
+{c:"化学的危害",t:false,
+ q:"カキやホタテで発症するリスクのある毒として正しいものはどれか？",
+ o:["シガテラ毒（魚）","麻痺性貝毒（貝）","ヒスタミン（魚）","アフラトキシン"],
+ a:1,
+ e:"麻痺性貝毒はイシガニ・ホタテガイ等で発症する自然毒。下痢性貝毒（アサリ・カキ）と区別されます。潜伏10-60時間で麻痺・下痢を引き起こします（Level 2 第4.1節・4.2節）。",
+ p:"🦪 貝毒：麻痺性（ホタテ・イシガニ）/ 下痢性（アサリ・カキ）"},
+
+{c:"化学的危害",t:true,
+ q:"カツオやマグロが原因となる化学的危害として正しいものはどれか？",
+ o:["シガテラ毒中毒","ヒスタミン中毒","麻痺性貝毒","下痢性貝毒"],
+ a:1,
+ e:"ヒスタミン中毒はカツオやマグロが原因で、平均発症時間1時間で頭痛・じんましん・発熱を引き起こします。鮮度低下時にヒスタミンが生成されるため、冷蔵管理が重要です（Level 2 第4.1節・4.2節）。",
+ p:"🐟 ヒスタミン中毒：カツオ・マグロ・潜伏1時間"},
+
+{c:"化学的危害",t:false,
+ q:"乾燥イチジクやアーモンドに含まれる発がん性物質はどれか？",
+ o:["アフラトキシン（カビ毒）","デオキシニバレノール毒素","カドミウム（重金属）","ゼアラレノン（カビ毒）"],
+ a:0,
+ e:"アフラトキシンは乾燥イチジクやアーモンドに含まれるカビ毒（マイコトキシン）で、発がん性と肝機能障害を引き起こします。カビが生えた食品には強い注意が必要です（Level 2 第4.1節・4.2節）。",
+ p:"☠️ アフラトキシン：乾燥イチジク・アーモンド・発がん性"},
+
+{c:"化学的危害",t:false,
+ q:"麦類（小麦・大麦）に含まれることがあるカビ毒はどれか？",
+ o:["アフラトキシン","シガテラ毒（藻毒）","デオキシニバレノール","ヒスタミン（魚毒）"],
+ a:2,
+ e:"デオキシニバレノールは麦類（小麦・大麦）に含まれるカビ毒。食欲抑制や肝腫大を引き起こします（Level 2 第4.2節）。",
+ p:"🌾 デオキシニバレノール：麦類・食欲抑制・肝腫大"},
+
+{c:"化学的危害",t:false,
+ q:"米や大豆に含まれることがある重金属はどれか？",
+ o:["鉛（Pb・鉛中毒）","カドミウム（Cd）","亜鉛（Zn・亜鉛）","銅（Cu・銅中毒）"],
+ a:1,
+ e:"カドミウムは米や大豆に含まれることがある重金属で、長期摂取により腎機能障害や骨粗鬆症を引き起こします（Level 2 第4.2節）。",
+ p:"⚠️ カドミウム：米・大豆・腎機能障害"},
+
+{c:"化学的危害",t:false,
+ q:"pHが低い食品（酸性食品）と接触させてはいけない金属はどれか？",
+ o:["ステンレススチール","鉛・真鍮・銅・亜鉛メッキ","純チタン・タングステン","プラチナ・金・銀"],
+ a:1,
+ e:"鉛・真鍮・銅・亜鉛メッキなどの金属を食品接触面に使用してはなりません。これらの金属がpHが低い（酸性の）食品に触れると溶出してしまう恐れがあります（Level 2 第4.1節）。",
+ p:"🚫 食品接触NG金属：鉛・真鍮・銅・亜鉛メッキ"},
+
+{c:"化学的危害",t:true,
+ q:"化学的危害の症状として最も典型的なものはどれか？",
+ o:["皮膚の発疹のみが現れる","咳・くしゃみなど呼吸器症状","嘔吐・下痢・腹痛などの消化器症状","関節痛・筋肉痛などの全身症状"],
+ a:2,
+ e:"化学的危害の症状は嘔吐・下痢・腹痛など、多くの食中毒と非常に似ています。長期間化学物質に曝露された場合は、脳・神経・腎臓・肝臓に障害が残る場合もあります（Level 2 第4.1節）。",
+ p:"⚠️ 化学的危害：症状は食中毒に似る（消化器症状）"},
+
+{c:"化学的危害",t:false,
+ q:"化学薬品（洗剤等）の保管場所として正しいものはどれか？",
+ o:["食品と同じ冷蔵庫内に保管","食品から離して保管する","製造場の作業台付近に保管","使いやすいよう作業者に持たせる"],
+ a:1,
+ e:"化学薬品は食品から離して保管します。化学薬品が食品や機器、包装資材を汚染してはなりません。化学薬品ごとに発行されているSDS（安全データシート）をプレップルーム内に保管します（一般衛生管理プログラム 09条 E〜L）。",
+ p:"🧪 化学薬品は食品から離して保管。SDS常備"},
+
+{c:"アレルゲン",t:false,
+ q:"食物アレルギーの発症メカニズムとして正しいものはどれか？",
+ o:["過剰な食品摂取による消化不良","免疫が食品中のたんぱく質を誤認","腸内細菌バランスの崩れによる発症","食品添加物の過剰摂取による中毒"],
+ a:1,
+ e:"食物アレルギーとは、本来有害ではない食品中のたんぱく質（アレルゲン）を免疫対象（抗原）として細胞が誤認し、免疫が過剰に機能してしまうことです。乳幼児期に発症することが多く、成長とともに寛解する場合もあります（Level 2 第4.3節）。",
+ p:"🛡️ アレルギー＝免疫の過剰防衛反応（誤認識）"},
+
+{c:"アレルゲン",t:false,
+ q:"日本の食品表示法における特定原材料8品目に含まれないものはどれか？",
+ o:["小麦・乳・卵・えびの4品目","かに・落花生・そば・くるみ","大豆・米・玉ねぎ・じゃがいも","上記すべて含まれる8品目"],
+ a:2,
+ e:"日本の食品表示法における特定原材料8品目は①小麦②乳③卵④えび⑤かに⑥落花生⑦そば⑧くるみです。大豆・米・玉ねぎ・じゃがいもは8品目ではありません（大豆・カシューナッツ等は表示推奨の20品目）（Level 2 第4.3節）。",
+ p:"📋 特定原材料8品目：小麦・乳・卵・えび・かに・落花生・そば・くるみ"},
+
+{c:"アレルゲン",t:true,
+ q:"小麦の主なアレルゲンとなる原因たんぱく質はどれか？",
+ o:["グルテン（小麦由来）","カゼイン（乳由来）","オボアルブミン（卵）","トロポミオシン（甲殻）"],
+ a:0,
+ e:"小麦の原因たんぱく質はグルテンです。乳=カゼイン、卵=オボアルブミン/オボムコイド、えび・かに=トロポミオシン、落花生=7Sグロブリン等、そば=13Sグロブリン、くるみ=2Sアルブミンです（Level 2 第4.3節）。",
+ p:"🌾 小麦＝グルテン / 乳＝カゼイン / 卵＝オボアルブミン"},
+
+{c:"アレルゲン",t:false,
+ q:"えびとかにに共通するアレルゲンたんぱく質はどれか？",
+ o:["カゼイン（乳由来）","グルテン（小麦由来）","トロポミオシン（甲殻）","オボアルブミン（卵）"],
+ a:2,
+ e:"えびとかには両方ともトロポミオシンというたんぱく質がアレルゲンです。たんぱく質構造が似ているため、えびにアレルギーがある人はかににも反応する交差反応が起きやすいです（Level 2 第4.3節）。",
+ p:"🦐 えび＆かに＝トロポミオシン（交差反応あり）"},
+
+{c:"アレルゲン",t:false,
+ q:"食物アレルギーの症状として該当しないものはどれか？",
+ o:["じんましん・痒み・湿疹","鼻水・鼻詰まり・くしゃみ","関節リウマチ・骨粗鬆症","咳・呼吸困難・声枯れ"],
+ a:2,
+ e:"食物アレルギーの症状には皮膚症状（じんましん・痒み・湿疹）・粘膜症状（鼻水・鼻詰まり）・呼吸器症状（咳・声枯れ・呼吸困難）・消化器症状・神経症状・循環器症状があります。関節リウマチや骨粗鬆症はアレルギー症状ではありません（Level 2 第4.3節）。",
+ p:"⚠️ アレルギー症状：皮膚・粘膜・呼吸器・消化器・神経・循環器"},
+
+{c:"アレルゲン",t:false,
+ q:"アナフィラキシーショックを疑った際の最初の対応として正しいものはどれか？",
+ o:["経過観察で症状の変化を待つ","水を飲ませて落ち着かせる","早急にアドレナリン注射を実施","抗ヒスタミン薬を投与する"],
+ a:2,
+ e:"原因食品喫食後、数分から数時間以内に血圧低下や意識障害が発症した場合はアナフィラキシーショックが強く疑われます。早急にアドレナリン注射を実施する必要があります（Level 2 第4.3節）。",
+ p:"💉 アナフィラキシー疑い＝即アドレナリン注射"},
+
+{c:"アレルゲン",t:true,
+ q:"「交差反応」とはどのような現象か？",
+ o:["複数のアレルゲンを同時摂取で増強","食品同士が反応して新物質を生成","似たたんぱく質に免疫が同様反応","加熱でアレルゲン構造が変化"],
+ a:2,
+ e:"交差反応とは、特定原材料に準ずるたんぱく質構造が似た食品にも免疫が同様に機能してしまう現象です。例：えびアレルギーがあるとかににも反応します。特定原材料準ずる20品目は表示推奨です（Level 2 第4.3節）。",
+ p:"🔀 交差反応：似たたんぱく質に免疫が同様反応"},
+
+{c:"アレルゲン",t:false,
+ q:"食物アレルギーの治療法として一般的なものはどれか？",
+ o:["アレルゲンの完全除去と回避","少量から食べる経口免疫療法","抗生物質の長期服用治療","免疫抑制剤の継続投与療法"],
+ a:1,
+ e:"近年の治療では、アレルゲンを完全に除去するのではなく、医師監修のもとで対象アレルゲンを少しずつ食べて免疫機能に耐性を獲得させる治療法（食物経口免疫療法）が一般的です（Level 2 第4.3節）。",
+ p:"⚕️ 治療：完全除去でなく経口免疫療法が主流"},
+
+{c:"アレルゲン",t:false,
+ q:"食物アレルギーの診断方法として正しい組み合わせはどれか？",
+ o:["問診のみで診断を完了する","血液検査と皮膚テストのみ実施","問診・血液・皮膚テスト・経口負荷","CT・MRI・内視鏡で画像診断"],
+ a:2,
+ e:"食物アレルギーの診断には①問診②血液検査③皮膚テスト④食物経口負荷試験が用いられます。複数の検査を組み合わせて慎重に判断します（Level 2 第4.3節）。",
+ p:"🔬 アレルギー診断：問診＋血液＋皮膚＋経口負荷の4本柱"},
+
+{c:"アレルゲン",t:false,
+ q:"製造場でのアレルゲンの交差接触（Cross-contact）を防ぐ最も重要な対策はどれか？",
+ o:["アイテム切替時の機器・作業面の洗浄消毒","製造日数を週1回に制限","製造前後に必ず換気を実施","従業員の手袋を頻繁に交換"],
+ a:0,
+ e:"アイテム切り替え時にはすべての機器・設備類と作業面が洗浄・消毒されている必要があります。これがアレルゲンの交差接触防止の最重要対策です（一般衛生管理プログラム 08条 B、10条 A）。",
+ p:"🧼 交差接触防止：アイテム変更時に必ず洗浄消毒"},
+
+{c:"アレルゲン",t:false,
+ q:"アレルギー反応が運動や入浴後に起こるケースに関する説明として正しいものはどれか？",
+ o:["アレルゲン摂取直後にのみ発症する","運動や入浴後にもアナフィラキシー可","加熱した食品では絶対起こらない","入浴後の発症は治療不要で軽症"],
+ a:1,
+ e:"アレルゲンの摂取単独では発症せずに、運動や入浴後にアナフィラキシーショックを起こす場合もあるので注意が必要です（食物依存性運動誘発アナフィラキシー）（Level 2 第4.3節）。",
+ p:"⚠️ 食後の運動・入浴でアナフィラキシー発症のケースあり"},
+
+{c:"アレルゲン",t:true,
+ q:"アレルゲンの含有・開示義務に関する説明として正しいものはどれか？",
+ o:["加工度の高い食品は表示不要","8品目は法的に表示義務がある","20品目すべてに表示義務がある","社内基準のみで表示要否を判断"],
+ a:1,
+ e:"日本の食品表示法では特定原材料8品目（小麦・乳・卵・えび・かに・落花生・そば・くるみ）が法的に表示義務化されています。特定原材料に準ずる20品目は表示推奨です（Level 2 第4.3節）。",
+ p:"📋 8品目=法的義務 / 20品目=表示推奨"},
+
+{c:"物理的危害",t:false,
+ q:"物理的危害の特徴として他の危害と異なる点はどれか？",
+ o:["混入物が目に見える","長期間後に症状が出る","加熱で完全に無害化される","少量では人体に影響がない"],
+ a:0,
+ e:"物理的危害は他の2つの危害（生物的・化学的）と異なり、混入物が目に見える点が特徴です。消費者の大きな不満と苦情を引き起こしやすく、切り傷・出血・窒息・歯の破折などのケガに繋がります（Level 2 第5節）。",
+ p:"👀 物理的危害：目に見える混入物→苦情に直結"},
+
+{c:"物理的危害",t:false,
+ q:"硬質異物として分類されないものはどれか？",
+ o:["ガラス片（破片）","毛髪（軟質）","金属片（硬質）","石（小石・砂）"],
+ a:1,
+ e:"硬質異物：ガラス片・金属片・石（口腔内裂傷・歯の損傷リスク）。軟質異物：毛髪・げっ歯類・プラスチック片（不快感）。毛髪は軟質異物に分類されます（Level 2 第5節）。",
+ p:"🔍 硬質異物：ガラス・金属・石 / 軟質：毛髪・げっ歯類・プラ"},
+
+{c:"物理的危害",t:false,
+ q:"物理的危害の主な原因として最も大きいものはどれか？",
+ o:["原材料サプライヤーの過失","配送中の事故・破損混入","消費者宅での保管中混入","食品取扱者由来の異物混入"],
+ a:3,
+ e:"食品取扱者は物理的危害の主要な原因です。ドレスコードの遵守（ヘアネット・白衣の着用、アクセサリーの禁止等）や製造場での飲食・喫煙の禁止などの個人衛生強化が必要です（Level 2 第5節）。",
+ p:"👤 物理的危害の主原因＝食品取扱者（個人衛生で予防）"},
+
+{c:"物理的危害",t:true,
+ q:"ガラス片の混入を防止する最も有効な手段はどれか？",
+ o:["手袋着用と素手回避","色彩選別機・X線検出","冷蔵保管の徹底管理","抗菌包装の使用"],
+ a:1,
+ e:"ガラス片の除去には色彩選別機やX線検出機が有効です。金属片は洗浄工程・金属探知機、軟質異物（毛髪等）は個人衛生向上、プラスチック片は目視検査・風力選別機が有効です（Level 2 第5節）。",
+ p:"🔍 ガラス検出：色彩選別機・X線 / 金属：金属探知機"},
+
+{c:"物理的危害",t:false,
+ q:"原材料の開梱時に異物混入を防ぐ正しい方法はどれか？",
+ o:["カッターで素早く開梱する","ハサミは分解可能で結合部にネジなし","段ボールをそのまま製造場へ持込","個人持参のはさみで開梱"],
+ a:1,
+ e:"原材料の開梱に使用するハサミは分解可能で洗浄が容易でなければなりません。また、刃の結合部は異物混入を防止するためネジなどの留め具が使われていないものを選択します。カッターの使用は不可（一般衛生管理プログラム 08条 C・D）。",
+ p:"🔧 開梱ハサミ：分解可能・ネジなし。カッター禁止"},
+
+{c:"物理的危害",t:false,
+ q:"記録を記入する際の筆記用具として正しいものはどれか？",
+ o:["シャープペン・鉛筆を使用","フリクションペンを使用","キャップなしの一体型ペン","修正テープと併用する"],
+ a:2,
+ e:"記録には異物混入リスクを考慮しキャップが付いていないボールペンなど脱着可能な部品がない筆記用具を使用します。鉛筆・シャープペン・フリクションペンは容易に訂正できるため使用不可（一般衛生管理プログラム 15条 B）。",
+ p:"✏️ 筆記用具：キャップなしボールペン。鉛筆・フリクションNG"},
+
+{c:"物理的危害",t:false,
+ q:"書類記入に使用するバインダーの素材として正しいものはどれか？",
+ o:["紙製のバインダー","プラスチック製のバインダー","アルミ製またはステンレス製","木製の伝統的バインダー"],
+ a:2,
+ e:"書類の記入に用いるバインダーは異物混入防止のため、アルミ製またはステンレス製のものを使用します。紙製およびプラスチック製のバインダーは破片混入リスクがあるため使用不可（一般衛生管理プログラム 15条 C）。",
+ p:"📁 バインダー：アルミorステンレス。紙・プラ禁止"},
+
+{c:"物理的危害",t:false,
+ q:"物理的危害の予防策として最も効果的なものはどれか？",
+ o:["加熱調理時間を延長する","冷凍保存期間を短縮する","ドレスコード遵守と個人衛生","原材料の購入量を減らす"],
+ a:2,
+ e:"物理的危害を防ぐためには洗浄や目視検査が有効ですが、食品取扱者が主要な原因のため、ドレスコードの遵守（ヘアネット・白衣・アクセサリー禁止）や製造場での飲食・喫煙禁止などの個人衛生強化が最も効果的です（Level 2 第5節）。",
+ p:"🛡️ 物理的危害予防：ドレスコード＋個人衛生"},
+
+{c:"危害総合",t:false,
+ q:"食品の汚染とは何を指すか？",
+ o:["食品が腐敗して食べられない状態","食品中に食中毒原因物質が存在","食品の見た目が変色した状態","食品の賞味期限が切れた状態"],
+ a:1,
+ e:"汚染とは、食品や飲料の中に食中毒を引き起こす可能性がある何らかの有害な物質が存在していることです。食中毒に至る可能性のある事象の出発点でもあり、汚染された食品を喫食したい消費者はいません（Level 2 第2.3節）。",
+ p:"⚠️ 汚染＝食中毒原因物質の存在（=出発点）"},
+
+{c:"危害総合",t:true,
+ q:"危害が現実の食中毒に至るプロセスとして正しいものはどれか？",
+ o:["危害要因は基本的に制御不可","危害が制御されない時に食中毒に","加熱調理ですべて防げる","冷蔵保存ですべて防げる"],
+ a:1,
+ e:"危害要因が制御されていない場合に食中毒が生じる可能性があります。危害要因により食品が汚染されると、汚染された食品は消費者の健康への脅威となります。食品安全のプロは「可能性が現実になる」のを避ける役割を担います（Level 2 第2.3節）。",
+ p:"🎯 食品安全＝危害が現実化するのを防ぐ仕事"},
+
+{c:"危害総合",t:false,
+ q:"PHF（潜在的に危険性のある食品）に該当しないものはどれか？",
+ o:["加熱不十分な肉類（生焼け）","殻付きの卵や卵半加工品","生の魚介類・カット魚介","乾燥豆類・乾麺類・乾物"],
+ a:3,
+ e:"PHFは病原性バクテリアが増殖しやすい食品。加熱不十分な肉・牛乳・乳製品・殻付き卵・生魚介・加熱済みの豆/パスタ/ごはん・生発芽食品・大豆食品・カットメロン等が該当。乾燥豆類・乾燥パスタ等は調理前は水分が少なくPHFではありません（Level 2 第2.2節）。",
+ p:"💧 PHFは水分があるもの。乾物は調理前なら該当せず"},
+
+{c:"危害総合",t:false,
+ q:"食品安全の最高レベルを担保する責任を負う立場として正しいものはどれか？",
+ o:["店舗のレジ担当者のみ","本社の経営陣のみが対象","保健所の担当職員のみ","食品を取扱うすべての従業員"],
+ a:3,
+ e:"食品を取り扱う企業ならびにその企業で働く従業員は、食品が安全に飲食されるよう保持するための法的・道徳的・経済的な責任を負っています。レジ担当も含む全員が関係者です（Level 2 第1節）。",
+ p:"👥 食品安全は全従業員の責任（法的・道徳的・経済的）"}
+];
+let cur=0,ans=new Array(Q.length).fill(null),done=new Array(Q.length).fill(false);
+const L=['A','B','C','D','E'];
+function start(){document.getElementById('start').style.display='none';document.getElementById('quiz').style.display='block';load(0);}
+function load(i){
+  cur=i;const q=Q[i],tot=Q.length;
+  document.getElementById('qn').textContent=`問題 ${i+1} / ${tot}`;
+  document.getElementById('qcat').textContent=q.c;
+  document.getElementById('qt').textContent=q.q;
+  document.getElementById('pt').textContent=`${i+1} / ${tot}`;
+  document.getElementById('pbi').style.width=((i+1)/tot*100)+'%';
+  const tr=document.getElementById('trap');tr.className=q.t?'trap on':'trap';
+  const o=document.getElementById('opts');o.innerHTML='';
+  q.o.forEach((opt,j)=>{
+    const d=document.createElement('div');d.className='opt';
+    d.innerHTML=`<span class="ol">${L[j]}</span><span>${opt}</span>`;
+    d.onclick=()=>pick(j);o.appendChild(d);
+  });
+  const e=document.getElementById('exp');e.style.display='none';e.className='exp';
+  if(done[i])show(ans[i],q.a,q.e,q.p);
+  document.getElementById('pb').disabled=i===0;
+  const last=i===tot-1;
+  document.getElementById('nb').style.display=last?'none':'inline-block';
+  document.getElementById('sub').style.display=last?'inline-block':'none';
+}
+function pick(j){
+  if(done[cur])return;
+  ans[cur]=j;done[cur]=true;
+  show(j,Q[cur].a,Q[cur].e,Q[cur].p);
+}
+function show(sel,cor,et,pt){
+  const os=document.querySelectorAll('.opt');
+  os.forEach(o=>o.classList.add('dis'));
+  os[cor].classList.add('cor');
+  if(sel!==cor)os[sel].classList.add('wrg');else os[sel].classList.add('cor');
+  const e=document.getElementById('exp');e.style.display='block';
+  const ok=sel===cor;e.className='exp'+(ok?'':' we');
+  e.innerHTML=`<div class="et">${ok?'✓ 正解！':'✗ 不正解'}</div>${et}`+(pt?`<div class="ep">${pt}</div>`:'');
+}
+function next(){if(cur<Q.length-1)load(cur+1);}
+function prev(){if(cur>0)load(cur-1);}
+function submit(){
+  const tot=Q.length;let c=0,u=0;
+  Q.forEach((q,i)=>{if(ans[i]===null)u++;else if(ans[i]===q.a)c++;});
+  const w=tot-c-u,sc=Math.round(c/tot*100);
+  document.getElementById('quiz').style.display='none';
+  document.getElementById('result').style.display='block';
+  document.getElementById('pbi').style.width='100%';
+  document.getElementById('pt').textContent=`${tot} / ${tot}`;
+  document.getElementById('sp').textContent=sc;
+  document.getElementById('rc').textContent=c;
+  document.getElementById('rw').textContent=w;
+  document.getElementById('ru').textContent=u;
+  const p=sc>=85;
+  document.getElementById('rtt').textContent=p?'合格 PASS':'不合格 FAIL';
+  document.getElementById('rtt').style.color=p?'var(--correct)':'var(--wrong)';
+  document.getElementById('rm').textContent=p?`🎉 合格ライン（85点）突破！\n正解率 ${sc}% — 本番も大丈夫！`:`合格まであと${85-sc}点。\n解説の💡ポイントを確認して再チャレンジ！`;
+  setTimeout(()=>{const a=document.getElementById('arc');a.style.transition='stroke-dashoffset 1.5s ease';a.style.strokeDashoffset=534-(sc/100)*534;a.style.stroke=p?'var(--correct)':'var(--wrong)';},100);
+}
+function review(){
+  const s=document.getElementById('rvs');
+  s.style.display=s.style.display==='none'?'block':'none';
+  if(s.innerHTML.trim()!==''&&s.style.display==='none')return;
+  let h='<div class="rvt">解答レビュー — 全問</div>';
+  Q.forEach((q,i)=>{
+    const ok=ans[i]===q.a,cl=ok?'rc':'rw';
+    const at=ans[i]===null?'未回答':`${L[ans[i]]}. ${q.o[ans[i]]}`;
+    const pp=q.p?`<div style="margin-top:6px;padding:6px 10px;background:rgba(251,191,36,.08);border-left:3px solid var(--gold);border-radius:4px;font-size:.78rem;color:var(--gold)">${q.p}</div>`:'';
+    h+=`<div class="rvi ${cl}"><div style="font-size:.72rem;margin-bottom:7px;color:var(--accent);font-family:'Syne',sans-serif">${i+1}問目 — ${q.c}${q.t?' ⚠':''}</div><div class="rvq">${q.q}</div><div><div class="ral">あなたの回答</div><div class="${ok?'rac':'raw'}" style="font-size:.85rem">${at}</div>${!ok?`<div class="ral" style="margin-top:7px">正解</div><div class="rac" style="font-size:.85rem">${L[q.a]}. ${q.o[q.a]}</div>`:''}<div class="ral" style="margin-top:7px">解説</div><div style="opacity:.8;font-size:.82rem;line-height:1.7">${q.e}</div>${pp}</div></div>`;
+  });
+  s.innerHTML=h;
+}
+function retry(){
+  ans=new Array(Q.length).fill(null);done=new Array(Q.length).fill(false);
+  document.getElementById('result').style.display='none';
+  document.getElementById('arc').style.strokeDashoffset=534;
+  document.getElementById('rvs').style.display='none';document.getElementById('rvs').innerHTML='';
+  document.getElementById('quiz').style.display='block';
+  document.getElementById('pbi').style.width='1%';load(0);
+}
+</script>
+</body>
+</html>

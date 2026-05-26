@@ -118,7 +118,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-seri
 </head>
 <body>
 <div id="header">
-  <div><div class="hd-sub">COSTCO WHOLESALE JAPAN</div><h1>FOOD SAFETY EXAM <span class="vol-badge">VOL.3</span></h1></div>
+  <div><div class="hd-sub"><a href="./index.html" style="color:rgba(255,255,255,.7);text-decoration:none">← COSTCO WHOLESALE JAPAN</a></div><h1>FOOD SAFETY EXAM <span class="vol-badge">VOL.3</span></h1></div>
   <div id="pw"><span id="pt">0 / 60</span><div id="pbo"><div id="pbi"></div></div></div>
 </div>
 <div id="start">
@@ -167,7 +167,9 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-seri
     <div class="rsc"><div class="rsn" id="ru" style="color:var(--gold)">0</div><div class="rsl">未回答</div></div>
   </div>
   <button class="rb" onclick="retry()">もう一度挑戦</button>
+  <button class="rb" style="background:var(--wrong);border-color:var(--wrong);color:#fff" onclick="retryWrong()" id="rwb">間違えた問題だけ再挑戦</button>
   <button class="rb" style="background:var(--border);border-color:var(--border)" onclick="review()">間違いを確認</button>
+  <a class="rb" href="./index.html" style="display:inline-block;background:transparent;border:1px solid var(--accent);color:var(--accent);text-decoration:none;text-align:center">📋 メニューに戻る</a>
   <div class="rvs" id="rvs" style="display:none"></div>
 </div>
 <script>
@@ -592,6 +594,8 @@ const Q=[
  e:"異物混入を防ぐため、包装されていない食品が載っているトレイをストレージラックに一時保管する際には、ラック上部からトレイを挿入し、容器包装時にはラックの下部から取り出し包装を行います（一般衛生管理プログラム 08条 B）。",
  p:"↕️ ストレージラック：上から挿入→下から取出（異物落下防止）"}
 ];
+// Preserve original Q array for full retry capability
+const Q_ORIGINAL = Q.slice();
 let cur=0,ans=new Array(Q.length).fill(null),done=new Array(Q.length).fill(false);
 const L=['A','B','C','D','E'];
 function start(){document.getElementById('start').style.display='none';document.getElementById('quiz').style.display='block';load(0);}
@@ -670,6 +674,32 @@ function review(){
   s.innerHTML=h;
 }
 function retry(){
+  // Restore original Q if previously filtered
+  Q.length=0;Q_ORIGINAL.forEach(q=>Q.push(q));
+  ans=new Array(Q.length).fill(null);done=new Array(Q.length).fill(false);
+  document.getElementById('result').style.display='none';
+  document.getElementById('arc').style.strokeDashoffset=534;
+  document.getElementById('rvs').style.display='none';document.getElementById('rvs').innerHTML='';
+  // Show the retry-wrong button again (will be hidden if no wrong answers)
+  const rwb=document.getElementById('rwb');if(rwb)rwb.style.display='inline-block';
+  document.getElementById('quiz').style.display='block';
+  document.getElementById('pbi').style.width='1%';load(0);
+}
+
+function retryWrong(){
+  // Filter Q to only wrong (or unanswered) questions
+  const wrong=[];
+  for(let i=0;i<Q.length;i++){
+    if(ans[i]===null||ans[i]!==Q[i].a){
+      wrong.push(Q[i]);
+    }
+  }
+  if(wrong.length===0){
+    alert('全問正解です！🎉');
+    return;
+  }
+  // Replace Q with wrong questions only
+  Q.length=0;wrong.forEach(q=>Q.push(q));
   ans=new Array(Q.length).fill(null);done=new Array(Q.length).fill(false);
   document.getElementById('result').style.display='none';
   document.getElementById('arc').style.strokeDashoffset=534;

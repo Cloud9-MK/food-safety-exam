@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>コストコ フードセーフティー テスト直前編 — 番外編②</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Syne:wght@700;800&display=swap');
+:root{
+  --bg:#08090D;--card:#10121A;--border:#1E2130;
+  --purple:#5B4FE9;--accent:#A78BFA;--gold:#FBBF24;
+  --text:#F1F0FF;--muted:#6B7280;
+  --correct:#10B981;--wrong:#EF4444;--selected:#1E40AF;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;}
+#header{
+  background:linear-gradient(135deg,#1E1B4B 0%,#3730A3 60%,#5B4FE9 100%);
+  padding:13px 26px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 4px 24px rgba(91,79,233,.4);
+  border-bottom:2px solid var(--accent);
+}
+#header h1{font-family:'Syne',sans-serif;font-size:1.5rem;letter-spacing:2px;color:#fff;font-weight:800;}
+.hd-sub{font-size:.62rem;color:rgba(255,255,255,.6);letter-spacing:2px;margin-bottom:2px;}
+.vol-badge{background:var(--gold);color:#111;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:800;padding:3px 10px;border-radius:4px;letter-spacing:2px;margin-left:10px;}
+#pw{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+#pt{font-size:.78rem;color:rgba(255,255,255,.85);}
+#pbo{width:180px;height:5px;background:rgba(255,255,255,.18);border-radius:3px;overflow:hidden;}
+#pbi{height:100%;width:0%;background:var(--accent);border-radius:3px;transition:width .4s;}
+#start{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90vh;padding:40px 20px;text-align:center;}
+.vl{font-family:'Syne',sans-serif;font-size:.78rem;letter-spacing:5px;color:var(--accent);margin-bottom:14px;}
+.bt{font-family:'Syne',sans-serif;font-size:clamp(2.6rem,6.5vw,4.5rem);color:#fff;letter-spacing:2px;line-height:1.1;margin-bottom:8px;font-weight:800;}
+.bt span{color:var(--accent);}
+.tl{font-size:.9rem;color:var(--gold);letter-spacing:1px;margin-bottom:6px;}
+.bs{font-size:.8rem;color:var(--muted);margin-bottom:40px;}
+.ig{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:480px;margin-bottom:40px;}
+.ic{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.ic .n{font-family:'Syne',sans-serif;font-size:2.4rem;color:var(--accent);line-height:1;font-weight:700;}
+.ic .l{font-size:.68rem;color:var(--muted);margin-top:4px;}
+.sb{background:var(--purple);color:#fff;border:1px solid var(--accent);padding:16px 56px;font-size:1rem;font-weight:700;border-radius:8px;cursor:pointer;letter-spacing:2px;transition:all .15s;box-shadow:0 4px 24px rgba(91,79,233,.5);}
+.sb:hover{background:#4338CA;transform:translateY(-2px);}
+#quiz{display:none;padding:28px 20px;max-width:820px;margin:0 auto;}
+.qm{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.qn{font-family:'Syne',sans-serif;font-size:1rem;color:var(--gold);letter-spacing:2px;font-weight:700;}
+.qcat{font-size:.67rem;background:var(--border);color:var(--muted);padding:4px 12px;border-radius:20px;}
+.trap{display:none;font-size:.65rem;background:rgba(239,68,68,.15);color:#F87171;border:1px solid rgba(239,68,68,.3);padding:3px 10px;border-radius:20px;margin-right:6px;}
+.trap.on{display:inline-block;}
+.qt{font-size:1rem;line-height:1.9;font-weight:500;margin-bottom:22px;padding:22px;background:var(--card);border:1px solid var(--border);border-radius:12px;border-left:4px solid var(--accent);}
+.opts{display:flex;flex-direction:column;gap:10px;}
+.opt{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:15px 18px;cursor:pointer;display:flex;align-items:flex-start;gap:12px;transition:border-color .15s,background .15s,transform .1s;font-size:.93rem;line-height:1.65;}
+.opt:hover:not(.dis){border-color:#334;background:#13151F;transform:translateX(4px);}
+.ol{min-width:27px;height:27px;background:var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--muted);flex-shrink:0;margin-top:1px;transition:background .15s,color .15s;}
+.opt.sel{border-color:var(--selected);background:rgba(30,64,175,.18);}
+.opt.sel .ol{background:var(--selected);color:#fff;}
+.opt.cor{border-color:var(--correct);background:rgba(16,185,129,.1);}
+.opt.cor .ol{background:var(--correct);color:#fff;}
+.opt.wrg{border-color:var(--wrong);background:rgba(239,68,68,.1);}
+.opt.wrg .ol{background:var(--wrong);color:#fff;}
+.opt.dis{cursor:default;}
+.exp{display:none;margin-top:16px;padding:18px 20px;background:#061410;border:1px solid var(--correct);border-radius:10px;font-size:.88rem;line-height:1.9;color:#A7F3D0;}
+.exp.we{background:#140606;border-color:var(--wrong);color:#FECACA;}
+.exp .et{font-weight:700;margin-bottom:6px;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;}
+.exp .ep{margin-top:10px;padding:8px 12px;background:rgba(251,191,36,.08);border-left:3px solid var(--gold);border-radius:4px;font-size:.82rem;color:var(--gold);}
+.nr{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
+.nb{padding:11px 28px;border:none;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all .15s;}
+.nb.p{background:var(--purple);color:#fff;border:1px solid var(--accent);}
+.nb.p:hover{background:#4338CA;}
+.nb.s{background:var(--border);color:var(--text);}
+.nb.s:hover{background:#252840;}
+.nb:disabled{opacity:.35;cursor:not-allowed;}
+#result{display:none;padding:50px 20px;max-width:680px;margin:0 auto;text-align:center;}
+.sr{width:200px;height:200px;margin:0 auto 28px;position:relative;}
+.sr svg{transform:rotate(-90deg);}
+.sr .st{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.sp{font-family:'Syne',sans-serif;font-size:3.2rem;line-height:1;color:var(--text);font-weight:800;}
+.sl{font-size:.65rem;color:var(--muted);}
+.rt{font-family:'Syne',sans-serif;font-size:2.2rem;letter-spacing:2px;margin-bottom:8px;font-weight:800;}
+.rm{color:var(--muted);margin-bottom:28px;line-height:1.8;white-space:pre-line;}
+.rsg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+.rsc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.rsn{font-family:'Syne',sans-serif;font-size:2rem;line-height:1;font-weight:700;}
+.rsl{font-size:.68rem;color:var(--muted);margin-top:4px;}
+.rb{background:var(--purple);color:#fff;border:1px solid var(--accent);padding:14px 44px;font-size:.95rem;font-weight:700;border-radius:8px;cursor:pointer;letter-spacing:2px;transition:all .15s;margin:8px;}
+.rb:hover{background:#4338CA;}
+.rvs{text-align:left;margin-top:44px;}
+.rvt{font-family:'Syne',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--gold);margin-bottom:18px;font-weight:700;}
+.rvi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:10px;}
+.rvi.rw{border-color:rgba(239,68,68,.35);}
+.rvi.rc{border-color:rgba(16,185,129,.22);}
+.rvq{font-size:.88rem;margin-bottom:10px;line-height:1.6;}
+.ral{color:var(--muted);font-size:.72rem;margin-bottom:3px;}
+.rac{color:var(--correct);font-weight:500;}
+.raw{color:var(--wrong);}
+</style>
+<!-- PWA-INJECT-START -->
+<link rel="manifest" href="./manifest.json" />
+<meta name="theme-color" content="#E31837" />
+<meta name="application-name" content="FoodSafety模試" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="FoodSafety模試" />
+<link rel="apple-touch-icon" href="./icons/icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png" />
+<link rel="shortcut icon" href="./icons/icon-64.png" />
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function (e) {
+        console.warn('SW register failed:', e);
+      });
+    });
+  }
+</script>
+<!-- PWA-INJECT-END -->
+</head>
+<body>
+<div id="header">
+  <div><div class="hd-sub"><a href="./index.html" style="color:rgba(255,255,255,.7);text-decoration:none">← COSTCO WHOLESALE JAPAN</a></div><h1>FOOD SAFETY EXAM <span class="vol-badge">特訓</span></h1></div>
+  <div id="pw"><span id="pt">0 / 60</span><div id="pbo"><div id="pbi"></div></div></div>
+</div>
+<div id="start">
+  <div class="vl">BONUS — TEST READY</div>
+  <div class="bt">テスト<br><span>直前編</span></div>
+  <div class="tl">⚡ ここだけは押さえたい厳選60問</div>
+  <div class="bs">判断・シナリオ・管理職視点・ひっかけの本番想定問題<br>正解するまで同じ問題が出る「反復モード」搭載</div>
+  <div class="ig">
+    <div class="ic"><div class="n">60</div><div class="l">問題数</div></div>
+    <div class="ic"><div class="n">4-5</div><div class="l">択問題</div></div>
+    <div class="ic"><div class="n">∞</div><div class="l">反復モード</div></div>
+  </div>
+  <button class="sb" onclick="start()">試験開始</button>
+</div>
+<div id="quiz">
+  <div class="qm">
+    <span class="qn" id="qn">問題 1 / 60</span>
+    <div style="display:flex;align-items:center;">
+      <span class="trap" id="trap">⚠ ひっかけ注意</span>
+      <span class="qcat" id="qcat"></span>
+    </div>
+  </div>
+  <div class="qt" id="qt"></div>
+  <div class="opts" id="opts"></div>
+  <div class="exp" id="exp"></div>
+  <div class="nr">
+    <button class="nb s" id="pb" onclick="prev()">◀ 前へ</button>
+    <button class="nb p" id="nb" onclick="next()">次へ ▶</button>
+    <button class="nb p" id="sub" onclick="submit()" style="display:none">結果を見る</button>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:14px;justify-content:center;flex-wrap:wrap">
+    <button class="nb s" onclick="confirmReset()" style="font-size:.78rem;padding:8px 18px;opacity:.7">🔄 最初からやり直す</button>
+    <a class="nb s" href="./index.html" style="font-size:.78rem;padding:8px 18px;opacity:.7;text-decoration:none;display:inline-block">📋 メニューに戻る</a>
+  </div>
+</div>
+<div id="result">
+  <div class="sr">
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="85" fill="none" stroke="#1E2130" stroke-width="13"/>
+      <circle id="arc" cx="100" cy="100" r="85" fill="none" stroke="#5B4FE9" stroke-width="13"
+        stroke-linecap="round" stroke-dasharray="534" stroke-dashoffset="534"/>
+    </svg>
+    <div class="st"><div class="sp" id="sp">0</div><div class="sl">点</div></div>
+  </div>
+  <div class="rt" id="rtt">—</div>
+  <div class="rm" id="rm"></div>
+  <div class="rsg">
+    <div class="rsc"><div class="rsn" id="rc" style="color:var(--correct)">0</div><div class="rsl">正解</div></div>
+    <div class="rsc"><div class="rsn" id="rw" style="color:var(--wrong)">0</div><div class="rsl">不正解</div></div>
+    <div class="rsc"><div class="rsn" id="ru" style="color:var(--gold)">0</div><div class="rsl">未回答</div></div>
+  </div>
+  <button class="rb" onclick="retry()">もう一度挑戦</button>
+  <button class="rb" style="background:var(--wrong);border-color:var(--wrong);color:#fff" onclick="retryWrong()" id="rwb">間違えた問題だけ再挑戦</button>
+  <button class="rb" style="background:var(--border);border-color:var(--border)" onclick="review()">間違いを確認</button>
+  <a class="rb" href="./index.html" style="display:inline-block;background:transparent;border:1px solid var(--accent);color:var(--accent);text-decoration:none;text-align:center">📋 メニューに戻る</a>
+  <div class="rvs" id="rvs" style="display:none"></div>
+</div>
+<script>
+const Q=[
+{c:"🎯判断",t:false,
+ q:"冷蔵庫温度が10°Cで連続2時間異常を示した。最初に取るべき行動は？",
+ o:["すぐに食品を廃棄","保健所に通報","冷蔵庫を再起動","GMもしくはAGMに報告"],
+ a:3,
+ e:"温度異常時の手順：①逸脱時間・期間を把握 ②GM/AGMに報告 ③逸脱保管庫の食品温度点検 ④原因特定・修理 ⑤1時間後再点検。",
+ p:"🚨 温度異常→まずGM/AGM報告"},
+
+{c:"🎯判断",t:true,
+ q:"床に落とした包装なしの食品を見つけた時の正しい対応は？",
+ o:["加熱すれば使用可","洗浄消毒すれば使用可","製造に使用せず製品化しない","管理職の判断で使用"],
+ a:2,
+ e:"汚染された可能性のある食品は加熱・洗浄でも復活せず、製造使用・製品化禁止（一般衛生管理プログラム 08条 H）。",
+ p:"🚫 汚染疑い食品は即廃棄（加熱・洗浄でも復活せず）"},
+
+{c:"🎯判断",t:false,
+ q:"PCR検査でO-157陽性疑い（擬陽性）となった従業員への正しい対応は？",
+ o:["本人同意で作業継続可","マスク手袋で代替対応","陰性確定までフレッシュ作業停止","3日経過観察"],
+ a:2,
+ e:"擬陽性も陽性扱い。陰性確定まで作業制限を継続。装備で代替不可。再採便・再検査が必要。",
+ p:"🚫 PCR擬陽性=陰性確定まで作業停止"},
+
+{c:"🎯判断",t:false,
+ q:"スライサーの刃に欠けを発見した。最初に取るべき行動は？",
+ o:["製造に使用せずフレッシュ部門管理職に報告","テープで補修して使用継続","欠けを取り除いて使用継続","次回点検まで使用継続"],
+ a:0,
+ e:"硬質異物混入リスク機器は作業開始前に点検。破損があれば即時に使用停止し管理職に報告。",
+ p:"🔪 刃物破損→即使用停止＋管理職報告"},
+
+{c:"🎯判断",t:true,
+ q:"受領した冷凍食品が−10°Cだった。判断として正しいのは？",
+ o:["若干の温度差なら受領可","受領拒否＋伝票記録＋バイヤー連絡","すぐに冷凍庫に入れて受領","送り返さず保管庫管理"],
+ a:1,
+ e:"冷凍受領基準は−15°C以下。基準逸脱は受領拒否し、伝票記録・該当部門バイヤーへ連絡。",
+ p:"❌ 冷凍-10°C=基準外→受領拒否"},
+
+{c:"🎯判断",t:false,
+ q:"メンバーから「この商品で食中毒になった」と問い合わせがあった。正しい対応は？",
+ o:["倉庫店GMが単独判断","該当製品を独自回収","保健所に即時通報","グーグルフォームから本社FS共有"],
+ a:3,
+ e:"CCP工程ある製品の食中毒疑い問い合わせは、製品名・状態・焼成温度等の記録状況を本社FSに共有。",
+ p:"📝 食中毒問い合わせ→本社FSへGoogle Form共有"},
+
+{c:"🎯判断",t:false,
+ q:"汎用シンクで野菜の消毒殺菌作業をしようとしている。判断として正しいのは？",
+ o:["汎用シンクで実施可能","3槽シンクで実施","食品準備専用シンクで実施","手洗いシンクで代用"],
+ a:2,
+ e:"野菜・果物の消毒殺菌は食品準備専用シンクでのみ実施。3槽・4槽シンクの使用は不可。",
+ p:"🚿 野菜消毒=食品準備専用シンク限定"},
+
+{c:"🎯判断",t:false,
+ q:"解凍中の冷凍肉が再凍結状態になっていた。対応として正しいのは？",
+ o:["再凍結は不可なので廃棄判断","再凍結品として保管継続","加熱して使用","別容器に移して再使用"],
+ a:0,
+ e:"解凍された製品・原材料の再凍結は不可。食品の品質と安全性を著しく損なうため廃棄。",
+ p:"🚫 再凍結=絶対NG→廃棄"},
+
+{c:"🎯判断",t:true,
+ q:"体調不良の従業員から「軽い下痢で勤務できる」と相談を受けた。対応は？",
+ o:["症状回復まで作業制限","マスク手袋着用で作業継続可","管理職判断で短時間勤務","抗生物質服用で勤務可"],
+ a:0,
+ e:"下痢・嘔吐・発熱などの症状がある従業員はフレッシュ部門作業に従事させない。症状消失まで作業制限。",
+ p:"🤒 下痢症状→症状消失まで作業制限"},
+
+{c:"🎯判断",t:false,
+ q:"記録の数値を訂正したい。正しい方法は？",
+ o:["修正テープで塗りつぶし","修正ペンで塗りつぶし","二重線で消し正しい内容を記入","消しゴムで消す"],
+ a:2,
+ e:"訂正は二重線で消し正しい内容を記入。修正テープ・ペン・塗りつぶし・改ざんは厳禁。管理職が訂正内容を点検。",
+ p:"✏️ 訂正=二重線＋正しい内容（テープ・ペンNG）"},
+
+{c:"🎯判断",t:false,
+ q:"製造中、化学薬品が食品にかかった可能性がある。判断として正しいのは？",
+ o:["洗浄すれば使用可","加熱すれば使用可","使用せず廃棄","冷蔵保管で経過観察"],
+ a:2,
+ e:"化学薬品による汚染が疑われる食品類は製造・販売に使用せず廃棄。化学薬品は食品から最低15cm以上離して保管。",
+ p:"⚠️ 化学薬品汚染疑い→使用せず廃棄"},
+
+{c:"🎯判断",t:false,
+ q:"原材料の包装に小さな破れを発見した。最初に取るべき行動は？",
+ o:["テープで補修して使用","内容物点検＋受領可否決定","通常通り保管庫へ","少量なら問題なし"],
+ a:1,
+ e:"包装破れの兆候があれば現物を点検し受領可否を決定。汚染リスクある場合は受領拒否し伝票記録。",
+ p:"📦 包装破れ→内容物点検→可否判断"},
+
+{c:"🚨ひっかけ",t:true,
+ q:"加熱した食品ではアレルギー反応は起こらない、これは正しいか？",
+ o:["正しい（加熱で変性するため）","誤り（変性しても発症する場合あり）","基本的に正しいが乳製品は例外","加熱方法により異なる"],
+ a:1,
+ e:"たんぱく質が加熱変性してもアレルゲン性が残る場合がある。加熱した食品でもアレルギー反応は起こり得る。",
+ p:"⚠️ 加熱変性してもアレルゲン性残存（誤解しやすい）"},
+
+{c:"🚨ひっかけ",t:true,
+ q:"冷蔵庫4°C以下で保管すれば全てのバクテリア増殖を防げる、これは正しいか？",
+ o:["正しい（病原菌は冷蔵で停止）","誤り（リステリア菌は4°C以下でも増殖）","基本的に正しいが時間制限あり","冷蔵庫メーカーにより異なる"],
+ a:1,
+ e:"リステリア菌は4°C以下でも増殖可能。冷蔵保管は多くのバクテリア増殖を抑制するが完全停止ではない。",
+ p:"❄️ リステリア=4°C以下でも増殖（要注意）"},
+
+{c:"🚨ひっかけ",t:true,
+ q:"消費期限・賞味期限は管理職判断で延長可能、これは正しいか？",
+ o:["正しい（GM判断で延長可）","本社承認なら延長可能","一切延長してはならない","AGM以上の判断で延長可"],
+ a:2,
+ e:"製品・原材料・仕掛品の消費期限・賞味期限・使用期限は一切延長してはならない（例外なし、一般衛生管理プログラム 07条 I）。",
+ p:"⛔ 期限延長は絶対NG（管理職承認でも不可）"},
+
+{c:"🚨ひっかけ",t:true,
+ q:"冷凍保管温度の最新基準は−18°C以下、これは正しいか？",
+ o:["正しい（国際標準）","−15°C以下が最新基準（変更あり）","−20°C以下が最新基準","商品により異なる"],
+ a:1,
+ e:"一般衛生管理プログラム最新基準は−15°C以下。Level 2 TEXTBOOK旧基準（−18°C）から変更されている。",
+ p:"🧊 最新基準=−15°C（旧基準−18°Cから変更）"},
+
+{c:"🚨ひっかけ",t:true,
+ q:"殺虫剤を使う場面でコストコ従業員が製造場内で散布できる、これは正しいか？",
+ o:["正しい（教育を受けた者なら可）","管理職の判断で可","コストコ従業員は製造場内で使用禁止","緊急時のみ使用可"],
+ a:2,
+ e:"製造場内において、コストコの従業員は殺虫剤を使用してはならない。特別訓練された業者（イカリ消毒）に委託。",
+ p:"🚫 製造場内：コストコ従業員の殺虫剤使用は禁止"},
+
+{c:"🚨ひっかけ",t:true,
+ q:"解凍方法として室温解凍は無条件で実施可能、これは正しいか？",
+ o:["スペックシート明記＋加熱殺菌ありの場合のみ可","正しい（冬季なら問題なし）","気温20°C以下なら可","緊急時はいつでも可"],
+ a:0,
+ e:"室温解凍はスペックシートに明記され、かつ後工程で加熱殺菌される場合のみ可能。両方の条件が必要。",
+ p:"⚠️ 室温解凍=レシピ明記＋加熱殺菌ありの2条件"},
+
+{c:"🚨ひっかけ",t:true,
+ q:"70°C/1分は63°C/30分と同等以上の加熱条件、これは正しいか？",
+ o:["誤り（70°C/1分は不足）","正しい（高温短時間殺菌）","正しい（業界標準）","製品により異なる"],
+ a:0,
+ e:"同等以上の条件は75°C/1分・80°C/14秒・84°C/4秒。70°C/1分は不足で同等以上ではない。",
+ p:"🔥 70°C/1分は不足→75°C以上必須"},
+
+{c:"🚨ひっかけ",t:true,
+ q:"ハンドジェルで手洗いの代用ができる、これは正しいか？",
+ o:["正しい（時短で効率的）","緊急時のみ代用可","手洗いの代用にはならない","製造前のみ代用可"],
+ a:2,
+ e:"ハンドジェル・除菌スプレーは手洗いの代用にならない。温水・ハンドソープ・ペーパー＋30秒以上が必須。",
+ p:"🧼 ハンドジェルは手洗いの代用不可"},
+
+{c:"🚨ひっかけ",t:true,
+ q:"冷凍保管していた食品は二次汚染リスクがない、これは正しいか？",
+ o:["誤り（凍結は停止のみ、解凍後増殖）","正しい（凍結で菌は死滅）","正しい（−15°Cで殺菌）","保管期間による"],
+ a:0,
+ e:"冷凍は菌を死滅させず増殖を停止させるだけ。解凍後は危険温度区域で急速増殖するため二次汚染リスクあり。",
+ p:"🧊 冷凍=殺菌ではなく増殖停止のみ"},
+
+{c:"🚨ひっかけ",t:true,
+ q:"D63デリ部門の白いエプロンは加熱済み食品の取扱用、これは正しいか？",
+ o:["正しい（清潔の象徴）","正しい（共通ルール）","誤り（白=生牛・豚肉用）","部門により異なる"],
+ a:2,
+ e:"D63オーブンルーム：赤エプロン=加熱済み / 青=生鶏肉 / 白=生牛・豚肉。白は加熱済みではない。",
+ p:"🎨 D63白=生牛豚肉（加熱済みではない）"},
+
+{c:"💼管理職",t:false,
+ q:"AGM・SUPがHotline案件を受けた時の最初の対応は？",
+ o:["HQ HRに即報告＋事実関係把握","本人と当事者を呼び出し面談","管理職会議で議論","保健所に通報"],
+ a:0,
+ e:"Hotline案件は速やかに本社HRに報告し、事実関係を整理。一次面談前にHQ HRと方針すり合わせが重要。",
+ p:"📞 Hotline案件→まず本社HRへ報告"},
+
+{c:"💼管理職",t:false,
+ q:"CCP工程の重要管理者として正しいのは？",
+ o:["倉庫店GM単独","従業員全員","本社フードセーフティー部門のみ","フレッシュ部門管理職（バイヤー含む）"],
+ a:3,
+ e:"CCPの管理責任はフレッシュ部門の管理職（購買部・オペレーション部・FS部門で構成されるHACCPチーム）。",
+ p:"👥 CCP管理＝フレッシュ部門管理職"},
+
+{c:"💼管理職",t:false,
+ q:"フレッシュ部門マネージャーが毎日チェックすべきものは？",
+ o:["従業員の有給休暇取得率","冷蔵冷凍庫温度記録（2時間ごと）","従業員の通勤時間","保健所からの郵便物"],
+ a:1,
+ e:"冷蔵冷凍庫は2時間ごとに温度点検し、Temp Check Walk Logに記録。管理職は毎日記録の点検と署名が必要。",
+ p:"⏰ 冷蔵冷凍庫=2時間ごと点検＋管理職毎日確認"},
+
+{c:"💼管理職",t:true,
+ q:"リコール発生時の倉庫店の役割として正しいのは？",
+ o:["独自判断で即時回収開始","本社からの指示に従って対応","管理職会議で対応決定","事後報告で対応"],
+ a:1,
+ e:"リコールはVP＋Country Managerが決定。倉庫店は本社指示に従って対応。独自判断・事後報告は不可。",
+ p:"📞 リコール時=本社指示に従う（独自判断NG）"},
+
+{c:"💼管理職",t:false,
+ q:"従業員教育の Level 1 と Level 2 の対象者の違いは？",
+ o:["L1=新入社員のみ / L2=管理職","L1=製造担当 / L2=営業担当","L1=正社員のみ / L2=役員","L1=全従業員年1回 / L2=管理職＋SUP3年1回"],
+ a:3,
+ e:"Level 1=全従業員対象・年1回・合格80%。Level 2=マネージャー以上＋スーパーバイザー・3年に1回・合格85点。",
+ p:"🎓 L1=全員年1回80% / L2=Mgr+Sup 3年1回85点"},
+
+{c:"💼管理職",t:false,
+ q:"管理職が記録に署名する目的として最も重要なのは？",
+ o:["人事考課のため","記入内容の妥当性保証＋訂正点検","残業時間記録のため","退職時の引き継ぎのため"],
+ a:1,
+ e:"管理職・責任者の署名は基準逸脱・記録漏れ・読みやすさ・不明箇所の妥当性を保証する重要な責任。",
+ p:"✍️ 管理職署名=記録の妥当性保証"},
+
+{c:"💼管理職",t:false,
+ q:"スペックシート（レシピ）の機密保持義務として正しいのは？",
+ o:["内部資料なので開示可","本社承認で開示可能","官公庁以外への開示・漏洩は禁止","退職後は開示可"],
+ a:2,
+ e:"スペックシートは機密情報。官公庁以外の第三者に開示・漏洩は禁止。退職後も継続する義務。",
+ p:"🔒 レシピ=官公庁以外への開示・漏洩は厳禁"},
+
+{c:"💼管理職",t:false,
+ q:"HACCPチームへの参加に必要な要件は？",
+ o:["入社3年以上","TOEIC700点以上","管理職資格","JFIC主催のHACCP講習会受講"],
+ a:3,
+ e:"HACCPチームに参加するにはJFIC（一般財団法人食品産業センター等）主催のHACCP講習会受講が必須。",
+ p:"📚 HACCPチーム参加=JFIC講習会必須"},
+
+{c:"💼管理職",t:true,
+ q:"管理職が新規製造員にまず教えるべきことは？",
+ o:["会社の組織図","メンバーカードの仕組み","商品の販売目標","個人衛生・手洗い・ドレスコード"],
+ a:3,
+ e:"食品安全の基礎は個人衛生。新規製造員にはまず手洗い・服装・健康管理を徹底教育してから作業に入らせる。",
+ p:"🧼 新規教育=個人衛生・手洗い・服装が最優先"},
+
+{c:"💼管理職",t:false,
+ q:"管理職としての安全文化醸成で最も重要なのは？",
+ o:["違反者への厳罰","張り紙の数を増やす","見本を示し継続的に教育","監視カメラを増設"],
+ a:2,
+ e:"安全文化は管理職自身が見本を示し継続的に教育することで醸成される。罰則中心ではなく啓発と育成が重要。",
+ p:"👥 安全文化=管理職が見本＋継続教育"},
+
+{c:"🔍記録",t:false,
+ q:"水質検査の記録の保管期間は？",
+ o:["最低1年間","最低3年間","最低5年間","永久保管"],
+ a:0,
+ e:"水質検査記録および貯水槽清掃記録は倉庫店アドミニストレーション部門で最低1年間保管。",
+ p:"📁 水質検査記録=最低1年保管"},
+
+{c:"🔍記録",t:false,
+ q:"記録書類のバインダー材質として正しいのは？",
+ o:["紙製バインダー","プラスチック製バインダー","アルミ製またはステンレス製","木製バインダー"],
+ a:2,
+ e:"異物混入防止のため、バインダーはアルミ製またはステンレス製。紙・プラスチック・木製は不可。",
+ p:"📁 バインダー=アルミ/ステンレス必須"},
+
+{c:"🔍記録",t:false,
+ q:"記入用具として使用してはいけないものは？",
+ o:["キャップなしボールペン","ジェルインクペン","ノック式ボールペン","鉛筆・シャープペン・フリクションペン"],
+ a:3,
+ e:"容易に訂正可能な鉛筆・シャープペン・フリクションペンは使用禁止。改ざんリスクを防ぐため。",
+ p:"✏️ 使用NG=鉛筆・シャープ・フリクション"},
+
+{c:"🔍記録",t:true,
+ q:"記録の空欄項目への記入として正しい方法は？",
+ o:["空白のまま","「不明」と記載","斜線「/」・締めマーク「〆」・バツ「×」","管理者サインで埋める"],
+ a:2,
+ e:"空欄には「/」「〆」「×」を使い記入漏れではないことを示す。空白は改ざんや記入漏れと判断されるリスクあり。",
+ p:"✏️ 空欄処理=/〆×（空白NG）"},
+
+{c:"🔍記録",t:false,
+ q:"防虫防鼠の書類管理として正しいのは？",
+ o:["1つのファイルで一元管理","部門ごとに個別保管","電子データのみで管理","本社で一括管理"],
+ a:0,
+ e:"防虫防鼠関連書類は倉庫店アドミニストレーション部門で1つのファイルで一元管理。",
+ p:"📁 防虫防鼠書類=1ファイル一元管理"},
+
+{c:"🔍記録",t:false,
+ q:"CCP工程の記録頻度として正しいのは？",
+ o:["ロットごとに必ず記録","1日1回まとめて","週1回まとめて","月1回まとめて"],
+ a:0,
+ e:"CCP工程はロットごとに必ず記録。記録不備は重大な品質管理違反となる。",
+ p:"🎯 CCP記録=ロットごと必須"},
+
+{c:"🔍記録",t:false,
+ q:"保管期間が明示されていない記録の最低保管期間は？",
+ o:["最低1年","最低3年","最低5年","保管不要"],
+ a:0,
+ e:"保管期間が明示されていない記録は最低1年間保管。明示されている場合はその期間に従う。",
+ p:"📁 保管期間不明=最低1年"},
+
+{c:"🔍記録",t:true,
+ q:"トイレ点検記録の使用書類として正しいのは？",
+ o:["FLOORWALK CHECKLIST","Daily Walk Sheet","Sanitation Log","Temp Check Walk Log"],
+ a:0,
+ e:"トイレ点検は最低1時間に1回実施しFLOORWALK CHECKLISTに記録。他の様式は別用途。",
+ p:"🚻 トイレ点検記録=FLOORWALK CHECKLIST"},
+
+{c:"⚠️シナリオ",t:false,
+ q:"鶏唐揚げを食べた人が48時間後に発熱・下痢。原因として最も疑われる菌は？",
+ o:["黄色ブドウ球菌","ヒスタミン中毒","ボツリヌス菌","カンピロバクター菌"],
+ a:3,
+ e:"カンピロバクター菌：加熱不十分な鶏肉・豚肉、潜伏48-60時間。微好気性。鶏肉の代表的な食中毒原因菌。",
+ p:"🐔 鶏肉+48時間後発症=カンピロバクター"},
+
+{c:"⚠️シナリオ",t:false,
+ q:"おにぎり・お弁当を食べて1-2時間後に激しい嘔吐。原因として最も疑われる菌は？",
+ o:["サルモネラ属菌","黄色ブドウ球菌","O-157","リステリア菌"],
+ a:1,
+ e:"黄色ブドウ球菌：手指の傷から侵入し毒素を産生。耐熱性毒素で加熱無効。潜伏1-6時間と短く嘔吐が主症状。",
+ p:"🍙 手作りおにぎり+短時間嘔吐=黄色ブドウ球菌"},
+
+{c:"⚠️シナリオ",t:false,
+ q:"ハンバーグを食べて3-8日後に激しい血便。原因として最も疑われる菌は？",
+ o:["カンピロバクター菌","腸炎ビブリオ菌","腸管出血性大腸菌O-157","リステリア菌"],
+ a:2,
+ e:"O-157：加熱不十分な牛肉・生野菜、潜伏3-8日。生体内毒素型で血便・腹痛が主症状。HUS（溶血性尿毒症症候群）リスク。",
+ p:"🥩 牛肉+3-8日後血便=O-157"},
+
+{c:"⚠️シナリオ",t:true,
+ q:"ホタテの煮物を食べて10-60時間後に手足の麻痺。原因は？",
+ o:["ヒスタミン中毒","カンピロバクター","麻痺性貝毒","シガテラ毒"],
+ a:2,
+ e:"麻痺性貝毒：ホタテガイ・イシガニ等。麻痺・下痢が主症状。潜伏10-60時間。加熱しても無効化されない自然毒。",
+ p:"🦪 ホタテ+麻痺=麻痺性貝毒"},
+
+{c:"⚠️シナリオ",t:false,
+ q:"カツオの刺身を食べて1時間後に頭痛・じんましん・発熱。原因は？",
+ o:["アニサキス症","腸炎ビブリオ","ノロウイルス","ヒスタミン中毒"],
+ a:3,
+ e:"ヒスタミン中毒：カツオ・マグロ等の赤身魚。鮮度低下でヒスタミン生成。潜伏1時間と短く頭痛・じんましん。",
+ p:"🐟 カツオ+1時間後じんましん=ヒスタミン"},
+
+{c:"⚠️シナリオ",t:false,
+ q:"真空パックの保存食を食べて12時間後に視力低下・呼吸困難。原因として最も疑われるのは？",
+ o:["ボツリヌス菌","黄色ブドウ球菌","サルモネラ","O-157"],
+ a:0,
+ e:"ボツリヌス菌：偏性嫌気性で真空パック食品で増殖。神経毒で視力低下・呼吸困難・致死率高い緊急疾患。",
+ p:"🥫 真空パック+神経症状=ボツリヌス（緊急！）"},
+
+{c:"⚠️シナリオ",t:true,
+ q:"生牡蠣を食べて24-48時間後に激しい嘔吐・下痢が集団発生。原因は？",
+ o:["ノロウイルス","黄色ブドウ球菌","麻痺性貝毒","O-157"],
+ a:0,
+ e:"ノロウイルス：生牡蠣等の二枚貝が代表的原因。潜伏24-48時間。集団感染しやすく嘔吐・下痢が主症状。",
+ p:"🦪 生牡蠣+集団発症=ノロウイルス"},
+
+{c:"⚠️シナリオ",t:false,
+ q:"焼きめしを食べて1-5時間後に嘔吐。原因として最も疑われるのは？",
+ o:["黄色ブドウ球菌","リステリア","サルモネラ","セレウス菌"],
+ a:3,
+ e:"セレウス菌（嘔吐型）：焼きめし・パスタが代表的原因。芽胞形成で加熱に強く、再加熱不十分で増殖。",
+ p:"🍚 焼きめし+嘔吐=セレウス菌"},
+
+{c:"📐計算",t:false,
+ q:"63°C/30分加熱と同等以上で「最短時間」の加熱条件は？",
+ o:["75°C/1分","80°C/14秒","84°C/4秒","70°C/1分"],
+ a:2,
+ e:"同等以上：75°C/1分=80°C/14秒=84°C/4秒。最短時間は84°C/4秒。70°C/1分は不足。",
+ p:"⏱️ 同等以上最短=84°C/4秒"},
+
+{c:"📐計算",t:false,
+ q:"冷蔵庫の温度逸脱が連続45分続いた。点検記録間隔から考えた逸脱時間として正しいのは？",
+ o:["正確に45分","最大1時間45分","最大2時間45分（点検間隔考慮）","最大3時間"],
+ a:2,
+ e:"冷蔵冷凍庫は2時間ごとに点検。前回点検から最大2時間+確認した45分=最大2時間45分の逸脱可能性を考慮。",
+ p:"⏰ 逸脱時間=確認時間+最大点検間隔（2時間）"},
+
+{c:"📐計算",t:false,
+ q:"次亜塩素酸ナトリウム200ppmを作る場合の希釈で正しいのは？",
+ o:["原液200mLを水800mLで希釈","原液100mLを水900mLで希釈","原液1Lを水1Lで希釈","原液濃度から計算しSDS確認"],
+ a:3,
+ e:"希釈計算は原液濃度（5%、6%、12%等）により異なる。SDSと作業手順書を確認し正確に希釈する必要がある。",
+ p:"🧪 希釈計算=原液濃度確認＋SDS参照"},
+
+{c:"📐計算",t:false,
+ q:"加熱後の冷却で20°C到達時間が35分かかった場合、判断として正しいのは？",
+ o:["基準内（30分以内なら）","余裕ある","基準逸脱（30分以内が必要）","製品により異なる"],
+ a:2,
+ e:"冷却基準は30分以内に中心20°C以下＋60分以内に10°C以下。35分は基準逸脱。製品安全のため対応が必要。",
+ p:"❄️ 30分以内20°C到達=基準（35分はNG）"},
+
+{c:"📐計算",t:true,
+ q:"フードコート ダイスタマネギの使用開始15:00、現在20:00。判断として正しいのは？",
+ o:["まだ使用可能（6時間ルール）","5時間経過なので継続使用可","6時間まであと1時間使用可","直ちに廃棄"],
+ a:2,
+ e:"FCダイスタマネギの最長使用時間は6時間。15:00開始なら21:00まで使用可能、20:00時点ではあと1時間使用可。",
+ p:"🧅 FC玉ねぎ最長6時間（時刻計算注意）"},
+
+{c:"📐計算",t:false,
+ q:"製造作業開始時刻10:00、ショーケース陳列時刻11:30。判断として正しいのは？",
+ o:["90分経過なので基準内","保管庫に移したから問題なし","60分超過で基準逸脱","時間管理対象外"],
+ a:2,
+ e:"温度管理製品は製造開始後60分以内にショーケース陳列or保管庫管理。90分経過は基準逸脱。",
+ p:"⏰ 製造開始60分以内=陳列or保管庫（90分はNG）"},
+
+{c:"🎓総合",t:true,
+ q:"生鶏肉と加熱済みチキンを保管する時、最も重要な対策は？",
+ o:["完全ゾーニング（棚・パレット・台車別）","同じ棚で温度のみ分ける","カバーがあれば同保管可","冷凍であれば混合可"],
+ a:0,
+ e:"Non-RTE（生鶏肉）とRTE（加熱済み）は常に区分け（ゾーニング）。棚・パレット・台車などの作業機器・備品を分けて使用・管理。",
+ p:"🚧 Non-RTE/RTE=完全ゾーニング必須"},
+
+{c:"🎓総合",t:false,
+ q:"コストコのCCPと一般食品工場のCCPの違いとして正しいのは？",
+ o:["基本的に同じ加熱殺菌","製品により決定方法異なる","コストコはCCP対象外","コストコは独自基準（80°C/14秒等）"],
+ a:3,
+ e:"コストコは独自のCCP基準。例：ガーリックシュリンプ・プルコギベイク・グリルチキン=80°C/14秒。一般基準63°C/30分と異なる。",
+ p:"🎯 コストコCCP=独自基準（80°C/14秒等）"},
+
+{c:"🎓総合",t:false,
+ q:"HACCPとPRPの関係を最も正確に表しているのは？",
+ o:["HACCPはPRPの一部","PRPはHACCPが効果的に機能するための前提条件","両者は独立したシステム","PRPはHACCP導入後に整備"],
+ a:1,
+ e:"PRP（Pre-requisite Programs）はHACCPの効果的運用のための前提条件。PRPなしのHACCPは機能しない。",
+ p:"🏛️ PRP=HACCP機能の前提条件（土台）"},
+
+{c:"🎓総合",t:false,
+ q:"食品安全の責任を最も適切に表しているのは？",
+ o:["本社が全責任を負う","管理職のみの責任","全従業員が責任を負い管理職が安全文化を醸成","保健所の責任"],
+ a:2,
+ e:"食品安全は全従業員の責任。管理職は教育と模範を通して安全文化を醸成する重要な役割を担う。",
+ p:"👥 食品安全=全員の責任＋管理職が文化醸成"},
+
+{c:"🎓総合",t:true,
+ q:"フードセーフティトレーニングLevel 2試験の目的として最も正確なのは？",
+ o:["全従業員の基礎知識確認","外部認証取得","製造担当者の技能評価","管理職とSUPの判断力と知識を確認"],
+ a:3,
+ e:"Level 2はマネージャー以上＋スーパーバイザー対象の試験。実務での判断力と専門知識を確認するため85点合格。",
+ p:"🎓 Level 2=管理職+SUPの判断力評価"},
+
+{c:"🎓総合",t:false,
+ q:"コストコでの食品安全の最終的なゴールとして正しいのは？",
+ o:["法令違反ゼロ","監査100点満点","メンバーへの安全な食品提供と信頼維持","従業員教育100%達成"],
+ a:2,
+ e:"食品安全の最終目的は、メンバー（顧客）に安全な食品を提供し信頼を維持すること。すべての基準・教育・記録はこの目的のため。",
+ p:"🎯 最終目的=メンバーへの安全提供＋信頼維持"}
+];
+// Preserve original Q array for full retry capability (deep copy of opts)
+const Q_ORIGINAL = Q.map(q=>({...q,o:q.o.slice()}));
+let cur=0,ans=new Array(Q.length).fill(null),done=new Array(Q.length).fill(false);
+let iteration=1; // 反復モード周回数
+const L=['A','B','C','D','E'];
+function confirmReset(){
+  if(confirm('試験を最初からやり直しますか？\n現在の進捗は失われます。')){
+    start();
+  }
+}
+function shuffleOptions(){
+  // Shuffle each question's options, updating answer index accordingly
+  for(let i=0;i<Q.length;i++){
+    const q=Q[i];
+    const correctOpt=q.o[q.a];
+    // Fisher-Yates shuffle
+    const indices=[0,1,2,3].slice(0,q.o.length);
+    for(let k=indices.length-1;k>0;k--){
+      const r=Math.floor(Math.random()*(k+1));
+      [indices[k],indices[r]]=[indices[r],indices[k]];
+    }
+    const newOpts=indices.map(idx=>q.o[idx]);
+    q.o=newOpts;
+    q.a=newOpts.indexOf(correctOpt);
+  }
+}
+function start(){
+  // Restore Q from original (in case retry-wrong was used)
+  Q.length=0;Q_ORIGINAL.forEach(q=>Q.push({...q,o:q.o.slice()}));
+  shuffleOptions();
+  // Reset answer state
+  ans=new Array(Q.length).fill(null);
+  done=new Array(Q.length).fill(false);
+  cur=0;
+  iteration=1; // 反復モードを最初から
+  // Reset UI state
+  document.getElementById('start').style.display='none';
+  document.getElementById('result').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  document.getElementById('pbi').style.width='1%';
+  const rwb=document.getElementById('rwb');if(rwb)rwb.style.display='inline-block';
+  load(0);
+}
+function load(i){
+  cur=i;const q=Q[i],tot=Q.length;
+  document.getElementById('qn').textContent=`問題 ${i+1} / ${tot}`;
+  document.getElementById('qcat').textContent=q.c;
+  document.getElementById('qt').textContent=q.q;
+  document.getElementById('pt').textContent=`${i+1} / ${tot}`;
+  document.getElementById('pbi').style.width=((i+1)/tot*100)+'%';
+  const tr=document.getElementById('trap');tr.className=q.t?'trap on':'trap';
+  const o=document.getElementById('opts');o.innerHTML='';
+  q.o.forEach((opt,j)=>{
+    const d=document.createElement('div');d.className='opt';
+    d.innerHTML=`<span class="ol">${L[j]}</span><span>${opt}</span>`;
+    d.onclick=()=>pick(j);o.appendChild(d);
+  });
+  const e=document.getElementById('exp');e.style.display='none';e.className='exp';
+  if(done[i])show(ans[i],q.a,q.e,q.p);
+  document.getElementById('pb').disabled=i===0;
+  const last=i===tot-1;
+  document.getElementById('nb').style.display=last?'none':'inline-block';
+  document.getElementById('sub').style.display=last?'inline-block':'none';
+}
+function pick(j){
+  if(done[cur])return;
+  ans[cur]=j;done[cur]=true;
+  show(j,Q[cur].a,Q[cur].e,Q[cur].p);
+}
+function show(sel,cor,et,pt){
+  const os=document.querySelectorAll('.opt');
+  os.forEach(o=>o.classList.add('dis'));
+  os[cor].classList.add('cor');
+  if(sel!==cor)os[sel].classList.add('wrg');else os[sel].classList.add('cor');
+  const e=document.getElementById('exp');e.style.display='block';
+  const ok=sel===cor;e.className='exp'+(ok?'':' we');
+  e.innerHTML=`<div class="et">${ok?'✓ 正解！':'✗ 不正解'}</div>${et}`+(pt?`<div class="ep">${pt}</div>`:'');
+}
+function next(){if(cur<Q.length-1)load(cur+1);}
+function prev(){if(cur>0)load(cur-1);}
+function submit(){
+  const tot=Q.length;let c=0,u=0;
+  Q.forEach((q,i)=>{if(ans[i]===null)u++;else if(ans[i]===q.a)c++;});
+  const w=tot-c-u;
+  
+  // 反復モード: 間違えた問題があれば自動で再出題
+  if(w>0||u>0){
+    iteration++;
+    setTimeout(()=>{
+      alert(`📝 反復モード ${iteration}周目\n間違えた${w+u}問を再出題！\n正解するまで何度でも挑戦しよう。`);
+      retryWrongAuto();
+    },300);
+    return;
+  }
+  
+  // 全問正解 - 最終結果表示
+  document.getElementById('quiz').style.display='none';
+  document.getElementById('result').style.display='block';
+  document.getElementById('pbi').style.width='100%';
+  document.getElementById('pt').textContent=`${tot} / ${tot}`;
+  document.getElementById('sp').textContent=100;
+  document.getElementById('rc').textContent=c;
+  document.getElementById('rw').textContent=0;
+  document.getElementById('ru').textContent=0;
+  document.getElementById('rtt').textContent=`🎉 全問正解達成！`;
+  document.getElementById('rtt').style.color='var(--correct)';
+  document.getElementById('rm').textContent=`${iteration}周目で全60問マスター完了！\n暗記マスターおめでとう！🎓`;
+  setTimeout(()=>{const a=document.getElementById('arc');a.style.transition='stroke-dashoffset 1.5s ease';a.style.strokeDashoffset=0;a.style.stroke='var(--correct)';},100);
+}
+function review(){
+  const s=document.getElementById('rvs');
+  // Toggle visibility
+  const isHidden = (s.style.display==='none' || s.style.display==='');
+  if(!isHidden){
+    s.style.display='none';
+    return;
+  }
+  s.style.display='block';
+  // Always rebuild content (avoid stale state)
+  let h='<div class="rvt">解答レビュー — 全問</div>';
+  Q.forEach((q,i)=>{
+    const ok=ans[i]===q.a,cl=ok?'rc':'rw';
+    const at=ans[i]===null?'未回答':`${L[ans[i]]}. ${q.o[ans[i]]}`;
+    const pp=q.p?`<div style="margin-top:6px;padding:6px 10px;background:rgba(251,191,36,.08);border-left:3px solid var(--gold);border-radius:4px;font-size:.78rem;color:var(--gold)">${q.p}</div>`:'';
+    h+=`<div class="rvi ${cl}"><div style="font-size:.72rem;margin-bottom:7px;color:var(--accent);font-family:'Syne',sans-serif">${i+1}問目 — ${q.c}${q.t?' ⚠':''}</div><div class="rvq">${q.q}</div><div><div class="ral">あなたの回答</div><div class="${ok?'rac':'raw'}" style="font-size:.85rem">${at}</div>${!ok?`<div class="ral" style="margin-top:7px">正解</div><div class="rac" style="font-size:.85rem">${L[q.a]}. ${q.o[q.a]}</div>`:''}<div class="ral" style="margin-top:7px">解説</div><div style="opacity:.8;font-size:.82rem;line-height:1.7">${q.e}</div>${pp}</div></div>`;
+  });
+  s.innerHTML=h;
+}
+function retry(){
+  // Restore original Q with fresh option arrays, then shuffle
+  Q.length=0;Q_ORIGINAL.forEach(q=>Q.push({...q,o:q.o.slice()}));
+  shuffleOptions();
+  ans=new Array(Q.length).fill(null);done=new Array(Q.length).fill(false);
+  document.getElementById('result').style.display='none';
+  document.getElementById('arc').style.strokeDashoffset=534;
+  document.getElementById('rvs').style.display='none';document.getElementById('rvs').innerHTML='';
+  const rwb=document.getElementById('rwb');if(rwb)rwb.style.display='inline-block';
+  document.getElementById('quiz').style.display='block';
+  document.getElementById('pbi').style.width='1%';load(0);
+}
+
+function retryWrongAuto(){
+  // Auto retry with only wrong questions (no user click needed)
+  const wrong=[];
+  for(let i=0;i<Q.length;i++){
+    if(ans[i]===null||ans[i]!==Q[i].a){
+      wrong.push(Q[i]);
+    }
+  }
+  if(wrong.length===0){return;}
+  Q.length=0;wrong.forEach(q=>Q.push(q));
+  // Re-shuffle options for these
+  for(let i=0;i<Q.length;i++){
+    const q=Q[i];
+    const correctOpt=q.o[q.a];
+    const indices=[0,1,2,3].slice(0,q.o.length);
+    for(let k=indices.length-1;k>0;k--){
+      const r=Math.floor(Math.random()*(k+1));
+      [indices[k],indices[r]]=[indices[r],indices[k]];
+    }
+    const newOpts=indices.map(idx=>q.o[idx]);
+    q.o=newOpts;
+    q.a=newOpts.indexOf(correctOpt);
+  }
+  ans=new Array(Q.length).fill(null);done=new Array(Q.length).fill(false);
+  cur=0;
+  document.getElementById('result').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  document.getElementById('pbi').style.width='1%';
+  load(0);
+}
+
+function retryWrong(){
+  // Filter Q to only wrong (or unanswered) questions
+  const wrong=[];
+  for(let i=0;i<Q.length;i++){
+    if(ans[i]===null||ans[i]!==Q[i].a){
+      wrong.push(Q[i]);
+    }
+  }
+  if(wrong.length===0){
+    alert('全問正解です！🎉');
+    return;
+  }
+  // Replace Q with wrong questions only
+  Q.length=0;wrong.forEach(q=>Q.push(q));
+  ans=new Array(Q.length).fill(null);done=new Array(Q.length).fill(false);
+  document.getElementById('result').style.display='none';
+  document.getElementById('arc').style.strokeDashoffset=534;
+  document.getElementById('rvs').style.display='none';document.getElementById('rvs').innerHTML='';
+  document.getElementById('quiz').style.display='block';
+  document.getElementById('pbi').style.width='1%';load(0);
+}
+</script>
+</body>
+</html>

@@ -627,8 +627,16 @@ function start(){
   // Restore Q from original (in case retry-wrong was used)
   Q.length=0;Q_ORIGINAL.forEach(q=>Q.push({...q,o:q.o.slice()}));
   shuffleOptions();
+  // Reset answer state
+  ans=new Array(Q.length).fill(null);
+  done=new Array(Q.length).fill(false);
+  cur=0;
+  // Reset UI state
   document.getElementById('start').style.display='none';
+  document.getElementById('result').style.display='none';
   document.getElementById('quiz').style.display='block';
+  document.getElementById('pbi').style.width='1%';
+  const rwb=document.getElementById('rwb');if(rwb)rwb.style.display='inline-block';
   load(0);
 }
 function load(i){

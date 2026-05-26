@@ -149,6 +149,10 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-seri
     <button class="nb p" id="nb" onclick="next()">次へ ▶</button>
     <button class="nb p" id="sub" onclick="submit()" style="display:none">結果を見る</button>
   </div>
+  <div style="display:flex;gap:10px;margin-top:14px;justify-content:center;flex-wrap:wrap">
+    <button class="nb s" onclick="confirmReset()" style="font-size:.78rem;padding:8px 18px;opacity:.7">🔄 最初からやり直す</button>
+    <a class="nb s" href="./index.html" style="font-size:.78rem;padding:8px 18px;opacity:.7;text-decoration:none;display:inline-block">📋 メニューに戻る</a>
+  </div>
 </div>
 <div id="result">
   <div class="sr">
@@ -594,11 +598,39 @@ const Q=[
  e:"食品を取り扱う企業ならびにその企業で働く従業員は、食品が安全に飲食されるよう保持するための法的・道徳的・経済的な責任を負っています。レジ担当も含む全員が関係者です（Level 2 第1節）。",
  p:"👥 食品安全は全従業員の責任（法的・道徳的・経済的）"}
 ];
-// Preserve original Q array for full retry capability
-const Q_ORIGINAL = Q.slice();
+// Preserve original Q array for full retry capability (deep copy of opts)
+const Q_ORIGINAL = Q.map(q=>({...q,o:q.o.slice()}));
 let cur=0,ans=new Array(Q.length).fill(null),done=new Array(Q.length).fill(false);
 const L=['A','B','C','D','E'];
-function start(){document.getElementById('start').style.display='none';document.getElementById('quiz').style.display='block';load(0);}
+function confirmReset(){
+  if(confirm('試験を最初からやり直しますか？\n現在の進捗は失われます。')){
+    start();
+  }
+}
+function shuffleOptions(){
+  // Shuffle each question's options, updating answer index accordingly
+  for(let i=0;i<Q.length;i++){
+    const q=Q[i];
+    const correctOpt=q.o[q.a];
+    // Fisher-Yates shuffle
+    const indices=[0,1,2,3].slice(0,q.o.length);
+    for(let k=indices.length-1;k>0;k--){
+      const r=Math.floor(Math.random()*(k+1));
+      [indices[k],indices[r]]=[indices[r],indices[k]];
+    }
+    const newOpts=indices.map(idx=>q.o[idx]);
+    q.o=newOpts;
+    q.a=newOpts.indexOf(correctOpt);
+  }
+}
+function start(){
+  // Restore Q from original (in case retry-wrong was used)
+  Q.length=0;Q_ORIGINAL.forEach(q=>Q.push({...q,o:q.o.slice()}));
+  shuffleOptions();
+  document.getElementById('start').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  load(0);
+}
 function load(i){
   cur=i;const q=Q[i],tot=Q.length;
   document.getElementById('qn').textContent=`問題 ${i+1} / ${tot}`;
@@ -674,13 +706,13 @@ function review(){
   s.innerHTML=h;
 }
 function retry(){
-  // Restore original Q if previously filtered
-  Q.length=0;Q_ORIGINAL.forEach(q=>Q.push(q));
+  // Restore original Q with fresh option arrays, then shuffle
+  Q.length=0;Q_ORIGINAL.forEach(q=>Q.push({...q,o:q.o.slice()}));
+  shuffleOptions();
   ans=new Array(Q.length).fill(null);done=new Array(Q.length).fill(false);
   document.getElementById('result').style.display='none';
   document.getElementById('arc').style.strokeDashoffset=534;
   document.getElementById('rvs').style.display='none';document.getElementById('rvs').innerHTML='';
-  // Show the retry-wrong button again (will be hidden if no wrong answers)
   const rwb=document.getElementById('rwb');if(rwb)rwb.style.display='inline-block';
   document.getElementById('quiz').style.display='block';
   document.getElementById('pbi').style.width='1%';load(0);
